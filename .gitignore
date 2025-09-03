@@ -1,0 +1,30 @@
+# === Terraform ===
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform/
+.terraform.lock.hcl
+
+# Plans locaux
+*.plan
+
+# Variables sensibles (ne pas commit les tfvars avec secrets)
+*.tfvars
+*.tfvars.json
+
+# === Logs & OS ===
+*.log
+.DS_Store
+Thumbs.db
+
+# === VS Code ===
+.vscode/
+.history/
+
+
+.idea/
