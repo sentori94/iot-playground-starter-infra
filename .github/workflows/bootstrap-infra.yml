@@ -1,0 +1,168 @@
+# .github/workflows/bootstrap-infra.yml
+name: bootstrap-infra
+on:
+  workflow_dispatch:
+    inputs:
+      MODE:
+        description: "Action Terraform à exécuter"
+        type: choice
+        required: true
+        default: plan
+        options: [plan, apply]
+      STATE_BUCKET_NAME:
+        description: "Nom unique du bucket S3 pour le state"
+        required: true
+      RDS_IDENTIFIER:
+        description: "Identifiant RDS (existant ou à créer)"
+        required: false
+        default: "iot-sensors-db"
+
+env:
+  AWS_REGION: eu-west-3
+  ECR_REPOS: "api-sensors simulator frontend"
+
+jobs:
+  backend:
+    name: 1) Backend (S3 + DynamoDB)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: terraform init (local state)
+        working-directory: infra/global/backend
+        run: terraform init -input=false
+
+      - name: terraform plan (backend)
+        if: ${{ github.event.inputs.MODE == 'plan' }}
+        working-directory: infra/global/backend
+        run: terraform plan -input=false -no-color -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}"
+
+      - name: terraform apply (backend)
+        if: ${{ github.event.inputs.MODE == 'apply' }}
+        working-directory: infra/global/backend
+        run: terraform apply -auto-approve -input=false -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}"
+
+      - name: Inject backend bucket in providers.tf
+        # on écrit le bucket même en mode plan pour que les jobs suivants puissent init
+        run: sed -i "s|<STATE_BUCKET_NAME>|${{ github.event.inputs.STATE_BUCKET_NAME }}|g" infra/envs/dev/providers.tf
+
+  ecr:
+    name: 2) ECR (create/import + plan/apply)
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: terraform init
+        working-directory: infra/envs/dev/ecr
+        run: terraform init -input=false
+
+      - name: try import existing repos (ignore errors)
+        working-directory: infra/envs/dev/ecr
+        run: |
+          set +e
+          for r in $ECR_REPOS; do
+            terraform import "aws_ecr_repository.repos[\"$r\"]" "$r" || true
+          done
+          set -e
+
+      - name: terraform plan (ecr)
+        if: ${{ github.event.inputs.MODE == 'plan' }}
+        working-directory: infra/envs/dev/ecr
+        run: terraform plan -input=false -no-color
+
+      - name: terraform apply (ecr)
+        if: ${{ github.event.inputs.MODE == 'apply' }}
+        working-directory: infra/envs/dev/ecr
+        run: terraform apply -auto-approve -input=false
+
+  rds:
+    name: 3) RDS (create/import + plan/apply)
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: write dev.auto.tfvars (subnets/SG depuis secrets)
+        working-directory: infra/envs/dev/rds
+        run: |
+          cat > dev.auto.tfvars <<EOF
+          db_identifier          = "${{ github.event.inputs.RDS_IDENTIFIER }}"
+          db_name                = "${{ secrets.DB_NAME       || 'postgres' }}"
+          db_username            = "${{ secrets.DB_USERNAME   || 'postgres' }}"
+          subnet_ids             = [${{ secrets.RDS_SUBNET_IDS }}]
+          vpc_security_group_ids = [${{ secrets.RDS_SG_IDS }}]
+          EOF
+          cat dev.auto.tfvars
+
+      - name: put DB password in SSM (if provided)
+        if: ${{ secrets.DB_PASSWORD != '' }}
+        run: |
+          aws ssm put-parameter \
+            --name "/iot/dev/db/password" \
+            --type "SecureString" \
+            --value "${{ secrets.DB_PASSWORD }}" \
+            --overwrite
+
+      - name: terraform init
+        working-directory: infra/envs/dev/rds
+        run: terraform init -input=false
+
+      - name: try import existing DB (ignore errors)
+        working-directory: infra/envs/dev/rds
+        run: terraform import aws_db_instance.postgres "${{ github.event.inputs.RDS_IDENTIFIER }}" || true
+
+      - name: terraform plan (rds)
+        if: ${{ github.event.inputs.MODE == 'plan' }}
+        working-directory: infra/envs/dev/rds
+        run: terraform plan -input=false -no-color
+
+      - name: terraform apply (rds)
+        if: ${{ github.event.inputs.MODE == 'apply' }}
+        working-directory: infra/envs/dev/rds
+        run: terraform apply -auto-approve -input=false
+
+  eks_addons:
+    name: 4) EKS add-ons (ALB Controller)
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: terraform init
+        working-directory: infra/envs/dev/eks
+        run: terraform init -input=false
+
+      - name: terraform plan (eks addons)
+        if: ${{ github.event.inputs.MODE == 'plan' }}
+        working-directory: infra/envs/dev/eks
+        run: terraform plan -input=false -no-color
+
+      - name: terraform apply (eks addons)
+        if: ${{ github.event.inputs.MODE == 'apply' }}
+        working-directory: infra/envs/dev/eks
+        run: terraform apply -auto-approve -input=false
