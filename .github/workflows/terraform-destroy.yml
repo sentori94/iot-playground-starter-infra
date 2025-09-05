@@ -1,0 +1,101 @@
+name: "Terraform Destroy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      CONFIRM:
+        description: "Tapez EXACTEMENT: DESTROY-MY-INFRA"
+        required: true
+        default: "type here"
+      STATE_BUCKET_NAME:
+        description: "Nom du bucket S3 du backend (ex: iot-playground-tfstate-walid)"
+        required: true
+
+env:
+  AWS_REGION: eu-west-3
+  DDB_LOCK_TABLE: terraform-locks
+  STATE_KEY: envs/dev/terraform.tfstate
+
+jobs:
+  destroy-infra:
+    name: "Destroy Infra (Terraform)"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Fail if backend bucket missing (safety)
+        run: |
+          aws s3api head-bucket --bucket "${{ github.event.inputs.STATE_BUCKET_NAME }}" >/dev/null 2>&1 \
+            || { echo "Backend bucket not found"; exit 1; }
+
+      - name: Terraform init (S3 backend)
+        working-directory: infra/envs/dev
+        run: |
+          terraform init -input=false \
+            -backend-config="bucket=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
+            -backend-config="key=${{ env.STATE_KEY }}" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ env.DDB_LOCK_TABLE }}" \
+            -backend-config="encrypt=true"
+
+      # Terraform demande toujours les variables déclarées ; on passe les secrets même pour destroy
+      - name: Terraform destroy
+        working-directory: infra/envs/dev
+        run: |
+          terraform destroy -auto-approve -input=false \
+            -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
+            -var="db_username=${{ secrets.DB_USERNAME }}" \
+            -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+  teardown-backend:
+    name: "Teardown Backend (S3 + DynamoDB)"
+    runs-on: ubuntu-latest
+    needs: destroy-infra
+    if: ${{ needs.destroy-infra.result == 'success' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' }}
+    steps:
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Delete state object(s) from S3 (idempotent)
+        run: |
+          BUCKET="${{ github.event.inputs.STATE_BUCKET_NAME }}"
+          KEY="${{ env.STATE_KEY }}"
+          # Supprime la clé de state et d’éventuelles versions/locks
+          aws s3 rm "s3://$BUCKET/$KEY" --recursive || true
+          # Si le bucket est versionné, on purge tout
+          aws s3api list-object-versions --bucket "$BUCKET" --query 'Versions[].{K:Key,V:VersionId}' --output text 2>/dev/null | \
+          awk '{print $1,$2}' | while read -r k v; do
+            aws s3api delete-object --bucket "$BUCKET" --key "$k" --version-id "$v" || true
+          done
+          aws s3api list-object-versions --bucket "$BUCKET" --query 'DeleteMarkers[].{K:Key,V:VersionId}' --output text 2>/dev/null | \
+          awk '{print $1,$2}' | while read -r k v; do
+            aws s3api delete-object --bucket "$BUCKET" --key "$k" --version-id "$v" || true
+          done
+
+      - name: Delete S3 bucket (idempotent)
+        run: |
+          BUCKET="${{ github.event.inputs.STATE_BUCKET_NAME }}"
+          # s3 rm récursif (au cas où) puis delete-bucket
+          aws s3 rm "s3://$BUCKET" --recursive || true
+          aws s3api delete-bucket --bucket "$BUCKET" || true
+
+      - name: Delete DynamoDB lock table (idempotent)
+        run: |
+          TABLE="${{ env.DDB_LOCK_TABLE }}"
+          aws dynamodb describe-table --table-name "$TABLE" >/dev/null 2>&1 || exit 0
+          aws dynamodb delete-table --table-name "$TABLE"

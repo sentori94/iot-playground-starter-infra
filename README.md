@@ -1,36 +1,25 @@
-# iot-playground-starter-infra (Terraform) – Version *Access Keys* (sans OIDC)
+# iot-playground-starter-infra (Minimal)
 
-Infra pour **ECR + EKS + RDS** avec backend S3/DynamoDB. Authentification CI/CD via
-**clés IAM** stockées comme secrets GitHub (plus simple que l’OIDC).
+## Contenu
+- **infra/envs/dev/** : crée VPC + 2 subnets privés + SG + RDS + ECR (1 seul repo backend).
+- **.github/workflows/bootstrap.yml** : pipeline GitHub Actions avec `plan` ou `apply`.
 
-## Secrets GitHub à créer
-Dans chacun des repos concernés (code et/ou infra) :
+## Secrets GitHub nécessaires
+À mettre dans **Settings > Secrets and variables > Actions** du repo :
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_REGION` = `eu-west-3`
+- `DB_USERNAME` (ex: postgres)
+- `DB_PASSWORD` (ton mot de passe choisi)
 
-Crée deux IAM Users si possible:
-- `ci-ecr` (permissions ECR push/pull)
-- `tf-infra` (permissions S3 backend + DynamoDB lock + Describe + EKS Describe + SSM GetParameter)
+## Paramètres à donner lors du lancement du workflow
+- `MODE` : `plan` (voir diff) ou `apply` (créer/modifier).
+- `STATE_BUCKET_NAME` : un nom **unique** pour le bucket S3 du state (ex: `iot-playground-tfstate-walid`).
 
-## Ordre conseillé
-1. `infra/global/backend/` : crée le bucket S3 et la table DynamoDB (state/lock)
-2. `infra/envs/dev/ecr/` : crée/import ECR (`api-sensors`, `simulator`, `frontend`)
-3. `infra/envs/dev/rds/` : crée/import RDS + SubnetGroup + SG
-4. `infra/envs/dev/eks/` : data sources EKS + add-ons (ALB Controller)
-5. `infra/envs/dev/apps/` : déploiements Helm (consomme ECR)
-
-## Placeholders à remplacer
-- `<STATE_BUCKET_NAME>` : nom unique du bucket S3 pour le state
-- `<ACCOUNT_ID>` : ID de ton compte AWS
-
-## Imports utiles (exemples)
-```bash
-# ECR
-terraform import 'aws_ecr_repository.repos["api-sensors"]' api-sensors
-terraform import 'aws_ecr_repository.repos["simulator"]'  simulator
-terraform import 'aws_ecr_repository.repos["frontend"]'   frontend
-
-# RDS
-terraform import aws_db_instance.postgres iot-sensors-db
-```
+## Résultat attendu
+Après un `apply` réussi :
+- 1 VPC `10.30.0.0/16`
+- 2 subnets privés (eu-west-3a, eu-west-3b)
+- 1 Security Group RDS (5432 ouvert au VPC)
+- 1 base PostgreSQL RDS (db.t3.micro)
+- 1 repo ECR `iot-backend`
