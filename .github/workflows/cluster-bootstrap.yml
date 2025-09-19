@@ -1,0 +1,65 @@
+name: Cluster Bootstrap (ALB)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  alb:
+    runs-on: ubuntu-latest
+    env:
+      CLUSTER: iot-playground-starter
+      REGION: eu-west-3
+      POLICY_NAME: AWSLoadBalancerControllerIAMPolicy
+      ROLE_NAME: AmazonEKSLoadBalancerControllerRole
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/<RolePourGitHub>
+          aws-region: ${{ env.REGION }}
+
+      - uses: azure/setup-kubectl@v4
+        with: { version: 'latest' }
+
+      - uses: azure/setup-helm@v4
+        with: { version: 'latest' }
+
+      - name: Install ALB Controller
+        run: |
+          aws eks update-kubeconfig --name "$CLUSTER" --region "$REGION"
+          curl -sSL -o alb-iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+          aws iam create-policy --policy-name "$POLICY_NAME" --policy-document file://alb-iam-policy.json >/dev/null || true
+          OIDC_ISSUER=$(aws eks describe-cluster --name "$CLUSTER" --region "$REGION" --query "cluster.identity.oidc.issuer" --output text)
+          OIDC_PROVIDER_ARN="arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):oidc-provider/${OIDC_ISSUER#https://}"
+          cat > trust.json <<EOF
+          {
+            "Version": "2012-10-17",
+            "Statement": [{
+              "Effect": "Allow",
+              "Principal": { "Federated": "$OIDC_PROVIDER_ARN" },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "${OIDC_ISSUER#https://}:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller"
+                }
+              }
+            }]
+          }
+          EOF
+          aws iam create-role --role-name "$ROLE_NAME" --assume-role-policy-document file://trust.json >/dev/null || true
+          POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].Arn | [0]" --output text)
+          aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN" || true
+          helm repo add eks https://aws.github.io/eks-charts
+          helm repo update
+          helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-controller \
+            -n kube-system \
+            --set clusterName="$CLUSTER" \
+            --set serviceAccount.create=true \
+            --set serviceAccount.name=aws-load-balancer-controller \
+            --set "serviceAccount.annotations.eks\.amazonaws\.com/role-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):role/$ROLE_NAME"

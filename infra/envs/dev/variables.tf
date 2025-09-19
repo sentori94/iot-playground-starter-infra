@@ -15,3 +15,18 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+
+variable "aws_region" {
+    type = string
+    default = "eu-west-3"
+}
+
+variable "cluster_name"  {
+    type = string
+    default = "iot-playground-starter"
+}
+
+variable "eks_version" {
+    type = string
+    default = "1.30"
+}

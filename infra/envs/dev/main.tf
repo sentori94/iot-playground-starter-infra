@@ -17,14 +17,14 @@ resource "aws_subnet" "private_a" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = "10.30.1.0/24"
   availability_zone = "eu-west-3a"
-  tags = { Name = "iot-subnet-a" }
+  tags = { Name = "iot-subnet-a", "kubernetes.io/role/internal-elb" = "1" }
 }
 
 resource "aws_subnet" "private_b" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = "10.30.2.0/24"
   availability_zone = "eu-west-3b"
-  tags = { Name = "iot-subnet-b" }
+  tags = { Name = "iot-subnet-b", "kubernetes.io/role/internal-elb" = "1" }
 }
 
 # ECR unique
@@ -73,9 +73,40 @@ resource "aws_db_instance" "postgres" {
   db_subnet_group_name       = aws_db_subnet_group.this.name
   vpc_security_group_ids     = [aws_security_group.rds.id]
   deletion_protection        = false
-  publicly_accessible        = false
+      publicly_accessible        = false
   multi_az                   = false
   backup_retention_period    = 1
   auto_minor_version_upgrade = true
   tags = { Project = "iot-playground-starter", Env = "dev" }
+}
+
+# --- EKS via module (le VPC reste en resources chez toi) ---
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.8"
+
+  cluster_name                    = var.cluster_name
+  cluster_version                 = var.eks_version
+  vpc_id                          = aws_vpc.this.id
+
+  subnet_ids = [
+    aws_subnet.private_a.id,
+    aws_subnet.private_b.id
+  ]
+
+  enable_irsa = true  # OIDC prêt pour les add-ons AWS
+
+  eks_managed_node_groups = {
+    default = {
+      min_size       = 1
+      desired_size   = 2
+      max_size       = 3
+      instance_types = ["t3.medium"]
+      capacity_type  = "ON_DEMAND" # ou "SPOT" si tu veux optimiser le coût
+      subnets        = [
+        aws_subnet.private_a.id,
+        aws_subnet.private_b.id
+      ]
+    }
+  }
 }
