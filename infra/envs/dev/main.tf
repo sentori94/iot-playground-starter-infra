@@ -165,6 +165,34 @@ resource "aws_security_group" "svc" {
   }
 }
 
+# --- NAT ---
+resource "aws_eip" "nat" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "this" {
+  subnet_id     = aws_subnet.public_a.id
+  allocation_id = aws_eip.nat.id
+  tags = { Name = "nat-gw" }
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.this.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.this.id
+  }
+}
+
+resource "aws_route_table_association" "priv_a" {
+  subnet_id      = aws_subnet.private_a.id
+  route_table_id = aws_route_table.private.id
+}
+resource "aws_route_table_association" "priv_b" {
+  subnet_id      = aws_subnet.private_b.id
+  route_table_id = aws_route_table.private.id
+}
+
 # --- Logs ---
 resource "aws_cloudwatch_log_group" "app" {
   name              = "/ecs/${var.app_name}"
@@ -259,6 +287,14 @@ resource "aws_ecs_task_definition" "app" {
         }
       }
       environment = []
+
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
     }
   ])
 }
@@ -271,9 +307,9 @@ resource "aws_ecs_service" "app" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+    subnets          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
     security_groups  = [aws_security_group.svc.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   load_balancer {
@@ -290,6 +326,6 @@ resource "aws_ecs_service" "app" {
   #}
 
   health_check_grace_period_seconds = 90
-  depends_on = [aws_lb_listener.http]
+  #depends_on = [aws_lb_listener.http]
 }
 

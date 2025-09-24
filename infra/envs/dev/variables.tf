@@ -36,5 +36,5 @@ variable "public_subnets" { type = list(string) }
 variable "private_subnets" { type = list(string) }
 variable "image_url" { default = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/iot-playground-starter:latest" } # ex : <acct>.908518190934.dkr.ecr.eu-west-3.amazonaws.com/iot-backend:latest
 variable "container_port" { default = 8080 }
-variable "desired_count" { default = 1 }
+variable "desired_count" { default = 2 }
 variable "health_path" { default = "/actuator/health" }
