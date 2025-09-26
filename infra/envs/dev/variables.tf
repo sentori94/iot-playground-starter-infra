@@ -11,11 +11,6 @@ variable "db_username" {
   type = string
 }
 
-variable "db_password" {
-  type      = string
-  sensitive = true
-}
-
 variable "aws_region" {
   type    = string
   default = "eu-west-3"
@@ -29,6 +24,10 @@ variable "cluster_name" {
 variable "eks_version" {
   type    = string
   default = "1.30"
+}
+
+variable "project" {
+  default = "iot-playground-starter"
 }
 
 variable "app_name" { default = "spring-app" }

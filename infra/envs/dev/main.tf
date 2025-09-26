@@ -12,6 +12,11 @@ locals {
   vpc_id          = aws_vpc.this.id
 }
 
+resource "random_password" "db" {
+  length  = 24
+  special = true
+}
+
 # VPC & subnets
 resource "aws_vpc" "this" {
   cidr_block           = "10.30.0.0/16"
@@ -118,7 +123,7 @@ resource "aws_db_instance" "postgres" {
   allocated_storage          = 20
   db_name                    = var.db_name
   username                   = var.db_username
-  password                   = var.db_password
+  password                   = random_password.db.result
   skip_final_snapshot        = true
   db_subnet_group_name       = aws_db_subnet_group.this.name
   vpc_security_group_ids     = [aws_security_group.rds.id]
@@ -128,6 +133,25 @@ resource "aws_db_instance" "postgres" {
   backup_retention_period    = 1
   auto_minor_version_upgrade = true
   tags                       = { Project = "iot-playground-starter", Env = "dev" }
+}
+
+
+# --- Secret Manager ---
+resource "aws_secretsmanager_secret" "db" {
+  name = "${var.project}-rds-credentials"
+}
+
+resource "aws_secretsmanager_secret_version" "db" {
+  secret_id     = aws_secretsmanager_secret.db.id
+  secret_string = jsonencode({
+    username = var.db_username
+    password = random_password.db.result
+    host     = aws_db_instance.postgres.address
+    port     = aws_db_instance.postgres.port
+    dbname   = var.db_name
+    engine   = "postgres"
+    url      = "jdbc:postgresql://${aws_db_instance.postgres.address}:${aws_db_instance.postgres.port}/${var.db_name}"
+  })
 }
 
 # --- Security Groups ---
@@ -219,6 +243,24 @@ resource "aws_iam_role_policy_attachment" "exec_attach" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role_policy" "exec_secrets" {
+  name = "${var.app_name}-exec-secrets"
+  role = aws_iam_role.exec.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = aws_secretsmanager_secret.db.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "task" {
   name               = "${var.app_name}-task-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -287,6 +329,23 @@ resource "aws_ecs_task_definition" "app" {
         }
       }
       environment = []
+
+
+      # secrets injectés depuis AWS Secrets Manager
+      secrets = [
+        {
+          name      = "SPRING_DATASOURCE_URL"
+          valueFrom = "${aws_secretsmanager_secret.db.arn}:url::"
+        },
+        {
+          name      = "SPRING_DATASOURCE_USERNAME"
+          valueFrom = "${aws_secretsmanager_secret.db.arn}:username::"
+        },
+        {
+          name      = "SPRING_DATASOURCE_PASSWORD"
+          valueFrom = "${aws_secretsmanager_secret.db.arn}:password::"
+        }
+      ]
 
       healthCheck = {
         command     = ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
