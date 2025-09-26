@@ -63,13 +63,25 @@ resource "aws_ecr_repository" "backend" {
 
 # SG RDS
 resource "aws_security_group" "rds" {
+  #name   = "rds-sg"
   vpc_id = local.vpc_id
+
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.this.cidr_block]
+    description       = "Postgres depuis ECS"
+    from_port         = 5432
+    to_port           = 5432
+    protocol          = "tcp"
+    security_groups   = [aws_security_group.svc.id]
   }
+
+  ingress {
+    description     = "Postgres depuis Bastion"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -238,6 +250,7 @@ resource "aws_iam_role" "exec" {
   name               = "${var.app_name}-exec-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
 }
+
 resource "aws_iam_role_policy_attachment" "exec_attach" {
   role       = aws_iam_role.exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
@@ -388,3 +401,42 @@ resource "aws_ecs_service" "app" {
   #depends_on = [aws_lb_listener.http]
 }
 
+# --- Bastion RDS ---
+data "aws_ami" "ubuntu22" {
+  most_recent = true
+  owners      = ["099720109477"]  # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+}
+
+resource "aws_instance" "bastion" {
+  ami           = data.aws_ami.ubuntu22.id
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.public_a.id
+  vpc_security_group_ids = [aws_security_group.bastion.id]
+
+  key_name = "manually_generated_key_bastion"
+}
+
+resource "aws_security_group" "bastion" {
+  name   = "bastion-sg"
+  vpc_id = aws_vpc.this.id
+
+  ingress {
+    description = "SSH from my IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip] # ex: "X.X.X.X/32"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

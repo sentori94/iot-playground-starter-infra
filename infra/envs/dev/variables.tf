@@ -30,6 +30,15 @@ variable "project" {
   default = "iot-playground-starter"
 }
 
+
+variable "my_ip" {
+  default = "90.7.211.200/32"
+}
+
+variable "ssh_key_name" {
+  default = "rds_bastion_ssh_key"
+}
+
 variable "app_name" { default = "spring-app" }
 variable "public_subnets" { type = list(string) }
 variable "private_subnets" { type = list(string) }
