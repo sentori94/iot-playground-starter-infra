@@ -421,6 +421,11 @@ resource "aws_instance" "bastion" {
   key_name = "manually_generated_key_bastion"
 }
 
+resource "aws_eip_association" "bastion" {
+  instance_id   = aws_instance.bastion.id
+  allocation_id = "eipalloc-04626558c8f4ed68d"
+}
+
 resource "aws_security_group" "bastion" {
   name   = "bastion-sg"
   vpc_id = aws_vpc.this.id
