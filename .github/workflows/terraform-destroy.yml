@@ -1,6 +1,8 @@
 name: "Terraform Destroy"
 
 on:
+  schedule:
+    - cron: "30 0 * * *"   # Tous les jours à 00h30 UTC
   workflow_dispatch:
     inputs:
       CONFIRM:
@@ -9,6 +11,7 @@ on:
         default: "type here"
       STATE_BUCKET_NAME:
         description: "Nom du bucket S3 du backend (ex: iot-playground-tfstate-walid)"
+        default: "iot-playground-tfstate"
         required: true
 
 env:
@@ -20,7 +23,7 @@ jobs:
   destroy-infra:
     name: "Destroy Infra (Terraform)"
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' || github.event_name == 'schedule' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -55,8 +58,7 @@ jobs:
         run: |
           terraform destroy -auto-approve -input=false \
             -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
-            -var="db_username=${{ secrets.DB_USERNAME }}" \
-            -var="db_password=${{ secrets.DB_PASSWORD }}"
+            -var="db_username=${{ secrets.DB_USERNAME }}"
 
   teardown-backend:
     name: "Teardown Backend (S3 + DynamoDB)"
