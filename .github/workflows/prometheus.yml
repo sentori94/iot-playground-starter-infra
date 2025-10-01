@@ -1,0 +1,42 @@
+name: Build & Push Prometheus Image
+
+on:
+  workflow_dispatch:    # tu peux aussi mettre "push" si tu veux automatiser à chaque commit
+  push:
+    paths:
+      - 'docker/prometheus/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3  # adapte à ta région
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Docker image to ECR
+        run: |
+          IMAGE_NAME=prometheus
+          IMAGE_TAG=latest
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          ECR_URI=$ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$IMAGE_NAME
+
+          # Build
+          docker build -t $IMAGE_NAME:custom ./infra/docker/prometheus
+
+          # Tag
+          docker tag $IMAGE_NAME:custom $ECR_URI:$IMAGE_TAG
+
+          # Push
+          docker push $ECR_URI:$IMAGE_TAG

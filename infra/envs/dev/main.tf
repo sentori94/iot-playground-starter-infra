@@ -54,12 +54,12 @@ resource "aws_subnet" "private_b" {
 }
 
 # ECR unique
-resource "aws_ecr_repository" "backend" {
-  name                 = "iot-backend"
-  image_tag_mutability = "IMMUTABLE"
-  image_scanning_configuration { scan_on_push = true }
-  tags = { Project = "iot-playground-starter", Env = "dev" }
-}
+#resource "aws_ecr_repository" "backend" {
+  #name                 = "iot-backend"
+  #image_tag_mutability = "IMMUTABLE"
+  #image_scanning_configuration { scan_on_push = true }
+  #tags = { Project = "iot-playground-starter", Env = "dev" }
+#}
 
 # SG RDS
 resource "aws_security_group" "rds" {
@@ -443,5 +443,123 @@ resource "aws_security_group" "bastion" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# --- Prometheus ---
+data "aws_s3_bucket" "prometheus_config" {
+  bucket = var.s3_bucket_name
+}
+
+resource "aws_iam_role_policy" "prometheus_s3_access" {
+  role = aws_iam_role.exec.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = ["s3:GetObject"],
+        Resource = "arn:aws:s3:::${var.s3_bucket_name}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_security_group" "prometheus" {
+  vpc_id = aws_vpc.this.id
+
+  ingress {
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lb_listener_rule" "prometheus" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 20
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.prometheus.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/prometheus/*"]
+    }
+  }
+}
+
+resource "aws_ecs_task_definition" "prometheus" {
+  family                   = "prometheus"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "512"
+  memory                   = "1024"
+  execution_role_arn       = aws_iam_role.exec.arn
+  task_role_arn            = aws_iam_role.task.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "prometheus"
+      #image     = "prom/prometheus:v2.52.0"
+      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.prometheus_repo}:latest"
+      essential = true
+      portMappings = [
+        {
+          containerPort = 9090
+          protocol      = "tcp"
+        }
+      ]
+      #command = [
+        #"sh", "-c",
+        #"sudo mkdir -p /etc/prometheus && sudo aws s3 cp s3://${data.aws_s3_bucket.prometheus_config.bucket}/prometheus.yml /etc/prometheus/prometheus.yml && exec /bin/sh -c ''"
+      #]
+    }
+  ])
+}
+
+resource "aws_lb_target_group" "prometheus" {
+  name        = "prometheus-tg"
+  port        = 9090
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.this.id
+  target_type = "ip"
+  health_check {
+    path                = "/-/healthy"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+}
+
+resource "aws_ecs_service" "prometheus" {
+  name            = "prometheus"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.prometheus.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    security_groups = [aws_security_group.prometheus.id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.prometheus.arn
+    container_name   = "prometheus"
+    container_port   = 9090
   }
 }
