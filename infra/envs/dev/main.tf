@@ -484,19 +484,63 @@ resource "aws_security_group" "prometheus" {
   }
 }
 
-resource "aws_lb_listener_rule" "prometheus" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 20
+resource "aws_security_group" "alb_prometheus" {
+  name        = "${var.project}-alb-prometheus-sg"
+  description = "Allow HTTP access to Prometheus ALB"
+  vpc_id      = aws_vpc.this.id
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.prometheus.arn
+  ingress {
+    description = "Allow HTTP from anywhere"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  condition {
-    path_pattern {
-      values = ["/prometheus/*"]
-    }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lb" "prometheus" {
+  name               = "${var.project}-prometheus-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_prometheus.id]
+  subnets          = [aws_subnet.public_a.id, aws_subnet.public_a.id]
+
+  tags = {
+    Name = "${var.project}-prometheus-alb"
+  }
+}
+
+resource "aws_lb_target_group" "prometheus" {
+  name        = "${var.project}-prometheus-tg"
+  port        = 9090
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.this.id
+  target_type = "ip"
+
+  health_check {
+    path                = "/-/healthy"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+}
+
+resource "aws_lb_listener" "prometheus_http" {
+  load_balancer_arn = aws_lb.prometheus.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.prometheus.arn
   }
 }
 
@@ -562,4 +606,146 @@ resource "aws_ecs_service" "prometheus" {
     container_name   = "prometheus"
     container_port   = 9090
   }
+}
+
+
+# --- Grafana ---
+resource "aws_security_group" "alb_grafana" {
+  name        = "${var.project}-alb-grafana-sg"
+  description = "Allow HTTP access to Grafana ALB"
+  vpc_id      = aws_vpc.this.id
+
+  ingress {
+    description = "Allow HTTP from anywhere"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "grafana" {
+  name        = "${var.project}-grafana-sg"
+  description = "Allow traffic from Grafana ALB only"
+  vpc_id      = aws_vpc.this.id
+
+  ingress {
+    description              = "Allow HTTP from Grafana ALB"
+    from_port                = 3000
+    to_port                  = 3000
+    protocol                 = "tcp"
+    security_groups          = [aws_security_group.alb_grafana.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lb" "grafana" {
+  name               = "${var.project}-grafana-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_grafana.id]
+  subnets          = [aws_subnet.public_a.id, aws_subnet.public_a.id]
+
+  tags = {
+    Name = "${var.project}-grafana-alb"
+  }
+}
+
+resource "aws_lb_target_group" "grafana" {
+  name        = "${var.project}-grafana-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.this.id
+  target_type = "ip"
+
+  health_check {
+    path                = "/login"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+}
+
+resource "aws_lb_listener" "grafana_http" {
+  load_balancer_arn = aws_lb.grafana.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.grafana.arn
+  }
+}
+
+resource "aws_ecs_task_definition" "grafana" {
+  family                   = "grafana"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "512"
+  memory                   = "1024"
+  execution_role_arn       = aws_iam_role.exec.arn
+  task_role_arn            = aws_iam_role.task.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "grafana"
+      image     = "grafana/grafana:latest"
+      essential = true
+      portMappings = [
+        {
+          containerPort = 3000
+          protocol      = "tcp"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.grafana.name,
+          awslogs-region        = var.aws_region,
+          awslogs-stream-prefix = "grafana"
+        }
+      }
+    }
+  ])
+}
+
+resource "aws_cloudwatch_log_group" "grafana" {
+  name              = "/ecs/${var.project}-grafana"
+  retention_in_days = 7
+}
+
+resource "aws_ecs_service" "grafana" {
+  name            = "grafana"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.grafana.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    security_groups  = [aws_security_group.grafana.id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.grafana.arn
+    container_name   = "grafana"
+    container_port   = 3000
+  }
+
+  depends_on = [aws_lb_listener.grafana_http]
 }

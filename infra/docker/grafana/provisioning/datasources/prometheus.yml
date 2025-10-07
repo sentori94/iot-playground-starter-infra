@@ -1,0 +1,8 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://spring-app-prometheus-alb-855170568.eu-west-3.elb.amazonaws.com
+    isDefault: true
