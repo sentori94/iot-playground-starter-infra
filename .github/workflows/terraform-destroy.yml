@@ -10,7 +10,7 @@ on:
         required: true
         default: "type here"
       STATE_BUCKET_NAME:
-        description: "Nom du bucket S3 du backend (ex: iot-playground-tfstate-walid)"
+        description: "Nom du bucket S3 du backend (ex: iot-playground-tfstate)"
         default: "iot-playground-tfstate"
         required: true
 
@@ -23,7 +23,7 @@ jobs:
   destroy-infra:
     name: "Destroy Infra (Terraform)"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' || github.event_name == 'schedule' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' && github.event.inputs.STATE_BUCKET_NAME == 'iot-playground-tfstate' || github.event_name == 'schedule' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -101,3 +101,7 @@ jobs:
           TABLE="${{ env.DDB_LOCK_TABLE }}"
           aws dynamodb describe-table --table-name "$TABLE" >/dev/null 2>&1 || exit 0
           aws dynamodb delete-table --table-name "$TABLE"
+
+      - name: Force Delete Secret Manager
+        run: |
+          aws secretsmanager delete-secret --secret-id iot-playground-starter-rds-credentials --force-delete-without-recovery

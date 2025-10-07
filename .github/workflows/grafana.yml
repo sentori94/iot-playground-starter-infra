@@ -1,0 +1,49 @@
+name: Build & Push Grafana Image
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infra/docker/grafana/**'
+
+env:
+  AWS_REGION: eu-west-3
+  ECR_REPOSITORY: grafana
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push Grafana image
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          ECR_URI=$ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}
+
+          echo "Building Grafana image..."
+          docker build -t grafana:custom ./infra/docker/grafana
+
+          echo "Tagging..."
+          docker tag grafana:custom $ECR_URI:latest
+
+          echo "Pushing to ECR..."
+          docker push $ECR_URI:latest
+
+      - name: Output image URL
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "Image pushed: $ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest"

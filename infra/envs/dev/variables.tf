@@ -47,6 +47,10 @@ variable "prometheus_repo" {
   default = "prometheus"
 }
 
+variable "grafana_repo" {
+  default = "grafana"
+}
+
 variable "aws_account_id" {
   default = "908518190934"
 }
