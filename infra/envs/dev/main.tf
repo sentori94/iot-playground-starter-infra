@@ -288,6 +288,24 @@ module "grafana_service" {
 }
 
 # ===========================
+# CloudWatch Logs - Notification Lambda et Log Pipe
+# ===========================
+module "iot_playground_lambda_notify" {
+  source      = "../../modules/iot_playground_lambda_notify"
+  project     = "iot-playground"
+  environment = "dev"
+}
+
+module "iot_playground_pipe_logs" {
+  source            = "../../modules/iot_playground_pipe_logs"
+  project           = "iot-playground"
+  environment       = "dev"
+  log_group_name    = "/ecs/spring-app-dev"
+  filter_pattern    = "Run Finished"
+  lambda_target_arn = module.iot_playground_lambda_notify.lambda_arn
+}
+
+# ===========================
 # Templates pour Prometheus et Grafana
 # ===========================
 data "template_file" "prometheus_config" {
@@ -313,4 +331,3 @@ resource "local_file" "grafana_datasource_rendered" {
   content  = data.template_file.grafana_datasource.rendered
   filename = "${path.module}/templates/grafana-datasource-prometheus.yml"
 }
-
