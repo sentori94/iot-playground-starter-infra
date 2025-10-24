@@ -61,6 +61,12 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
 
+resource "aws_iam_policy_attachment" "lambda_logs" {
+  name       = "${var.project}-${var.environment}-lambda-logs-attach"
+  roles      = [aws_iam_role.lambda_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 # Fonction Lambda
 resource "aws_lambda_function" "generate_report" {
   function_name    = "${var.project}-${var.environment}-lambda-generate-report"
@@ -68,7 +74,7 @@ resource "aws_lambda_function" "generate_report" {
   source_code_hash = filebase64sha256("${path.module}/files/handler.zip")
   role             = aws_iam_role.lambda_role.arn
   handler          = "handler.lambda_handler"
-  runtime          = "python3.12"
+  runtime          = "python3.11"
   timeout          = 30
 
   environment {
@@ -86,6 +92,7 @@ resource "aws_lambda_function" "generate_report" {
   }
 }
 
-output "lambda_arn" {
-  value = aws_lambda_function.generate_report.arn
+resource "aws_cloudwatch_log_group" "lambda_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.generate_report.function_name}"
+  retention_in_days = 7
 }
