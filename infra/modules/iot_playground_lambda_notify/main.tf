@@ -27,10 +27,32 @@ resource "aws_lambda_function" "notify" {
   handler       = "handler.lambda_handler"
   runtime       = "python3.12"
   timeout       = 5
+  environment {
+    variables = {
+      DB_SECRET_ARN  = var.db_secret_arn
+      REPORTS_BUCKET = "iot-playground-reports"
+    }
+  }
 }
 
 # Log group for the Lambda
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.notify.function_name}"
   retention_in_days = 7
+}
+
+data "aws_iam_policy_document" "lambda_policy" {
+  statement {
+    actions = ["s3:PutObject"]
+    resources = ["arn:aws:s3:::iot-playground-reports/*"]
+  }
+
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["arn:aws:logs:*:*:*"]
+  }
 }
