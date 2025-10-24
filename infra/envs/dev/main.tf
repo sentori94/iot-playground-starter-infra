@@ -312,7 +312,7 @@ module "iot_playground_pipe_logs" {
   project           = "iot-playground"
   environment       = "dev"
   log_group_name    = "/ecs/spring-app-dev"
-  filter_pattern    = "Run Finished"
+  filter_pattern    = "\"Run\" \"finished\" \"SUCCESS\""
   lambda_target_arn = module.iot_playground_lambda_notify.lambda_arn
 }
 
