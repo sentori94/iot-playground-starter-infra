@@ -1,3 +1,17 @@
+# ===========================
+# Lambda Generate Report
+# ===========================
+
+# Récupérer les valeurs du Secret Manager
+data "aws_secretsmanager_secret_version" "db_credentials" {
+  secret_id = var.db_secret_arn
+}
+
+locals {
+  db_credentials = jsondecode(data.aws_secretsmanager_secret_version.db_credentials.secret_string)
+}
+
+# IAM Role pour Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "${var.project}-${var.environment}-lambda-generate-report-role"
 
@@ -13,19 +27,20 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+# Policy pour S3, Secrets Manager et CloudWatch Logs
 resource "aws_iam_policy" "lambda_policy" {
-  name   = "${var.project}-${var.environment}-lambda-generate-report-policy"
+  name = "${var.project}-${var.environment}-lambda-generate-report-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = ["s3:PutObject"],
+        Effect   = "Allow"
+        Action   = ["s3:PutObject"]
         Resource = "arn:aws:s3:::${var.reports_bucket}/*"
       },
       {
-        Effect = "Allow"
-        Action = ["secretsmanager:GetSecretValue"],
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
         Resource = var.db_secret_arn
       },
       {
@@ -34,19 +49,19 @@ resource "aws_iam_policy" "lambda_policy" {
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
-        ],
+        ]
         Resource = "arn:aws:logs:*:*:*"
       }
     ]
   })
 }
 
-resource "aws_iam_policy_attachment" "lambda_policy_attach" {
-  name       = "${var.project}-${var.environment}-lambda-generate-report-attach"
-  roles      = [aws_iam_role.lambda_role.name]
+resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
+  role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
 
+# Fonction Lambda
 resource "aws_lambda_function" "generate_report" {
   function_name    = "${var.project}-${var.environment}-lambda-generate-report"
   filename         = "${path.module}/files/handler.zip"
@@ -58,8 +73,15 @@ resource "aws_lambda_function" "generate_report" {
 
   environment {
     variables = {
-      DB_SECRET_ARN  = var.db_secret_arn
+      # S3
       REPORTS_BUCKET = var.reports_bucket
+
+      # Credentials DB depuis Secret Manager
+      DB_HOST     = local.db_credentials.url
+      DB_PORT     = ""
+      DB_NAME     = ""
+      DB_USERNAME = local.db_credentials.username
+      DB_PASSWORD = local.db_credentials.password
     }
   }
 }

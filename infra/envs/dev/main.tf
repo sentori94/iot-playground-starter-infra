@@ -303,18 +303,16 @@ module "grafana_service" {
 # ===========================
 module "s3_reports" {
   source      = "../../modules/s3_reports"
-  project     = "iot-playground"
-  environment = "dev"
+  project     = var.project
+  environment = var.env
 }
 
 module "lambda_generate_report" {
-  source        = "../../modules/lambda_generate_report"
-  project       = "iot-playground"
-  environment   = "dev"
-
+  source         = "../../modules/lambda_generate_report"
+  project        = var.project
+  environment    = var.env
   reports_bucket = module.s3_reports.bucket_name
-
-  db_secret_arn  = [module.database.secret_arn]
+  db_secret_arn  = module.database.secret_arn
 }
 
 # Note: Les configurations Prometheus et Grafana sont maintenant gérées dynamiquement
