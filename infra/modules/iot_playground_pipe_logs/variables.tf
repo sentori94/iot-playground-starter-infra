@@ -19,6 +19,7 @@ variable "filter_pattern" {
   type = string
 }
 
-variable "lambda_target_arn" {
-  type = string
+variable "lambda_target_arns" {
+  type        = list(string)
+  description = "Liste des ARNs des Lambdas à déclencher"
 }

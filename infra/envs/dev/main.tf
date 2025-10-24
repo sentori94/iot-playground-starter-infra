@@ -298,6 +298,7 @@ module "grafana_service" {
   tags = local.common_tags
 }
 
+
 # ===========================
 # Module S3 Reports et Lambda Generate Report
 # ===========================
@@ -313,6 +314,27 @@ module "lambda_generate_report" {
   environment    = var.env
   reports_bucket = module.s3_reports.bucket_name
   db_secret_arn  = module.database.secret_arn
+}
+
+# ===========================
+# CloudWatch Logs - Notification Lambda et Log Pipe
+# ===========================
+module "iot_playground_lambda_notify" {
+  source      = "../../modules/iot_playground_lambda_notify"
+  project     = "iot-playground"
+  environment = "dev"
+}
+
+module "iot_playground_pipe_logs" {
+  source             = "../../modules/iot_playground_pipe_logs"
+  project            = "iot-playground"
+  environment        = "dev"
+  log_group_name     = "/ecs/spring-app-dev"
+  filter_pattern     = "\"Run\" \"finished\" \"SUCCESS\""
+  lambda_target_arns = [
+    module.iot_playground_lambda_notify.lambda_arn,
+    module.lambda_generate_report.lambda_arn
+  ]
 }
 
 # Note: Les configurations Prometheus et Grafana sont maintenant gérées dynamiquement
