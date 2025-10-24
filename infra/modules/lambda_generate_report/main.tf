@@ -61,9 +61,8 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
 
-resource "aws_iam_policy_attachment" "lambda_logs" {
-  name       = "${var.project}-${var.environment}-lambda-logs-attach"
-  roles      = [aws_iam_role.lambda_role.name]
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
@@ -82,12 +81,10 @@ resource "aws_lambda_function" "generate_report" {
       # S3
       REPORTS_BUCKET = var.reports_bucket
 
-      # Credentials DB depuis Secret Manager
-      DB_HOST     = local.db_credentials.url
-      DB_PORT     = ""
-      DB_NAME     = ""
-      DB_USERNAME = local.db_credentials.username
-      DB_PASSWORD = local.db_credentials.password
+      # Credentials DB depuis Secret Manager (URL complète)
+      DB_URL         = local.db_credentials.url
+      DB_USERNAME    = local.db_credentials.username
+      DB_PASSWORD    = local.db_credentials.password
     }
   }
 }
