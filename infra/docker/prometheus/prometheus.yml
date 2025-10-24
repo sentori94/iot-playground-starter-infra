@@ -1,8 +1,8 @@
 global:
-  scrape_interval: 5s
+  scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'spring-boot-app'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "spring-app"
+    metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets: ['spring-app-alb-131303231.eu-west-3.elb.amazonaws.com']
+      - targets: ["PLACEHOLDER_WILL_BE_REPLACED_BY_ENTRYPOINT"]

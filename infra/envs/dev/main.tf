@@ -238,6 +238,13 @@ module "prometheus_service" {
   aws_region         = var.aws_region
   log_retention_days = 7
 
+  environment_variables = [
+    {
+      name  = "SPRING_APP_URL"
+      value = module.spring_app_alb.alb_dns_name
+    }
+  ]
+
   tags = local.common_tags
 }
 
@@ -262,6 +269,10 @@ module "grafana_service" {
   log_retention_days = 7
 
   environment_variables = [
+    {
+      name  = "PROMETHEUS_URL"
+      value = module.prometheus_alb.alb_dns_name
+    },
     {
       name  = "GF_AUTH_ANONYMOUS_ENABLED"
       value = "true"
@@ -305,29 +316,6 @@ module "iot_playground_pipe_logs" {
   lambda_target_arn = module.iot_playground_lambda_notify.lambda_arn
 }
 
-# ===========================
-# Templates pour Prometheus et Grafana
-# ===========================
-data "template_file" "prometheus_config" {
-  template = file("${path.module}/templates/prometheus.yml.tpl")
-  vars = {
-    spring_alb_dns = module.spring_app_alb.alb_dns_name
-  }
-}
-
-resource "local_file" "prometheus_config_rendered" {
-  content  = data.template_file.prometheus_config.rendered
-  filename = "${path.module}/templates/prometheus.yml"
-}
-
-data "template_file" "grafana_datasource" {
-  template = file("${path.module}/templates/grafana-datasource-prometheus.yml.tpl")
-  vars = {
-    prometheus_alb_dns = module.prometheus_alb.alb_dns_name
-  }
-}
-
-resource "local_file" "grafana_datasource_rendered" {
-  content  = data.template_file.grafana_datasource.rendered
-  filename = "${path.module}/templates/grafana-datasource-prometheus.yml"
-}
+# Note: Les configurations Prometheus et Grafana sont maintenant gérées dynamiquement
+# via les variables d'environnement SPRING_APP_URL et PROMETHEUS_URL.
+# Plus besoin de templates ni de rebuild des images Docker !
