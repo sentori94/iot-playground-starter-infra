@@ -314,6 +314,10 @@ module "lambda_generate_report" {
   environment    = var.env
   reports_bucket = module.s3_reports.bucket_name
   db_secret_arn  = module.database.secret_arn
+
+  depends_on = [
+    module.database
+  ]
 }
 
 # ===========================

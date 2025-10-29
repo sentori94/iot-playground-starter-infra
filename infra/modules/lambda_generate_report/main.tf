@@ -82,9 +82,9 @@ resource "aws_lambda_function" "generate_report" {
       REPORTS_BUCKET = var.reports_bucket
 
       # Credentials DB depuis Secret Manager (URL complète)
-      DB_URL         = local.db_credentials.url
-      DB_USERNAME    = local.db_credentials.username
-      DB_PASSWORD    = local.db_credentials.password
+      DB_URL         = local.db_credentials["url"]
+      DB_USERNAME    = local.db_credentials["username"]
+      DB_PASSWORD    = local.db_credentials["password"]
     }
   }
 }
