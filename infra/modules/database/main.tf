@@ -3,8 +3,10 @@
 # ===========================
 
 resource "random_password" "db" {
-  length  = 24
-  special = true
+  length           = 24
+  special          = true
+  # Ne pas inclure '/', '"', '@', ' '
+  override_special = "!#$%^&*()-_=+[]{}:,.?"
 }
 
 # Security Group pour RDS
@@ -81,4 +83,3 @@ resource "aws_secretsmanager_secret_version" "db" {
     url      = "jdbc:postgresql://${aws_db_instance.postgres.address}:${aws_db_instance.postgres.port}/${var.db_name}"
   })
 }
-

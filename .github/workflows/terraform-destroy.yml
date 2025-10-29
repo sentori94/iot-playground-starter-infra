@@ -104,4 +104,4 @@ jobs:
 
       - name: Force Delete Secret Manager
         run: |
-          aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials --force-delete-without-recovery
+          aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials-dev --force-delete-without-recovery
