@@ -309,11 +309,14 @@ module "s3_reports" {
 }
 
 module "lambda_generate_report" {
-  source         = "../../modules/lambda_generate_report"
-  project        = var.project
-  environment    = var.env
-  reports_bucket = module.s3_reports.bucket_name
-  db_secret_arn  = module.database.secret_arn
+  source                = "../../modules/lambda_generate_report"
+  project               = var.project
+  environment           = var.env
+  reports_bucket        = module.s3_reports.bucket_name
+  db_secret_arn         = module.database.secret_arn
+  vpc_id                = module.network.vpc_id
+  subnet_ids            = module.network.private_subnet_ids
+  db_security_group_id  = module.database.db_security_group_id
 
   depends_on = [
     module.database

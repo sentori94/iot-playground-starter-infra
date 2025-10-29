@@ -11,6 +11,35 @@ locals {
   db_credentials = jsondecode(data.aws_secretsmanager_secret_version.db_credentials.secret_string)
 }
 
+# Security Group pour Lambda
+resource "aws_security_group" "lambda" {
+  name        = "${var.project}-${var.environment}-lambda-generate-report-sg"
+  description = "Security group for Lambda Generate Report"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project}-${var.environment}-lambda-generate-report-sg"
+  }
+}
+
+# Autoriser la Lambda à se connecter à RDS
+resource "aws_security_group_rule" "lambda_to_rds" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = var.db_security_group_id
+  source_security_group_id = aws_security_group.lambda.id
+  description              = "Allow Lambda Generate Report to access RDS"
+}
+
 # IAM Role pour Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "${var.project}-${var.environment}-lambda-generate-report-role"
@@ -51,6 +80,17 @@ resource "aws_iam_policy" "lambda_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses"
+        ]
+        Resource = "*"
       }
     ]
   })
@@ -66,6 +106,11 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_vpc_execution" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
 # Fonction Lambda
 resource "aws_lambda_function" "generate_report" {
   function_name    = "${var.project}-${var.environment}-lambda-generate-report"
@@ -75,6 +120,11 @@ resource "aws_lambda_function" "generate_report" {
   handler          = "handler.lambda_handler"
   runtime          = "python3.11"
   timeout          = 30
+
+  vpc_config {
+    subnet_ids         = var.subnet_ids
+    security_group_ids = [aws_security_group.lambda.id]
+  }
 
   environment {
     variables = {
