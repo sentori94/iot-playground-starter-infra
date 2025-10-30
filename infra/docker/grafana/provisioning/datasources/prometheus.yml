@@ -6,3 +6,6 @@ datasources:
     access: proxy
     url: http://prometheus-alb-252097101.eu-west-3.elb.amazonaws.com
     isDefault: true
+    jsonData:
+      timeInterval: "1s"
+      minInterval: "1s"

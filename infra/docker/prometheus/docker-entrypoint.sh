@@ -9,7 +9,7 @@ mkdir -p /etc/prometheus
 # Générer dynamiquement le fichier prometheus.yml à partir de la variable d'environnement
 cat > /etc/prometheus/prometheus.yml <<EOF
 global:
-  scrape_interval: 15s
+  scrape_interval: 1s
 
 scrape_configs:
   - job_name: "spring-app"
