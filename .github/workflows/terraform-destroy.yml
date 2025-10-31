@@ -52,6 +52,58 @@ jobs:
             -backend-config="dynamodb_table=${{ env.DDB_LOCK_TABLE }}" \
             -backend-config="encrypt=true"
 
+      - name: Pre-destroy cleanup (detach EIPs + empty buckets)
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          set -e
+
+          # 1) Dissocier et libérer toutes les EIP actuellement associées
+          echo "Detaching and releasing associated Elastic IPs..."
+          aws ec2 describe-addresses --filters Name=domain,Values=vpc --query 'Addresses[?AssociationId!=`null`].[AssociationId,AllocationId]' --output text | \
+          while read -r assoc alloc; do
+            if [ -n "$assoc" ] && [ "$assoc" != "None" ]; then
+              echo "Disassociate $assoc"
+              aws ec2 disassociate-address --association-id "$assoc" || true
+            fi
+            if [ -n "$alloc" ] && [ "$alloc" != "None" ]; then
+              echo "Release allocation $alloc"
+              aws ec2 release-address --allocation-id "$alloc" || true
+            fi
+          done || true
+
+          # 2) Vider uniquement le bucket reports (PAS le bucket backend terraform)
+          BUCKET="iot-playground-dev-reports"
+          echo "Cleaning bucket: $BUCKET"
+          # Vérifier si le bucket existe
+          if aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
+            # Supprime toutes les versions
+            aws s3api list-object-versions --bucket "$BUCKET" --query 'Versions[].{K:Key,V:VersionId}' --output text 2>/dev/null | \
+            while read -r key ver; do
+              if [ -n "$key" ] && [ -n "$ver" ] && [ "$key" != "None" ] && [ "$ver" != "None" ]; then
+                echo "Deleting version: $key ($ver)"
+                aws s3api delete-object --bucket "$BUCKET" --key "$key" --version-id "$ver" || true
+              fi
+            done || true
+
+            # Supprime delete markers
+            aws s3api list-object-versions --bucket "$BUCKET" --query 'DeleteMarkers[].{K:Key,V:VersionId}' --output text 2>/dev/null | \
+            while read -r key ver; do
+              if [ -n "$key" ] && [ -n "$ver" ] && [ "$key" != "None" ] && [ "$ver" != "None" ]; then
+                echo "Deleting marker: $key ($ver)"
+                aws s3api delete-object --bucket "$BUCKET" --key "$key" --version-id "$ver" || true
+              fi
+            done || true
+
+            # Supprime objets restants
+            aws s3 rm "s3://$BUCKET" --recursive || true
+            echo "Bucket $BUCKET cleaned"
+          else
+            echo "Bucket $BUCKET does not exist, skipping"
+          fi
+
+          echo "Pre-destroy cleanup finished."
+
       # Terraform demande toujours les variables déclarées ; on passe les secrets même pour destroy
       - name: Terraform destroy
         working-directory: infra/envs/dev
