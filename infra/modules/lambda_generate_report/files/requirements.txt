@@ -2,4 +2,4 @@ psycopg2-binary
 boto3
 pg8000
 requests
-# ajoute ici tout ce que tu veux
+aws-xray-sdk

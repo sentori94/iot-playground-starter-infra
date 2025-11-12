@@ -56,7 +56,7 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-# Policy pour S3, Secrets Manager et CloudWatch Logs
+# Policy pour S3, Secrets Manager, CloudWatch Logs et X-Ray
 resource "aws_iam_policy" "lambda_policy" {
   name = "${var.project}-${var.environment}-lambda-generate-report-policy"
   policy = jsonencode({
@@ -91,6 +91,14 @@ resource "aws_iam_policy" "lambda_policy" {
           "ec2:UnassignPrivateIpAddresses"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords"
+        ]
+        Resource = "*"
       }
     ]
   })
@@ -120,6 +128,11 @@ resource "aws_lambda_function" "generate_report" {
   handler          = "handler.lambda_handler"
   runtime          = "python3.11"
   timeout          = 30
+
+  # Activation du tracing X-Ray
+  tracing_config {
+    mode = "Active"
+  }
 
   vpc_config {
     subnet_ids         = var.subnet_ids
