@@ -29,15 +29,8 @@ variable "allowed_cidr_blocks" {
   type        = list(string)
 }
 
-variable "eip_allocation_id" {
-  description = "ID d'allocation de l'EIP (optionnel)"
-  type        = string
-  default     = ""
-}
-
 variable "tags" {
   description = "Tags communs"
   type        = map(string)
   default     = {}
 }
-

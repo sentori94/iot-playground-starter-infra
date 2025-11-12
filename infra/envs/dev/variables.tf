@@ -95,12 +95,6 @@ variable "rds_instance_class" {
   default     = "db.t3.micro"
 }
 
-variable "bastion_eip_allocation_id" {
-  description = "ID d'allocation de l'EIP pour le bastion"
-  type        = string
-  default     = "eipalloc-04626558c8f4ed68d"
-}
-
 variable "bastion_key_name" {
   description = "Nom de la clé SSH pour le bastion"
   type        = string

@@ -12,6 +12,11 @@ on:
         description: "Nom unique du bucket S3 pour stocker le state"
         required: true
         default: iot-playground-tfstate
+      CLEAN_SECRETS:
+        description: "Nettoyer les secrets existants avant le déploiement ?"
+        type: boolean
+        required: false
+        default: false
 
 env:
   AWS_REGION: eu-west-3
@@ -69,6 +74,14 @@ jobs:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Clean existing secrets (start from clean state)
+        if: ${{ github.event.inputs.CLEAN_SECRETS == 'true' }}
+        run: |
+          echo "Cleaning existing secrets to ensure clean deployment..."
+          aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials-dev --force-delete-without-recovery || echo "RDS secret not found or already deleted"
+          aws secretsmanager delete-secret --secret-id iot-playground-xray-credentials-dev --force-delete-without-recovery || echo "X-Ray secret not found or already deleted"
+          echo "Secrets cleanup completed"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

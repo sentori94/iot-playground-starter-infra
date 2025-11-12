@@ -49,10 +49,17 @@ resource "aws_instance" "bastion" {
   })
 }
 
-# Association EIP si fournie
-resource "aws_eip_association" "bastion" {
-  count         = var.eip_allocation_id != "" ? 1 : 0
-  instance_id   = aws_instance.bastion.id
-  allocation_id = var.eip_allocation_id
+# Créer une nouvelle EIP pour le bastion
+resource "aws_eip" "bastion" {
+  domain = "vpc"
+
+  tags = merge(var.tags, {
+    Name = "${var.name}-eip"
+  })
 }
 
+# Association de l'EIP au bastion
+resource "aws_eip_association" "bastion" {
+  instance_id   = aws_instance.bastion.id
+  allocation_id = aws_eip.bastion.id
+}

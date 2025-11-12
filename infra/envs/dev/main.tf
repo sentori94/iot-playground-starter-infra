@@ -48,7 +48,6 @@ module "bastion" {
   instance_type       = "t3.micro"
   key_name            = var.bastion_key_name
   allowed_cidr_blocks = [var.my_ip]
-  eip_allocation_id   = var.bastion_eip_allocation_id
   tags                = local.common_tags
 }
 

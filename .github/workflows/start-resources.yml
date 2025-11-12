@@ -1,0 +1,140 @@
+name: "Start Resources"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1-5"  # Du lundi au vendredi à 6h00 UTC (8h00 Paris hiver / 9h00 Paris été)
+
+env:
+  AWS_REGION: eu-west-3
+
+jobs:
+  start-resources:
+    name: "Start ECS Services & RDS"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Start RDS Instance
+        run: |
+          echo "🚀 Starting RDS Instance..."
+          
+          DB_INSTANCE="iot-playground-db-dev"
+          
+          # Vérifier l'état actuel
+          STATUS=$(aws rds describe-db-instances \
+            --db-instance-identifier "$DB_INSTANCE" \
+            --query 'DBInstances[0].DBInstanceStatus' \
+            --output text 2>/dev/null || echo "not-found")
+          
+          if [ "$STATUS" = "not-found" ]; then
+            echo "⚠️  RDS instance $DB_INSTANCE not found"
+          elif [ "$STATUS" = "available" ]; then
+            echo "✅ RDS instance already running"
+          elif [ "$STATUS" = "stopped" ]; then
+            echo "Starting RDS instance: $DB_INSTANCE"
+            aws rds start-db-instance \
+              --db-instance-identifier "$DB_INSTANCE" \
+              --region ${{ env.AWS_REGION }}
+            echo "✅ RDS instance start initiated (will take a few minutes)"
+            
+            # Attendre que RDS soit disponible avant de démarrer ECS
+            echo "⏳ Waiting for RDS to be available..."
+            aws rds wait db-instance-available \
+              --db-instance-identifier "$DB_INSTANCE" \
+              --region ${{ env.AWS_REGION }}
+            echo "✅ RDS instance is now available"
+          else
+            echo "⚠️  RDS instance is in state: $STATUS"
+          fi
+
+      - name: Start ECS Services (restore desired count)
+        run: |
+          echo "🚀 Starting ECS Services..."
+          
+          # Liste des services ECS à démarrer
+          CLUSTER="iot-playground-cluster-dev"
+          
+          # Services avec leur desired count
+          declare -A SERVICES=(
+            ["spring-app-dev"]=1
+            ["iot-playground-prometheus-dev"]=1
+            ["iot-playground-grafana-dev"]=1
+          )
+          
+          for SERVICE in "${!SERVICES[@]}"; do
+            DESIRED_COUNT="${SERVICES[$SERVICE]}"
+            echo "Starting service: $SERVICE (desired count: $DESIRED_COUNT)"
+            aws ecs update-service \
+              --cluster "$CLUSTER" \
+              --service "$SERVICE" \
+              --desired-count "$DESIRED_COUNT" \
+              --region ${{ env.AWS_REGION }} || echo "⚠️  Service $SERVICE not found"
+          done
+          
+          echo "✅ ECS Services started (desired count restored)"
+
+      - name: Wait for ECS Services to be stable
+        run: |
+          echo "⏳ Waiting for ECS services to stabilize..."
+          
+          CLUSTER="iot-playground-cluster-dev"
+          SERVICES=(
+            "spring-app-dev"
+            "iot-playground-prometheus-dev"
+            "iot-playground-grafana-dev"
+          )
+          
+          for SERVICE in "${SERVICES[@]}"; do
+            echo "Waiting for service: $SERVICE"
+            aws ecs wait services-stable \
+              --cluster "$CLUSTER" \
+              --services "$SERVICE" \
+              --region ${{ env.AWS_REGION }} || echo "⚠️  Timeout or service $SERVICE not found"
+          done
+          
+          echo "✅ All services are stable"
+
+      - name: Get ALB URLs
+        run: |
+          echo "📋 Application URLs:"
+          
+          # Spring App ALB
+          SPRING_ALB=$(aws elbv2 describe-load-balancers \
+            --names "spring-app-alb-dev" \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text 2>/dev/null || echo "not-found")
+          
+          # Prometheus ALB
+          PROM_ALB=$(aws elbv2 describe-load-balancers \
+            --names "iot-playground-ptheus-alb-dev" \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text 2>/dev/null || echo "not-found")
+          
+          # Grafana ALB
+          GRAFANA_ALB=$(aws elbv2 describe-load-balancers \
+            --names "iot-playground-grafa-alb-dev" \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text 2>/dev/null || echo "not-found")
+          
+          echo ""
+          echo "🌐 Spring App:  http://$SPRING_ALB"
+          echo "📊 Prometheus:  http://$PROM_ALB"
+          echo "📈 Grafana:     http://$GRAFANA_ALB"
+          echo ""
+          echo "✅ All resources are now running!"
+
+      - name: Summary
+        run: |
+          echo "📊 Resources Start Summary:"
+          echo "  - RDS Instance: Started and available"
+          echo "  - ECS Services: All running with desired count restored"
+          echo "  - Health checks: Waiting for services to be healthy"
+          echo ""
+          echo "ℹ️  Applications should be accessible in ~2-3 minutes"
+

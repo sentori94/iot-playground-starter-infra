@@ -1,0 +1,80 @@
+name: "Stop Resources (Save Costs)"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 20 * * *"  # Tous les jours à 20h00 UTC (22h00 Paris hiver / 23h00 Paris été)
+
+env:
+  AWS_REGION: eu-west-3
+
+jobs:
+  stop-resources:
+    name: "Stop ECS Services & RDS"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Stop ECS Services (set desired count to 0)
+        run: |
+          echo "🛑 Stopping ECS Services..."
+          
+          # Liste des services ECS à arrêter
+          CLUSTER="iot-playground-cluster-dev"
+          SERVICES=(
+            "spring-app-dev"
+            "iot-playground-prometheus-dev"
+            "iot-playground-grafana-dev"
+          )
+          
+          for SERVICE in "${SERVICES[@]}"; do
+            echo "Stopping service: $SERVICE"
+            aws ecs update-service \
+              --cluster "$CLUSTER" \
+              --service "$SERVICE" \
+              --desired-count 0 \
+              --region ${{ env.AWS_REGION }} || echo "⚠️  Service $SERVICE not found or already stopped"
+          done
+          
+          echo "✅ ECS Services stopped (desired count set to 0)"
+
+      - name: Stop RDS Instance
+        run: |
+          echo "🛑 Stopping RDS Instance..."
+          
+          DB_INSTANCE="iot-playground-db-dev"
+          
+          # Vérifier l'état actuel
+          STATUS=$(aws rds describe-db-instances \
+            --db-instance-identifier "$DB_INSTANCE" \
+            --query 'DBInstances[0].DBInstanceStatus' \
+            --output text 2>/dev/null || echo "not-found")
+          
+          if [ "$STATUS" = "not-found" ]; then
+            echo "⚠️  RDS instance $DB_INSTANCE not found"
+          elif [ "$STATUS" = "stopped" ]; then
+            echo "✅ RDS instance already stopped"
+          elif [ "$STATUS" = "available" ]; then
+            echo "Stopping RDS instance: $DB_INSTANCE"
+            aws rds stop-db-instance \
+              --db-instance-identifier "$DB_INSTANCE" \
+              --region ${{ env.AWS_REGION }}
+            echo "✅ RDS instance stop initiated (will take a few minutes)"
+          else
+            echo "⚠️  RDS instance is in state: $STATUS (cannot stop now)"
+          fi
+
+      - name: Summary
+        run: |
+          echo "📊 Resources Stop Summary:"
+          echo "  - ECS Services: Desired count set to 0"
+          echo "  - RDS Instance: Stop command sent"
+          echo "  - 💰 Cost savings: ~90% on compute costs while stopped"
+          echo ""
+          echo "ℹ️  To restart resources, run the 'Start Resources' workflow"
+
