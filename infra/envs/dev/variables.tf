@@ -7,10 +7,6 @@ variable "db_name" {
   default = "postgres"
 }
 
-variable "db_username" {
-  type = string
-}
-
 variable "aws_region" {
   type    = string
   default = "eu-west-3"
@@ -109,4 +105,17 @@ variable "bastion_key_name" {
   description = "Nom de la clé SSH pour le bastion"
   type        = string
   default     = "manually_generated_key_bastion"
+}
+
+# Variables pour AWS X-Ray
+variable "xray_access_key_id" {
+  description = "AWS X-Ray Access Key ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "xray_secret_access_key" {
+  description = "AWS X-Ray Secret Access Key"
+  type        = string
+  sensitive   = true
 }

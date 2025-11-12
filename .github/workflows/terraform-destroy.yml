@@ -110,7 +110,8 @@ jobs:
         run: |
           terraform destroy -auto-approve -input=false \
             -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
-            -var="db_username=${{ secrets.DB_USERNAME }}"
+            -var="xray_access_key_id=dummy" \
+            -var="xray_secret_access_key=dummy"
 
   teardown-backend:
     name: "Teardown Backend (S3 + DynamoDB)"
@@ -156,4 +157,5 @@ jobs:
 
       - name: Force Delete Secret Manager
         run: |
-          aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials-dev --force-delete-without-recovery
+          aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials-dev --force-delete-without-recovery || true
+          aws secretsmanager delete-secret --secret-id iot-playground-xray-credentials-dev --force-delete-without-recovery || true

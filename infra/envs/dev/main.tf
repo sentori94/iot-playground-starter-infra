@@ -69,7 +69,6 @@ module "database" {
   instance_class            = var.rds_instance_class
   allocated_storage         = 20
   db_name                   = var.db_name
-  db_username               = var.db_username
   skip_final_snapshot       = true
   deletion_protection       = false
   publicly_accessible       = true
@@ -77,6 +76,19 @@ module "database" {
   backup_retention_period   = 1
   auto_minor_version_upgrade = true
   tags                      = local.common_tags
+}
+
+# ===========================
+# Module AWS X-Ray Secrets
+# ===========================
+module "xray_secrets" {
+  source = "../../modules/xray_secrets"
+
+  project                = var.project
+  environment            = var.env
+  xray_access_key_id     = var.xray_access_key_id
+  xray_secret_access_key = var.xray_secret_access_key
+  tags                   = local.common_tags
 }
 
 # ===========================
@@ -183,7 +195,7 @@ module "spring_app_service" {
   target_group_arn   = module.spring_app_alb.target_group_arn
   aws_region         = var.aws_region
   log_retention_days = 14
-  secret_arns        = [module.database.secret_arn]
+  secret_arns        = [module.database.secret_arn, module.xray_secrets.secret_arn]
 
   environment_variables = [
     {
@@ -204,6 +216,14 @@ module "spring_app_service" {
     {
       name      = "SPRING_DATASOURCE_PASSWORD"
       valueFrom = "${module.database.secret_arn}:password::"
+    },
+    {
+      name      = "XRAY_AWS_ACCESS_KEY_ID"
+      valueFrom = "${module.xray_secrets.secret_arn}:access_key_id::"
+    },
+    {
+      name      = "XRAY_AWS_SECRET_ACCESS_KEY"
+      valueFrom = "${module.xray_secrets.secret_arn}:secret_access_key::"
     }
   ]
 

@@ -36,7 +36,7 @@ output "db_url" {
 
 output "db_username" {
   description = "Utilisateur de la base"
-  value       = var.db_username
+  value       = local.db_username
 }
 
 output "db_password" {

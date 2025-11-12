@@ -86,9 +86,9 @@ jobs:
       - name: Terraform plan
         if: ${{ github.event.inputs.MODE == 'plan' }}
         working-directory: infra/envs/dev
-        run: terraform plan -no-color -input=false -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" -var="db_username=${{ secrets.DB_USERNAME }}"
+        run: terraform plan -no-color -input=false -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" -var="xray_access_key_id=${{ secrets.XRAY_AWS_ACCESS_KEY_ID }}" -var="xray_secret_access_key=${{ secrets.XRAY_AWS_SECRET_ACCESS_KEY }}"
 
       - name: Terraform apply
         if: ${{ github.event.inputs.MODE == 'apply' }}
         working-directory: infra/envs/dev
-        run: terraform apply -auto-approve -input=false -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" -var="db_username=${{ secrets.DB_USERNAME }}"
+        run: terraform apply -auto-approve -input=false -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" -var="xray_access_key_id=${{ secrets.XRAY_AWS_ACCESS_KEY_ID }}" -var="xray_secret_access_key=${{ secrets.XRAY_AWS_SECRET_ACCESS_KEY }}"

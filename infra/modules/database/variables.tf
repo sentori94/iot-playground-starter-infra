@@ -38,11 +38,7 @@ variable "allocated_storage" {
 variable "db_name" {
   description = "Nom de la base de données"
   type        = string
-}
-
-variable "db_username" {
-  description = "Nom d'utilisateur de la base de données"
-  type        = string
+  default     = "postgres"
 }
 
 variable "skip_final_snapshot" {
@@ -86,4 +82,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-

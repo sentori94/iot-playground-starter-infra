@@ -9,8 +9,6 @@
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_REGION` = `eu-west-3`
-- `DB_USERNAME` (ex: postgres)
-- `DB_PASSWORD` (ton mot de passe choisi)
 
 ## Paramètres à donner lors du lancement du workflow
 - `MODE` : `plan` (voir diff) ou `apply` (créer/modifier).
