@@ -156,7 +156,7 @@
     }
   ],
   "preload": false,
-  "refresh": "5s",
+  "refresh": "2s",
   "schemaVersion": 41,
   "tags": [
     "sensors",
