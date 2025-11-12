@@ -3,7 +3,7 @@ name: "Stop Resources (Save Costs)"
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 20 * * *"  # Tous les jours à 20h00 UTC (22h00 Paris hiver / 23h00 Paris été)
+    - cron: "0 22 * * *"  # Tous les jours à 22h00 UTC (00h00 Paris hiver / 01h00 Paris été)
 
 env:
   AWS_REGION: eu-west-3

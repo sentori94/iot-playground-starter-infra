@@ -38,6 +38,8 @@ resource "aws_security_group_rule" "lambda_to_rds" {
   security_group_id        = var.db_security_group_id
   source_security_group_id = aws_security_group.lambda.id
   description              = "Allow Lambda Generate Report to access RDS"
+
+  depends_on = [aws_security_group.lambda]
 }
 
 # IAM Role pour Lambda

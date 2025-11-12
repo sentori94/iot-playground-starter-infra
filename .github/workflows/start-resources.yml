@@ -2,8 +2,8 @@ name: "Start Resources"
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * 1-5"  # Du lundi au vendredi à 6h00 UTC (8h00 Paris hiver / 9h00 Paris été)
+  #schedule:
+    #- cron: "0 6 * * 1-5"  # Du lundi au vendredi à 6h00 UTC (8h00 Paris hiver / 9h00 Paris été)
 
 env:
   AWS_REGION: eu-west-3
