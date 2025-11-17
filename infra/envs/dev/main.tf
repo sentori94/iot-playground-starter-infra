@@ -195,11 +195,16 @@ module "spring_app_service" {
   aws_region         = var.aws_region
   log_retention_days = 14
   secret_arns        = [module.database.secret_arn, module.xray_secrets.secret_arn]
+  enable_xray        = true
 
   environment_variables = [
     {
       name  = "APP_GRAFANA_BASE_URL"
       value = "http://${module.grafana_alb.alb_dns_name}"
+    },
+    {
+      name  = "AWS_XRAY_DAEMON_ADDRESS"
+      value = "127.0.0.1:2000"
     }
   ]
 

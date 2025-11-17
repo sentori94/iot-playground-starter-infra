@@ -117,3 +117,8 @@ variable "tags" {
   default     = {}
 }
 
+variable "enable_xray" {
+  description = "Activer le sidecar X-Ray daemon"
+  type        = bool
+  default     = false
+}
