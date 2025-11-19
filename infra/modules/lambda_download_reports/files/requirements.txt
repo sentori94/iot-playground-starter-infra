@@ -1,0 +1,14 @@
+# Aucune dépendance externe requise
+#
+# Ce Lambda utilise uniquement des modules Python standard et boto3 qui est déjà
+# inclus par défaut dans l'environnement d'exécution AWS Lambda.
+#
+# Modules utilisés :
+# - json (standard library)
+# - boto3 (fourni par AWS Lambda)
+# - os (standard library)
+# - io.BytesIO (standard library)
+# - zipfile (standard library)
+# - datetime (standard library)
+# - base64 (standard library)
+

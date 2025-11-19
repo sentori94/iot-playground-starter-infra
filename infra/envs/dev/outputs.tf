@@ -51,3 +51,23 @@ output "ecs_cluster_name" {
   description = "Nom du cluster ECS"
   value       = module.ecs_cluster.cluster_name
 }
+
+# ===========================
+# API Gateway Downloads Reports
+# ===========================
+
+output "reports_api_endpoint" {
+  description = "Endpoint de l'API pour télécharger les rapports"
+  value       = module.lambda_download_reports.api_endpoint
+}
+
+output "reports_api_key" {
+  description = "API Key pour accéder à l'API de téléchargement (SENSIBLE - à stocker en sécurité)"
+  value       = module.lambda_download_reports.api_key_value
+  sensitive   = true
+}
+
+output "reports_api_usage_instructions" {
+  description = "Instructions pour utiliser l'API"
+  value       = "Utilisez: curl -H 'x-api-key: <API_KEY>' ${module.lambda_download_reports.api_endpoint}"
+}

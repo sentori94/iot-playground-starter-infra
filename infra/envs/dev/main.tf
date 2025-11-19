@@ -368,6 +368,18 @@ module "iot_playground_pipe_logs" {
   ]
 }
 
+# ===========================
+# Lambda Download Reports + API Gateway
+# ===========================
+module "lambda_download_reports" {
+  source                    = "../../modules/lambda_download_reports"
+  project                   = var.project
+  environment               = var.env
+  reports_bucket            = module.s3_reports.bucket_name
+  api_throttle_rate_limit   = 2   # 2 requêtes par seconde
+  api_throttle_burst_limit  = 5   # Burst de 5 requêtes max
+}
+
 # Note: Les configurations Prometheus et Grafana sont maintenant gérées dynamiquement
 # via les variables d'environnement SPRING_APP_URL et PROMETHEUS_URL.
 # Plus besoin de templates ni de rebuild des images Docker !

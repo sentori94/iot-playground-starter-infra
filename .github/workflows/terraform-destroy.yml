@@ -159,3 +159,14 @@ jobs:
         run: |
           aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials-dev --force-delete-without-recovery || true
           aws secretsmanager delete-secret --secret-id iot-playground-xray-credentials-dev --force-delete-without-recovery || true
+
+      - name: Force Delete API Gateway Resources
+        run: |
+          # Supprimer toutes les API Gateway REST APIs du projet
+          aws apigateway get-rest-apis --query "items[?contains(name, 'iot-playground')].id" --output text | \
+          while read -r api_id; do
+            if [ -n "$api_id" ] && [ "$api_id" != "None" ]; then
+              echo "Deleting API Gateway: $api_id"
+              aws apigateway delete-rest-api --rest-api-id "$api_id" || true
+            fi
+          done || true
