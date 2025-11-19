@@ -1,6 +1,6 @@
 output "api_endpoint" {
   description = "API Gateway endpoint URL"
-  value       = "${aws_api_gateway_stage.prod.invoke_url}/download"
+  value       = "${aws_api_gateway_stage.main.invoke_url}/download"
 }
 
 output "api_key_id" {
@@ -28,4 +28,3 @@ output "api_gateway_id" {
   description = "API Gateway REST API ID"
   value       = aws_api_gateway_rest_api.reports_api.id
 }
-
