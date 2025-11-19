@@ -190,3 +190,26 @@ resource "aws_api_gateway_usage_plan_key" "main" {
   key_type      = "API_KEY"
   usage_plan_id = aws_api_gateway_usage_plan.reports_usage_plan.id
 }
+
+# ===========================
+# Secrets Manager pour l'API Key
+# ===========================
+
+resource "aws_secretsmanager_secret" "api_key" {
+  name                    = "${var.project}-reports-api-key-${var.environment}"
+  description             = "API Key for reports download API Gateway"
+  recovery_window_in_days = 0
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "api_key" {
+  secret_id = aws_secretsmanager_secret.api_key.id
+  secret_string = jsonencode({
+    api_key = aws_api_gateway_api_key.reports_api_key.value
+  })
+}

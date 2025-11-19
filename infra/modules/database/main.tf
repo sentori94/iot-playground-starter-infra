@@ -72,6 +72,7 @@ resource "aws_db_instance" "postgres" {
 # Secrets Manager
 resource "aws_secretsmanager_secret" "db" {
   name = "${var.project}-rds-credentials-${var.environment}"
+  recovery_window_in_days = 0
   tags = var.tags
 }
 

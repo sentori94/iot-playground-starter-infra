@@ -28,3 +28,8 @@ output "api_gateway_id" {
   description = "API Gateway REST API ID"
   value       = aws_api_gateway_rest_api.reports_api.id
 }
+
+output "api_key_secret_arn" {
+  description = "ARN of the Secrets Manager secret containing the API Key"
+  value       = aws_secretsmanager_secret.api_key.arn
+}

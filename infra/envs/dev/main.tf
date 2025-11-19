@@ -194,7 +194,11 @@ module "spring_app_service" {
   target_group_arn   = module.spring_app_alb.target_group_arn
   aws_region         = var.aws_region
   log_retention_days = 14
-  secret_arns        = [module.database.secret_arn, module.xray_secrets.secret_arn]
+  secret_arns        = [
+    module.database.secret_arn,
+    module.xray_secrets.secret_arn,
+    module.lambda_download_reports.api_key_secret_arn
+  ]
   enable_xray        = true
 
   environment_variables = [
@@ -205,6 +209,10 @@ module "spring_app_service" {
     {
       name  = "AWS_XRAY_DAEMON_ADDRESS"
       value = "127.0.0.1:2000"
+    },
+    {
+      name  = "REPORTS_API_GATEWAY_URL"
+      value = module.lambda_download_reports.api_endpoint
     }
   ]
 
@@ -228,6 +236,10 @@ module "spring_app_service" {
     {
       name      = "XRAY_AWS_SECRET_ACCESS_KEY"
       valueFrom = "${module.xray_secrets.secret_arn}:secret_access_key::"
+    },
+    {
+      name      = "REPORTS_API_KEY"
+      valueFrom = "${module.lambda_download_reports.api_key_secret_arn}:api_key::"
     }
   ]
 
@@ -238,6 +250,12 @@ module "spring_app_service" {
     retries     = 3
     startPeriod = 60
   }
+
+  depends_on = [
+    module.database,
+    module.xray_secrets,
+    module.lambda_download_reports
+  ]
 
   tags = local.common_tags
 }
