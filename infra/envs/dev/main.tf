@@ -103,6 +103,16 @@ module "spring_app_sg" {
   tags                       = local.common_tags
 }
 
+module "angular_app_sg" {
+  source = "../../modules/security_groups"
+
+  name                       = "${var.project}-angular-${var.env}"
+  vpc_id                     = module.network.vpc_id
+  container_port             = 80
+  allow_prometheus_scraping  = false
+  tags                       = local.common_tags
+}
+
 module "prometheus_sg" {
   source = "../../modules/security_groups"
 
@@ -140,6 +150,23 @@ module "spring_app_alb" {
   health_check_healthy_threshold   = 2
   health_check_unhealthy_threshold = 5
   tags                             = local.common_tags
+}
+
+# ===========================
+# ALB pour Angular App
+# ===========================
+module "angular_app_alb" {
+  source = "../../modules/alb"
+
+  name              = "${var.project}-angula-alb-${var.env}"
+  vpc_id            = module.network.vpc_id
+  subnet_ids        = module.network.public_subnet_ids
+  security_group_id = module.angular_app_sg.alb_security_group_id
+  internal          = false
+  target_port       = 80
+  listener_port     = 80
+  health_check_path = "/"
+  tags              = local.common_tags
 }
 
 # ===========================
@@ -213,6 +240,10 @@ module "spring_app_service" {
     {
       name  = "REPORTS_API_GATEWAY_URL"
       value = module.lambda_download_reports.api_endpoint
+    },
+    {
+      name  = "CORS_ALLOWED_ORIGINS"
+      value = "http://${module.angular_app_alb.alb_dns_name},https://${module.angular_app_alb.alb_dns_name}"
     }
   ]
 
@@ -255,6 +286,36 @@ module "spring_app_service" {
     module.database,
     module.xray_secrets,
     module.lambda_download_reports
+  ]
+
+  tags = local.common_tags
+}
+
+# ===========================
+# ECS Service - Angular App
+# ===========================
+module "angular_app_service" {
+  source = "../../modules/ecs_service"
+
+  service_name       = "${var.project}-angular-${var.env}"
+  cluster_id         = module.ecs_cluster.cluster_id
+  image_url          = var.angular_image_ecr
+  container_port     = 80
+  cpu                = var.ecs_cpu
+  memory             = var.ecs_memory
+  desired_count      = 1
+  subnet_ids         = module.network.private_subnet_ids
+  security_group_id  = module.angular_app_sg.ecs_security_group_id
+  assign_public_ip   = false
+  target_group_arn   = module.angular_app_alb.target_group_arn
+  aws_region         = var.aws_region
+  log_retention_days = 7
+
+  environment_variables = [
+    {
+      name  = "API_URL"
+      value = "http://${module.spring_app_alb.alb_dns_name}"
+    }
   ]
 
   tags = local.common_tags

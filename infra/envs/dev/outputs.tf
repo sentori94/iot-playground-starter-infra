@@ -71,3 +71,17 @@ output "reports_api_usage_instructions" {
   description = "Instructions pour utiliser l'API"
   value       = "Utilisez: curl -H 'x-api-key: <API_KEY>' ${module.lambda_download_reports.api_endpoint}"
 }
+
+# ===========================
+# Angular Frontend
+# ===========================
+
+output "angular_app_alb_dns" {
+  description = "DNS de l'ALB pour l'application Angular"
+  value       = module.angular_app_alb.alb_dns_name
+}
+
+output "angular_app_url" {
+  description = "URL de l'application Angular (Frontend)"
+  value       = "http://${module.angular_app_alb.alb_dns_name}"
+}

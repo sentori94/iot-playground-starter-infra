@@ -75,6 +75,12 @@ variable "prom_image_ecr" {
   type        = string
 }
 
+variable "angular_image_ecr" {
+  description = "URL de l'image Angular dans ECR"
+  type        = string
+  default     = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/iot-playground-starter-front:latest"
+}
+
 # Variables pour ECS
 variable "ecs_cpu" {
   description = "CPU pour les tâches ECS"
