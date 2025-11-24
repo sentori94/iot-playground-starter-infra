@@ -16,10 +16,12 @@ datasources:
     access: proxy
     url: http://${PROMETHEUS_URL}
     isDefault: true
+    jsonData:
+      timeInterval: "10s"
+      minInterval: "10s"
 EOF
 
 echo "✅ Datasource Prometheus configuré avec l'URL: http://${PROMETHEUS_URL}"
 
 # Lancer Grafana avec la commande par défaut
 exec /run.sh
-

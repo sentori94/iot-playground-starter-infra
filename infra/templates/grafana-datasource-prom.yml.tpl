@@ -6,3 +6,4 @@ datasources:
     access: proxy
     url: http://${prometheus_alb_dns}
     isDefault: true
+
