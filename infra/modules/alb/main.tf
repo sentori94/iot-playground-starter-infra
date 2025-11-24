@@ -15,7 +15,7 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "this" {
-  name        = "${var.name}-tg"
+  name_prefix = substr("${var.name}-", 0, 6)
   port        = var.target_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -28,6 +28,10 @@ resource "aws_lb_target_group" "this" {
     healthy_threshold   = var.health_check_healthy_threshold
     unhealthy_threshold = var.health_check_unhealthy_threshold
     matcher             = var.health_check_matcher
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = merge(var.tags, {
