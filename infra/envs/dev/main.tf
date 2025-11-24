@@ -108,7 +108,7 @@ module "angular_app_sg" {
 
   name                       = "${var.project}-angular-${var.env}"
   vpc_id                     = module.network.vpc_id
-  container_port             = 80
+  container_port             = 8080
   allow_prometheus_scraping  = false
   tags                       = local.common_tags
 }
@@ -163,7 +163,7 @@ module "angular_app_alb" {
   subnet_ids        = module.network.public_subnet_ids
   security_group_id = module.angular_app_sg.alb_security_group_id
   internal          = false
-  target_port       = 80
+  target_port       = 8080
   listener_port     = 80
   health_check_path = "/"
   tags              = local.common_tags
@@ -300,7 +300,7 @@ module "angular_app_service" {
   service_name       = "${var.project}-angular-${var.env}"
   cluster_id         = module.ecs_cluster.cluster_id
   image_url          = var.angular_image_ecr
-  container_port     = 80
+  container_port     = 8080
   cpu                = var.ecs_cpu
   memory             = var.ecs_memory
   desired_count      = 1
