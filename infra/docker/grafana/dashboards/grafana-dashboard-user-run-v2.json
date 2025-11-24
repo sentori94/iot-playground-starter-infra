@@ -166,10 +166,6 @@
   "templating": {
     "list": [
       {
-        "current": {
-          "text": "prometheus",
-          "value": "dew0ddwep0p34d"
-        },
         "label": "Prometheus",
         "name": "DS_PROM",
         "options": [],
