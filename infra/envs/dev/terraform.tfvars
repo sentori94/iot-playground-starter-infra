@@ -20,3 +20,6 @@ route53_zone_name      = "iot-devices.cloud"
 backend_domain_name    = "api.iot-devices.cloud"
 # prometheus_domain_name = "prometheus.iot-devices.cloud"
 # grafana_domain_name    = "grafana.iot-devices.cloud"
+
+# Frontend URL pour CORS
+frontend_url = "https://app.iot-devices.cloud,http://app.iot-devices.cloud"

@@ -68,6 +68,12 @@ variable "grafana_domain_name" {
   default     = ""
 }
 
+variable "frontend_url" {
+  description = "URL complète du frontend pour CORS (ex: https://app.iot-devices.cloud)"
+  type        = string
+  default     = "https://app.iot-devices.cloud,http://app.iot-devices.cloud"
+}
+
 variable "prometheus_repo" {
   default = "prometheus"
 }
@@ -97,12 +103,6 @@ variable "grafana_image_ecr" {
 variable "prom_image_ecr" {
   description = "URL de l'image Prometheus dans ECR"
   type        = string
-}
-
-variable "angular_image_ecr" {
-  description = "URL de l'image Angular dans ECR"
-  type        = string
-  default     = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/iot-playground-starter-front:latest"
 }
 
 # Variables pour ECS
