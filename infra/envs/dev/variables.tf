@@ -44,6 +44,30 @@ variable "s3_bucket_name" {
   default = "iot-background-starter-files-bucket"
 }
 
+variable "route53_zone_name" {
+  description = "Nom de la zone Route53 hébergée (ex: example.com)"
+  type        = string
+  default     = ""
+}
+
+variable "backend_domain_name" {
+  description = "Nom de domaine pour l'API backend (ex: api.example.com)"
+  type        = string
+  default     = ""
+}
+
+variable "prometheus_domain_name" {
+  description = "Nom de domaine pour Prometheus (ex: prometheus.example.com)"
+  type        = string
+  default     = ""
+}
+
+variable "grafana_domain_name" {
+  description = "Nom de domaine pour Grafana (ex: grafana.example.com)"
+  type        = string
+  default     = ""
+}
+
 variable "prometheus_repo" {
   default = "prometheus"
 }

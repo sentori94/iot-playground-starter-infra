@@ -462,3 +462,34 @@ module "lambda_download_reports" {
 # Note: Les configurations Prometheus et Grafana sont maintenant gérées dynamiquement
 # via les variables d'environnement SPRING_APP_URL et PROMETHEUS_URL.
 # Plus besoin de templates ni de rebuild des images Docker !
+
+# ===========================
+# Module Route53 (optionnel)
+# ===========================
+module "route53" {
+  count  = var.route53_zone_name != "" ? 1 : 0
+  source = "../../modules/route53"
+
+  route53_zone_name = var.route53_zone_name
+
+  records = concat(
+    var.backend_domain_name != "" ? [{
+      name                   = var.backend_domain_name
+      alb_dns_name          = module.spring_app_alb.alb_dns_name
+      alb_zone_id           = module.spring_app_alb.alb_zone_id
+      evaluate_target_health = true
+    }] : [],
+    var.prometheus_domain_name != "" ? [{
+      name                   = var.prometheus_domain_name
+      alb_dns_name          = module.prometheus_alb.alb_dns_name
+      alb_zone_id           = module.prometheus_alb.alb_zone_id
+      evaluate_target_health = true
+    }] : [],
+    var.grafana_domain_name != "" ? [{
+      name                   = var.grafana_domain_name
+      alb_dns_name          = module.grafana_alb.alb_dns_name
+      alb_zone_id           = module.grafana_alb.alb_zone_id
+      evaluate_target_health = true
+    }] : []
+  )
+}

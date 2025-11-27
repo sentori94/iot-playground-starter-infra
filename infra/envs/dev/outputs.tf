@@ -14,7 +14,12 @@ output "spring_app_alb_dns" {
 
 output "spring_app_url" {
   description = "URL de l'application Spring"
-  value       = "http://${module.spring_app_alb.alb_dns_name}"
+  value       = var.backend_domain_name != "" ? "https://${var.backend_domain_name}" : "http://${module.spring_app_alb.alb_dns_name}"
+}
+
+output "spring_app_custom_domain" {
+  description = "Domaine personnalisé Route53 pour l'application Spring (si configuré)"
+  value       = var.backend_domain_name != "" ? var.backend_domain_name : null
 }
 
 output "prometheus_alb_dns" {

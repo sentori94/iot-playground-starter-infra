@@ -14,3 +14,9 @@ grafana_image_ecr = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/grafana:latest
 prom_image_ecr    = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/prometheus:latest"
 
 image_url = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/iot-playground-starter:latest"
+
+# Route53 - Domaine personnalisé
+route53_zone_name      = "iot-devices.cloud"
+backend_domain_name    = "api.iot-devices.cloud"
+# prometheus_domain_name = "prometheus.iot-devices.cloud"
+# grafana_domain_name    = "grafana.iot-devices.cloud"
