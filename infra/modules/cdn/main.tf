@@ -121,13 +121,8 @@ resource "aws_cloudfront_distribution" "cdn" {
     response_page_path = "/index.html"
   }
 
-  # Optional: Custom domain
-  dynamic "aliases" {
-    for_each = var.domain_name != "" ? [var.domain_name] : []
-    content {
-      aliases = [aliases.value]
-    }
-  }
+  # Optional: Custom domain aliases
+  aliases = var.domain_name != "" ? [var.domain_name] : []
 
   # SSL Certificate
   viewer_certificate {
