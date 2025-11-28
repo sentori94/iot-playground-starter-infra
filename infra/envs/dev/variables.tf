@@ -69,9 +69,9 @@ variable "grafana_domain_name" {
 }
 
 variable "frontend_url" {
-  description = "URL complète du frontend pour CORS (ex: https://app.iot-devices.cloud)"
+  description = "URL complète du frontend pour CORS (ex: https://app.sentori-studio.com)"
   type        = string
-  default     = "https://app.iot-devices.cloud,http://app.iot-devices.cloud"
+  default     = "https://app-iot.sentori-studio.com,http://app-iot.sentori-studio.com"
 }
 
 variable "prometheus_repo" {
