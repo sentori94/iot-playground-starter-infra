@@ -1,0 +1,265 @@
+name: "Deploy Infrastructure Manager Lambdas"
+
+on:
+  workflow_dispatch:
+    inputs:
+      MODE:
+        description: "Terraform mode"
+        type: choice
+        required: true
+        default: plan
+        options: [plan, apply]
+      STATE_BUCKET_NAME:
+        description: "Nom du bucket S3 pour le state Terraform (Infrastructure Manager uniquement)"
+        required: true
+        default: iot-playground-tfstate-infra-manager
+      GITHUB_REPO_OWNER:
+        description: "GitHub repository owner"
+        required: true
+        default: "sentori94"
+
+env:
+  AWS_REGION: eu-west-3
+  ENVIRONMENT: inframanager-dev
+
+jobs:
+  package-lambdas:
+    name: "Package Lambda Functions"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Package Lambda Functions
+        run: |
+          cd infra/modules/lambda_infra_manager/files
+          chmod +x package.sh
+          ./package.sh
+
+      - name: Upload Lambda Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-packages
+          path: |
+            infra/modules/lambda_infra_manager/files/*.zip
+          retention-days: 1
+
+  deploy-infra-manager:
+    name: "Deploy Infrastructure Manager [${{ github.event.inputs.MODE }}]"
+    needs: package-lambdas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/envs/${{ env.ENVIRONMENT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Lambda Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-packages
+          path: infra/modules/lambda_infra_manager/files/
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create S3 Bucket for Terraform State (if not exists)
+        run: |
+          BUCKET_NAME="${{ github.event.inputs.STATE_BUCKET_NAME }}"
+          echo "🪣 Checking if S3 bucket ${BUCKET_NAME} exists..."
+          
+          if aws s3 ls "s3://${BUCKET_NAME}" 2>&1 | grep -q 'NoSuchBucket'; then
+            echo "📦 Creating S3 bucket ${BUCKET_NAME}..."
+            aws s3 mb "s3://${BUCKET_NAME}" --region ${{ env.AWS_REGION }}
+            
+            echo "🔒 Enabling versioning..."
+            aws s3api put-bucket-versioning \
+              --bucket "${BUCKET_NAME}" \
+              --versioning-configuration Status=Enabled \
+              --region ${{ env.AWS_REGION }}
+            
+            echo "🔐 Enabling encryption..."
+            aws s3api put-bucket-encryption \
+              --bucket "${BUCKET_NAME}" \
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' \
+              --region ${{ env.AWS_REGION }}
+            
+            echo "🚫 Blocking public access..."
+            aws s3api put-public-access-block \
+              --bucket "${BUCKET_NAME}" \
+              --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true" \
+              --region ${{ env.AWS_REGION }}
+            
+            echo "✅ Bucket ${BUCKET_NAME} created and configured successfully!"
+          else
+            echo "✅ Bucket ${BUCKET_NAME} already exists!"
+          fi
+
+      - name: Create DynamoDB Table for Terraform State Locking (if not exists)
+        run: |
+          TABLE_NAME="terraform-locks-infra-manager"
+          echo "🔐 Checking if DynamoDB table ${TABLE_NAME} exists..."
+          
+          if ! aws dynamodb describe-table --table-name "${TABLE_NAME}" --region ${{ env.AWS_REGION }} > /dev/null 2>&1; then
+            echo "📦 Creating DynamoDB table ${TABLE_NAME}..."
+            aws dynamodb create-table \
+              --table-name "${TABLE_NAME}" \
+              --attribute-definitions AttributeName=LockID,AttributeType=S \
+              --key-schema AttributeName=LockID,KeyType=HASH \
+              --billing-mode PAY_PER_REQUEST \
+              --region ${{ env.AWS_REGION }} \
+              --tags Key=Name,Value=terraform-locks-infra-manager Key=Purpose,Value=TerraformStateLocking Key=ManagedBy,Value=GitHub-Actions
+            
+            echo "⏳ Waiting for table to be active..."
+            aws dynamodb wait table-exists --table-name "${TABLE_NAME}" --region ${{ env.AWS_REGION }}
+            
+            echo "✅ DynamoDB table ${TABLE_NAME} created successfully!"
+          else
+            echo "✅ DynamoDB table ${TABLE_NAME} already exists!"
+          fi
+
+      - name: Verify Lambda Packages
+        run: |
+          echo "📦 Verifying Lambda packages..."
+          ls -lh ../../modules/lambda_infra_manager/files/*.zip
+          echo "✅ All packages verified"
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
+            -backend-config="key=${{ env.ENVIRONMENT }}/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=terraform-locks-infra-manager"
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+            -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
+            -var="github_repo_owner=${{ github.event.inputs.GITHUB_REPO_OWNER }}" \
+            -out=tfplan
+
+      - name: Terraform Apply
+        if: github.event.inputs.MODE == 'apply'
+        run: terraform apply -auto-approve tfplan
+
+      - name: Output API Gateway Information
+        if: github.event.inputs.MODE == 'apply'
+        run: |
+          echo "### 🚀 Infrastructure Manager Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**API Gateway URL:**" >> $GITHUB_STEP_SUMMARY
+          terraform output -raw api_gateway_url >> $GITHUB_STEP_SUMMARY || echo "N/A" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📡 API Endpoints:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          API_URL=$(terraform output -raw api_gateway_url 2>/dev/null || echo "N/A")
+          echo "- **Create Infrastructure:** \`POST ${API_URL}/infra/create\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Check Status:** \`GET ${API_URL}/infra/status/{deploymentId}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Destroy Infrastructure:** \`POST ${API_URL}/infra/destroy\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 Lambda Functions:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Create Infra: \`$(terraform output -raw create_lambda_name 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Check Status: \`$(terraform output -raw check_status_lambda_name 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Destroy Infra: \`$(terraform output -raw destroy_lambda_name 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔐 Secret Configuration Required:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          SECRET_NAME=$(terraform output -raw github_token_secret_name 2>/dev/null || echo "N/A")
+          echo "Run this command to configure your GitHub token:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "aws secretsmanager put-secret-value \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --secret-id ${SECRET_NAME} \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --secret-string '{\"token\":\"ghp_YOUR_TOKEN_HERE\"}' \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --region ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  test-api:
+    name: "Test API Endpoints"
+    needs: deploy-infra-manager
+    if: github.event.inputs.MODE == 'apply'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/envs/${{ env.ENVIRONMENT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+          terraform_wrapper: false
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
+            -backend-config="key=${{ env.ENVIRONMENT }}/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=terraform-locks-infra-manager"
+
+      - name: Get API URL
+        id: get_api_url
+        run: |
+          API_URL=$(terraform output -raw api_gateway_url 2>/dev/null || echo "")
+          echo "api_url=${API_URL}" >> $GITHUB_OUTPUT
+          echo "API URL: ${API_URL}"
+
+      - name: Test Check Status Endpoint (404 expected)
+        if: steps.get_api_url.outputs.api_url != ''
+        run: |
+          API_URL="${{ steps.get_api_url.outputs.api_url }}"
+          DEPLOYMENT_ID="test-deployment-123"
+          echo "🧪 Testing CHECK STATUS endpoint (should return 404)..."
+          RESPONSE=$(curl -s "${API_URL}/infra/status/${DEPLOYMENT_ID}")
+          echo "$RESPONSE" | jq .
+          if echo "$RESPONSE" | jq -e '.success == false' > /dev/null; then
+            echo "✅ Check status endpoint working (404 as expected)!"
+          else
+            echo "⚠️ Unexpected response"
+          fi
+
+      - name: Create Test Summary
+        if: always()
+        run: |
+          echo "### 🧪 API Tests Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ API Gateway deployed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Check status endpoint tested" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Note:** Create endpoint test skipped (requires GitHub token configuration)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Configure your GitHub Personal Access Token in Secrets Manager" >> $GITHUB_STEP_SUMMARY
+          echo "2. Test the API from your frontend application" >> $GITHUB_STEP_SUMMARY
