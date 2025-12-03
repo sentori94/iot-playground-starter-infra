@@ -11,7 +11,7 @@ secretsmanager = boto3.client('secretsmanager')
 
 PROJECT = os.environ.get('PROJECT', 'iot-playground')
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'dev')
-AWS_REGION = os.environ.get('AWS_REGION', 'eu-west-3')
+AWS_REGION = os.environ.get('TARGET_AWS_REGION', 'eu-west-3')
 DEPLOYMENTS_TABLE = os.environ.get('DEPLOYMENTS_TABLE')
 GITHUB_TOKEN_SECRET = os.environ.get('GITHUB_TOKEN_SECRET')
 GITHUB_REPO_OWNER = os.environ.get('GITHUB_REPO_OWNER')

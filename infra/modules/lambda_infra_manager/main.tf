@@ -134,7 +134,7 @@ resource "aws_lambda_function" "create_infra" {
     variables = {
       ENVIRONMENT               = var.environment
       PROJECT                   = var.project
-      AWS_REGION                = var.aws_region
+      TARGET_AWS_REGION         = var.aws_region
       DEPLOYMENTS_TABLE         = aws_dynamodb_table.deployments.name
       GITHUB_TOKEN_SECRET       = aws_secretsmanager_secret.github_token.name
       GITHUB_REPO_OWNER         = var.github_repo_owner
@@ -173,7 +173,7 @@ resource "aws_lambda_function" "check_status" {
     variables = {
       ENVIRONMENT               = var.environment
       PROJECT                   = var.project
-      AWS_REGION                = var.aws_region
+      TARGET_AWS_REGION         = var.aws_region
       DEPLOYMENTS_TABLE         = aws_dynamodb_table.deployments.name
       GITHUB_TOKEN_SECRET       = aws_secretsmanager_secret.github_token.name
       GITHUB_REPO_OWNER         = var.github_repo_owner
@@ -211,7 +211,7 @@ resource "aws_lambda_function" "destroy_infra" {
     variables = {
       ENVIRONMENT                = var.environment
       PROJECT                    = var.project
-      AWS_REGION                 = var.aws_region
+      TARGET_AWS_REGION          = var.aws_region
       DEPLOYMENTS_TABLE          = aws_dynamodb_table.deployments.name
       GITHUB_TOKEN_SECRET        = aws_secretsmanager_secret.github_token.name
       GITHUB_REPO_OWNER          = var.github_repo_owner
