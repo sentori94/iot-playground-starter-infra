@@ -39,7 +39,7 @@ def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
     }
 
     payload = {
-        'ref': 'main',  # ou 'master' selon votre branche
+        'ref': 'master',  # ou 'master' selon votre branche
         'inputs': {
             'MODE': mode,
             'STATE_BUCKET_NAME': state_bucket_name,

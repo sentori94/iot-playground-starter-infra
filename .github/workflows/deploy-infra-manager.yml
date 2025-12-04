@@ -35,11 +35,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Package Lambda Functions
-        run: |
-          cd infra/modules/lambda_infra_manager/files
-          chmod +x package.sh
-          ./package.sh
+      #- name: Package Lambda Functions
+        #run: |
+          #cd infra/modules/lambda_infra_manager/files
+          #chmod +x package.sh
+          #./package.sh
 
       - name: Upload Lambda Packages
         uses: actions/upload-artifact@v4
