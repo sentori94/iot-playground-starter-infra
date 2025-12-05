@@ -1,21 +1,25 @@
 import json
 import os
 import boto3
+import urllib3
 from datetime import datetime
 from boto3.dynamodb.conditions import Attr
 from decimal import Decimal
 
 # Clients AWS
 dynamodb = boto3.resource('dynamodb')
+secretsmanager = boto3.client('secretsmanager')
 
 PROJECT = os.environ.get('PROJECT', 'iot-playground')
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'dev')
 DEPLOYMENTS_TABLE = os.environ.get('DEPLOYMENTS_TABLE')
+GITHUB_TOKEN_SECRET = os.environ.get('GITHUB_TOKEN_SECRET')
 GITHUB_REPO_OWNER = os.environ.get('GITHUB_REPO_OWNER')
 GITHUB_REPO_NAME = os.environ.get('GITHUB_REPO_NAME')
 
 # Table DynamoDB
 table = dynamodb.Table(DEPLOYMENTS_TABLE)
+http = urllib3.PoolManager()
 
 def decimal_to_int(obj):
     """Convertir les Decimal de DynamoDB en int pour la sérialisation JSON"""
@@ -28,6 +32,100 @@ def decimal_to_int(obj):
     else:
         return obj
 
+def get_github_token():
+    """Récupérer le GitHub token depuis Secrets Manager"""
+    try:
+        response = secretsmanager.get_secret_value(SecretId=GITHUB_TOKEN_SECRET)
+        return json.loads(response['SecretString'])['token']
+    except Exception as e:
+        print(f"⚠️ Failed to get GitHub token: {str(e)}")
+        return None
+
+def check_and_update_github_status(deployment_data):
+    """Vérifier et mettre à jour le statut depuis GitHub si le déploiement est actif"""
+    try:
+        deployment_id = deployment_data['deployment_id']
+        current_status = deployment_data.get('status')
+        workflow_run_id = deployment_data.get('workflow_run_id')
+
+        # Si déjà terminé ou pas de workflow_run_id, ne pas vérifier
+        if current_status in ['SUCCESS', 'FAILED', 'CANCELLED'] or not workflow_run_id:
+            return deployment_data
+
+        print(f"🔄 Checking GitHub status for active deployment {deployment_id}")
+
+        # Récupérer le token GitHub
+        github_token = get_github_token()
+        if not github_token:
+            return deployment_data
+
+        # Interroger l'API GitHub
+        url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/runs/{workflow_run_id}'
+
+        headers = {
+            'Authorization': f'token {github_token}',
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'Lambda-Infrastructure-Manager'
+        }
+
+        response = http.request('GET', url, headers=headers)
+
+        if response.status != 200:
+            print(f"⚠️ Failed to fetch workflow: HTTP {response.status}")
+            return deployment_data
+
+        run = json.loads(response.data.decode('utf-8'))
+        github_status = run['status']
+        conclusion = run.get('conclusion')
+
+        print(f"📊 GitHub status: {github_status}, conclusion: {conclusion}")
+
+        # Déterminer le nouveau statut
+        new_status = None
+
+        if github_status == 'completed':
+            if conclusion == 'success':
+                new_status = 'SUCCESS'
+            elif conclusion == 'cancelled':
+                new_status = 'CANCELLED'
+            else:
+                new_status = 'FAILED'
+
+            # Mettre à jour DynamoDB
+            print(f"✅ Updating deployment to {new_status}")
+            table.update_item(
+                Key={'deployment_id': deployment_id},
+                UpdateExpression='SET #status = :status, updated_at = :timestamp, completed_at = :completed',
+                ExpressionAttributeNames={'#status': 'status'},
+                ExpressionAttributeValues={
+                    ':status': new_status,
+                    ':timestamp': int(datetime.utcnow().timestamp()),
+                    ':completed': int(datetime.utcnow().timestamp())
+                }
+            )
+            deployment_data['status'] = new_status
+            deployment_data['completed_at'] = int(datetime.utcnow().timestamp())
+
+        elif github_status == 'in_progress' and current_status != 'IN_PROGRESS':
+            new_status = 'IN_PROGRESS'
+            print(f"🔄 Updating deployment to IN_PROGRESS")
+            table.update_item(
+                Key={'deployment_id': deployment_id},
+                UpdateExpression='SET #status = :status, updated_at = :timestamp',
+                ExpressionAttributeNames={'#status': 'status'},
+                ExpressionAttributeValues={
+                    ':status': 'IN_PROGRESS',
+                    ':timestamp': int(datetime.utcnow().timestamp())
+                }
+            )
+            deployment_data['status'] = 'IN_PROGRESS'
+
+        return deployment_data
+
+    except Exception as e:
+        print(f"⚠️ Error checking GitHub status: {str(e)}")
+        return deployment_data
+
 def lambda_handler(event, context):
     """
     Lambda pour récupérer le dernier déploiement en cours ou le plus récent
@@ -36,6 +134,7 @@ def lambda_handler(event, context):
     - Vérifier s'il y a un déploiement en cours
     - Afficher le statut actuel sur l'interface
     - Permettre le polling du statut
+    - Mettre à jour le statut depuis GitHub si le déploiement est actif
 
     Retourne le dernier déploiement (en priorité IN_PROGRESS, TRIGGERED, TRIGGERING)
     """
@@ -59,6 +158,9 @@ def lambda_handler(event, context):
             active_deployments.sort(key=lambda x: x.get('created_at', 0), reverse=True)
             latest_deployment = active_deployments[0]
             print(f"✅ Found active deployment: {latest_deployment['deployment_id']}")
+
+            # Vérifier et mettre à jour le statut depuis GitHub
+            latest_deployment = check_and_update_github_status(latest_deployment)
         else:
             # Sinon, chercher le dernier déploiement terminé (SUCCESS ou FAILED)
             print("ℹ️ No active deployment found, searching for latest completed...")
@@ -103,6 +205,8 @@ def lambda_handler(event, context):
         # Ajouter l'URL GitHub Actions si disponible
         if GITHUB_REPO_OWNER and GITHUB_REPO_NAME:
             deployment_info['github_actions_url'] = f'https://github.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions'
+            if latest_deployment.get('workflow_run_id'):
+                deployment_info['workflow_run_url'] = f'https://github.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/runs/{latest_deployment["workflow_run_id"]}'
 
         # Calculer la durée si le déploiement est terminé
         if latest_deployment['status'] in ['SUCCESS', 'FAILED', 'CANCELLED']:

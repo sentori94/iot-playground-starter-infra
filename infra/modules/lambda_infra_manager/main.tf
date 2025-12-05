@@ -343,6 +343,71 @@ resource "aws_lambda_function" "cancel_deployment" {
   }
 }
 
+# Lambda Function - Periodic Status Updater
+resource "aws_lambda_function" "periodic_status_updater" {
+  function_name    = "${var.project}-${var.environment}-periodic-status-updater"
+  filename         = "${path.module}/files/periodic_status_updater.zip"
+  source_code_hash = filebase64sha256("${path.module}/files/periodic_status_updater.zip")
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "periodic_status_updater_handler.lambda_handler"
+  runtime          = "python3.12"
+  timeout          = 60
+  memory_size      = 256
+
+  environment {
+    variables = {
+      ENVIRONMENT                = var.environment
+      PROJECT                    = var.project
+      DEPLOYMENTS_TABLE          = aws_dynamodb_table.deployments.name
+      GITHUB_TOKEN_SECRET        = aws_secretsmanager_secret.github_token.name
+      GITHUB_REPO_OWNER          = var.github_repo_owner
+      GITHUB_REPO_NAME           = var.github_repo_name
+    }
+  }
+
+  dynamic "vpc_config" {
+    for_each = length(var.subnet_ids) > 0 ? [1] : []
+    content {
+      subnet_ids         = var.subnet_ids
+      security_group_ids = var.security_group_ids
+    }
+  }
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-periodic-status-updater"
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+# EventBridge Rule pour déclencher la lambda toutes les 1 minute
+resource "aws_cloudwatch_event_rule" "periodic_status_update" {
+  name                = "${var.project}-${var.environment}-periodic-status-update"
+  description         = "Trigger status updater lambda every 1 minute"
+  schedule_expression = "rate(1 minute)"
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-periodic-status-update"
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+resource "aws_cloudwatch_event_target" "periodic_status_updater" {
+  rule      = aws_cloudwatch_event_rule.periodic_status_update.name
+  target_id = "PeriodicStatusUpdater"
+  arn       = aws_lambda_function.periodic_status_updater.arn
+}
+
+# Permission pour EventBridge d'invoquer la lambda
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.periodic_status_updater.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.periodic_status_update.arn
+}
+
 # CloudWatch Log Groups
 resource "aws_cloudwatch_log_group" "create_infra_logs" {
   name              = "/aws/lambda/${aws_lambda_function.create_infra.function_name}"
@@ -396,6 +461,16 @@ resource "aws_cloudwatch_log_group" "list_deployments_logs" {
 
 resource "aws_cloudwatch_log_group" "cancel_deployment_logs" {
   name              = "/aws/lambda/${aws_lambda_function.cancel_deployment.function_name}"
+  retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+resource "aws_cloudwatch_log_group" "periodic_status_updater_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.periodic_status_updater.function_name}"
   retention_in_days = 7
 
   tags = {
@@ -586,6 +661,14 @@ resource "aws_lambda_permission" "cancel_deployment_api_gw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cancel_deployment.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.infra_manager.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "periodic_status_updater_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.periodic_status_updater.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.infra_manager.execution_arn}/*/*"
 }

@@ -49,6 +49,12 @@ if exist cancel_deployment.zip del cancel_deployment.zip
 powershell -Command "Compress-Archive -Path cancel_deployment_handler.py -DestinationPath cancel_deployment.zip -Force"
 echo     OK cancel_deployment.zip created
 
+REM Periodic Status Updater Lambda
+echo   -^> Packaging periodic_status_updater...
+if exist periodic_status_updater.zip del periodic_status_updater.zip
+powershell -Command "Compress-Archive -Path periodic_status_updater_handler.py -DestinationPath periodic_status_updater.zip -Force"
+echo     OK periodic_status_updater.zip created
+
 echo.
 echo All Lambda functions packaged successfully!
 pause

@@ -39,9 +39,9 @@ def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
     }
 
     payload = {
-        'ref': 'master',  # ou 'master' selon votre branche
+        'ref': 'master',
         'inputs': {
-            'ENVIRONMENT': target_environment,
+            'CONFIRM': 'DESTROY-MY-INFRA',
             'STATE_BUCKET_NAME': state_bucket_name
         }
     }
@@ -53,7 +53,31 @@ def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
         headers=headers
     )
 
-    return response.status, response.data
+    if response.status != 204:
+        return response.status, response.data, None
+
+    # ✅ NOUVEAU : Récupérer le workflow_run_id juste après le déclenchement
+    print("🔍 Fetching workflow run ID...")
+    import time
+    time.sleep(2)  # Attendre 2 secondes pour que GitHub crée le run
+
+    # Interroger l'API GitHub pour récupérer le dernier run du workflow
+    runs_url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/workflows/{GITHUB_WORKFLOW_FILE}/runs?per_page=1'
+
+    runs_response = http.request('GET', runs_url, headers=headers)
+
+    workflow_run_id = None
+    workflow_url = None
+
+    if runs_response.status == 200:
+        runs_data = json.loads(runs_response.data.decode('utf-8'))
+        if runs_data.get('workflow_runs'):
+            latest_run = runs_data['workflow_runs'][0]
+            workflow_run_id = latest_run['id']
+            workflow_url = latest_run['html_url']
+            print(f"✅ Retrieved workflow_run_id: {workflow_run_id}")
+
+    return response.status, response.data, {'workflow_run_id': workflow_run_id, 'workflow_url': workflow_url}
 
 def lambda_handler(event, context):
     """
@@ -127,7 +151,7 @@ def lambda_handler(event, context):
         print(f"✅ Destruction {destruction_id} created in DynamoDB")
 
         # Déclencher le workflow GitHub Actions
-        status_code, response_data = trigger_github_workflow(
+        status_code, response_data, workflow_info = trigger_github_workflow(
             github_token,
             'destroy',
             state_bucket,
@@ -136,14 +160,24 @@ def lambda_handler(event, context):
 
         if status_code == 204:
             # Succès - le workflow a été déclenché
+            update_expression = 'SET #status = :status, updated_at = :timestamp'
+            expression_values = {
+                ':status': 'TRIGGERED',
+                ':timestamp': int(datetime.utcnow().timestamp())
+            }
+
+            # ✅ NOUVEAU : Enregistrer le workflow_run_id et l'URL si récupérés
+            if workflow_info and workflow_info.get('workflow_run_id'):
+                update_expression += ', workflow_run_id = :run_id, github_url = :url'
+                expression_values[':run_id'] = workflow_info['workflow_run_id']
+                expression_values[':url'] = workflow_info['workflow_url']
+                print(f"💾 Storing workflow_run_id: {workflow_info['workflow_run_id']}")
+
             table.update_item(
                 Key={'deployment_id': destruction_id},
-                UpdateExpression='SET #status = :status, updated_at = :timestamp',
+                UpdateExpression=update_expression,
                 ExpressionAttributeNames={'#status': 'status'},
-                ExpressionAttributeValues={
-                    ':status': 'TRIGGERED',
-                    ':timestamp': int(datetime.utcnow().timestamp())
-                }
+                ExpressionAttributeValues=expression_values
             )
 
             print(f"🗑️ GitHub Actions destruction workflow triggered successfully")
@@ -159,6 +193,11 @@ def lambda_handler(event, context):
                 'check_status_url': f'/infra/status/{destruction_id}',
                 'github_actions_url': f'https://github.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions'
             }
+
+            # Ajouter workflow_run_id dans la réponse si disponible
+            if workflow_info and workflow_info.get('workflow_run_id'):
+                response_body['workflow_run_id'] = workflow_info['workflow_run_id']
+                response_body['github_url'] = workflow_info['workflow_url']
 
             return {
                 'statusCode': 200,
