@@ -1,7 +1,25 @@
-name: "Terraform Bootstrap"
+name: "Terraform Bootstrap (Manual Mode)"
 on:
-  repository_dispatch:
-    types: [trigger-bootstrap]
+  workflow_dispatch:
+    inputs:
+      STATE_BUCKET_NAME:
+        description: 'S3 bucket name for Terraform state'
+        required: true
+        type: string
+        default: 'iot-playground-terraform-state-dev'
+      MODE:
+        description: 'Terraform action'
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+        default: 'plan'
+      CLEAN_SECRETS:
+        description: 'Clean existing secrets before deployment'
+        required: false
+        type: boolean
+        default: false
 
 env:
   AWS_REGION: eu-west-3
@@ -20,7 +38,7 @@ jobs:
       - name: Create S3 bucket + DynamoDB if missing
         run: |
           set -e
-          BUCKET="${{ github.event.client_payload.STATE_BUCKET_NAME }}"
+          BUCKET="${{ inputs.STATE_BUCKET_NAME }}"
           REGION="${{ env.AWS_REGION }}"
 
           # S3 bucket (idempotent)
@@ -47,7 +65,7 @@ jobs:
           fi
 
   deploy-infra:
-    name: "Deploy Infra [${{ github.event.client_payload.MODE }}]"
+    name: "Deploy Infra [${{ inputs.MODE }}]"
     needs: setup-backend
     runs-on: ubuntu-latest
     steps:
@@ -61,7 +79,7 @@ jobs:
           aws-region:            ${{ env.AWS_REGION }}
 
       - name: Clean existing secrets (start from clean state)
-        if: ${{ github.event.client_payload.CLEAN_SECRETS == 'true' && github.event.client_payload.MODE == 'apply' }}
+        if: ${{ inputs.CLEAN_SECRETS == true && inputs.MODE == 'apply' }}
         run: |
           echo "Cleaning existing secrets to ensure clean deployment..."
           aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials-dev --force-delete-without-recovery || echo "RDS secret not found or already deleted"
@@ -75,31 +93,33 @@ jobs:
         working-directory: infra/envs/dev
         run: |
           terraform init -input=false \
-            -backend-config="bucket=${{ github.event.client_payload.STATE_BUCKET_NAME }}" \
+            -backend-config="bucket=${{ inputs.STATE_BUCKET_NAME }}" \
             -backend-config="key=envs/dev/terraform.tfstate" \
             -backend-config="region=${{ env.AWS_REGION }}" \
             -backend-config="dynamodb_table=terraform-locks" \
             -backend-config="encrypt=true"
 
       - name: Terraform plan
-        if: ${{ github.event.client_payload.MODE == 'plan' }}
+        if: ${{ inputs.MODE == 'plan' }}
         working-directory: infra/envs/dev
-        run: terraform plan -no-color -input=false -var="state_bucket_name=${{ github.event.client_payload.STATE_BUCKET_NAME }}" -var="xray_access_key_id=${{ secrets.XRAY_AWS_ACCESS_KEY_ID }}" -var="xray_secret_access_key=${{ secrets.XRAY_AWS_SECRET_ACCESS_KEY }}"
+        run: terraform plan -no-color -input=false -var="state_bucket_name=${{ inputs.STATE_BUCKET_NAME }}" -var="xray_access_key_id=${{ secrets.XRAY_AWS_ACCESS_KEY_ID }}" -var="xray_secret_access_key=${{ secrets.XRAY_AWS_SECRET_ACCESS_KEY }}"
 
       - name: Terraform apply
-        if: ${{ github.event.client_payload.MODE == 'apply' }}
+        if: ${{ inputs.MODE == 'apply' }}
         working-directory: infra/envs/dev
-        run: terraform apply -auto-approve -input=false -var="state_bucket_name=${{ github.event.client_payload.STATE_BUCKET_NAME }}" -var="xray_access_key_id=${{ secrets.XRAY_AWS_ACCESS_KEY_ID }}" -var="xray_secret_access_key=${{ secrets.XRAY_AWS_SECRET_ACCESS_KEY }}"
+        run: terraform apply -auto-approve -input=false -var="state_bucket_name=${{ inputs.STATE_BUCKET_NAME }}" -var="xray_access_key_id=${{ secrets.XRAY_AWS_ACCESS_KEY_ID }}" -var="xray_secret_access_key=${{ secrets.XRAY_AWS_SECRET_ACCESS_KEY }}"
 
       - name: Output Infrastructure Information
-        if: github.event.client_payload.MODE == 'apply'
+        if: inputs.MODE == 'apply'
         working-directory: infra/envs/dev
         run: |
-          echo "### 🚀 Infrastructure Bootstrap Successful" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Infrastructure Bootstrap Successful (Manual Mode)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Warning:** This deployment was triggered manually and is NOT tracked in DynamoDB." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Environment:** dev" >> $GITHUB_STEP_SUMMARY
           echo "**Region:** ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**State Bucket:** ${{ github.event.client_payload.STATE_BUCKET_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**State Bucket:** ${{ inputs.STATE_BUCKET_NAME }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           echo "### 🌐 Network Resources:" >> $GITHUB_STEP_SUMMARY
@@ -151,9 +171,17 @@ jobs:
           echo "- [Open Prometheus](http://${PROMETHEUS_URL})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
+          echo "### ⚠️ Important Notes:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- This deployment was triggered manually" >> $GITHUB_STEP_SUMMARY
+          echo "- Not tracked in the Infrastructure Manager DynamoDB" >> $GITHUB_STEP_SUMMARY
+          echo "- Consider using the API endpoint for production deployments" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
           echo "### ✅ Next Steps:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "1. Deploy your Spring Boot application to ECS" >> $GITHUB_STEP_SUMMARY
           echo "2. Configure your frontend with the API endpoints" >> $GITHUB_STEP_SUMMARY
           echo "3. Access Grafana to monitor your infrastructure" >> $GITHUB_STEP_SUMMARY
           echo "4. Check CloudWatch logs for application insights" >> $GITHUB_STEP_SUMMARY
+
