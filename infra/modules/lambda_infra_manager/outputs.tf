@@ -28,9 +28,51 @@ output "destroy_lambda_name" {
   value       = aws_lambda_function.destroy_infra.function_name
 }
 
+output "get_latest_deployment_lambda_arn" {
+  description = "ARN of the get latest deployment Lambda"
+  value       = aws_lambda_function.get_latest_deployment.arn
+}
+
+output "get_latest_deployment_lambda_name" {
+  description = "Name of the get latest deployment Lambda"
+  value       = aws_lambda_function.get_latest_deployment.function_name
+}
+
+output "list_deployments_lambda_arn" {
+  description = "ARN of the list deployments Lambda"
+  value       = aws_lambda_function.list_deployments.arn
+}
+
+output "list_deployments_lambda_name" {
+  description = "Name of the list deployments Lambda"
+  value       = aws_lambda_function.list_deployments.function_name
+}
+
+output "cancel_deployment_lambda_arn" {
+  description = "ARN of the cancel deployment Lambda"
+  value       = aws_lambda_function.cancel_deployment.arn
+}
+
+output "cancel_deployment_lambda_name" {
+  description = "Name of the cancel deployment Lambda"
+  value       = aws_lambda_function.cancel_deployment.function_name
+}
+
 output "api_gateway_url" {
   description = "API Gateway invoke URL"
   value       = aws_apigatewayv2_stage.default.invoke_url
+}
+
+output "api_endpoints" {
+  description = "All API endpoints"
+  value = {
+    create_infra         = "${aws_apigatewayv2_stage.default.invoke_url}/infra/create"
+    destroy_infra        = "${aws_apigatewayv2_stage.default.invoke_url}/infra/destroy"
+    check_status         = "${aws_apigatewayv2_stage.default.invoke_url}/infra/status/{deploymentId}"
+    latest_deployment    = "${aws_apigatewayv2_stage.default.invoke_url}/infra/latest-deployment"
+    list_deployments     = "${aws_apigatewayv2_stage.default.invoke_url}/infra/list-deployments"
+    cancel_deployment    = "${aws_apigatewayv2_stage.default.invoke_url}/infra/cancel-deployment"
+  }
 }
 
 output "api_gateway_id" {

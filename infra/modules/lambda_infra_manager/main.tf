@@ -235,6 +235,114 @@ resource "aws_lambda_function" "destroy_infra" {
   }
 }
 
+# Lambda Function - Get Latest Deployment
+resource "aws_lambda_function" "get_latest_deployment" {
+  function_name    = "${var.project}-${var.environment}-get-latest-deployment"
+  filename         = "${path.module}/files/get_latest_deployment.zip"
+  source_code_hash = filebase64sha256("${path.module}/files/get_latest_deployment.zip")
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "get_latest_deployment_handler.lambda_handler"
+  runtime          = "python3.12"
+  timeout          = 30
+  memory_size      = 256
+
+  environment {
+    variables = {
+      ENVIRONMENT                = var.environment
+      PROJECT                    = var.project
+      DEPLOYMENTS_TABLE          = aws_dynamodb_table.deployments.name
+      GITHUB_REPO_OWNER          = var.github_repo_owner
+      GITHUB_REPO_NAME           = var.github_repo_name
+    }
+  }
+
+  dynamic "vpc_config" {
+    for_each = length(var.subnet_ids) > 0 ? [1] : []
+    content {
+      subnet_ids         = var.subnet_ids
+      security_group_ids = var.security_group_ids
+    }
+  }
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-get-latest-deployment"
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+# Lambda Function - List Deployments
+resource "aws_lambda_function" "list_deployments" {
+  function_name    = "${var.project}-${var.environment}-list-deployments"
+  filename         = "${path.module}/files/list_deployments.zip"
+  source_code_hash = filebase64sha256("${path.module}/files/list_deployments.zip")
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "list_deployments_handler.lambda_handler"
+  runtime          = "python3.12"
+  timeout          = 30
+  memory_size      = 256
+
+  environment {
+    variables = {
+      ENVIRONMENT                = var.environment
+      PROJECT                    = var.project
+      DEPLOYMENTS_TABLE          = aws_dynamodb_table.deployments.name
+      GITHUB_REPO_OWNER          = var.github_repo_owner
+      GITHUB_REPO_NAME           = var.github_repo_name
+    }
+  }
+
+  dynamic "vpc_config" {
+    for_each = length(var.subnet_ids) > 0 ? [1] : []
+    content {
+      subnet_ids         = var.subnet_ids
+      security_group_ids = var.security_group_ids
+    }
+  }
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-list-deployments"
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+# Lambda Function - Cancel Deployment
+resource "aws_lambda_function" "cancel_deployment" {
+  function_name    = "${var.project}-${var.environment}-cancel-deployment"
+  filename         = "${path.module}/files/cancel_deployment.zip"
+  source_code_hash = filebase64sha256("${path.module}/files/cancel_deployment.zip")
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "cancel_deployment_handler.lambda_handler"
+  runtime          = "python3.12"
+  timeout          = 30
+  memory_size      = 256
+
+  environment {
+    variables = {
+      ENVIRONMENT                = var.environment
+      PROJECT                    = var.project
+      DEPLOYMENTS_TABLE          = aws_dynamodb_table.deployments.name
+      GITHUB_REPO_OWNER          = var.github_repo_owner
+      GITHUB_REPO_NAME           = var.github_repo_name
+    }
+  }
+
+  dynamic "vpc_config" {
+    for_each = length(var.subnet_ids) > 0 ? [1] : []
+    content {
+      subnet_ids         = var.subnet_ids
+      security_group_ids = var.security_group_ids
+    }
+  }
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-cancel-deployment"
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
 # CloudWatch Log Groups
 resource "aws_cloudwatch_log_group" "create_infra_logs" {
   name              = "/aws/lambda/${aws_lambda_function.create_infra.function_name}"
@@ -258,6 +366,36 @@ resource "aws_cloudwatch_log_group" "check_status_logs" {
 
 resource "aws_cloudwatch_log_group" "destroy_infra_logs" {
   name              = "/aws/lambda/${aws_lambda_function.destroy_infra.function_name}"
+  retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+resource "aws_cloudwatch_log_group" "get_latest_deployment_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.get_latest_deployment.function_name}"
+  retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+resource "aws_cloudwatch_log_group" "list_deployments_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.list_deployments.function_name}"
+  retention_in_days = 7
+
+  tags = {
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+resource "aws_cloudwatch_log_group" "cancel_deployment_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.cancel_deployment.function_name}"
   retention_in_days = 7
 
   tags = {
@@ -345,6 +483,27 @@ resource "aws_apigatewayv2_integration" "destroy_infra" {
   payload_format_version = "2.0"
 }
 
+resource "aws_apigatewayv2_integration" "get_latest_deployment" {
+  api_id           = aws_apigatewayv2_api.infra_manager.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.get_latest_deployment.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "list_deployments" {
+  api_id           = aws_apigatewayv2_api.infra_manager.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.list_deployments.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "cancel_deployment" {
+  api_id           = aws_apigatewayv2_api.infra_manager.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.cancel_deployment.invoke_arn
+  payload_format_version = "2.0"
+}
+
 # API Routes
 resource "aws_apigatewayv2_route" "create_infra" {
   api_id    = aws_apigatewayv2_api.infra_manager.id
@@ -362,6 +521,24 @@ resource "aws_apigatewayv2_route" "destroy_infra" {
   api_id    = aws_apigatewayv2_api.infra_manager.id
   route_key = "POST /infra/destroy"
   target    = "integrations/${aws_apigatewayv2_integration.destroy_infra.id}"
+}
+
+resource "aws_apigatewayv2_route" "get_latest_deployment" {
+  api_id    = aws_apigatewayv2_api.infra_manager.id
+  route_key = "GET /infra/latest-deployment"
+  target    = "integrations/${aws_apigatewayv2_integration.get_latest_deployment.id}"
+}
+
+resource "aws_apigatewayv2_route" "list_deployments" {
+  api_id    = aws_apigatewayv2_api.infra_manager.id
+  route_key = "GET /infra/list-deployments"
+  target    = "integrations/${aws_apigatewayv2_integration.list_deployments.id}"
+}
+
+resource "aws_apigatewayv2_route" "cancel_deployment" {
+  api_id    = aws_apigatewayv2_api.infra_manager.id
+  route_key = "POST /infra/cancel-deployment"
+  target    = "integrations/${aws_apigatewayv2_integration.cancel_deployment.id}"
 }
 
 # Lambda Permissions for API Gateway
@@ -385,6 +562,30 @@ resource "aws_lambda_permission" "destroy_infra_api_gw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.destroy_infra.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.infra_manager.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "get_latest_deployment_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_latest_deployment.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.infra_manager.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "list_deployments_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.list_deployments.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.infra_manager.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "cancel_deployment_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cancel_deployment.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.infra_manager.execution_arn}/*/*"
 }

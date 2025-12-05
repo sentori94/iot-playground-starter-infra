@@ -40,3 +40,37 @@ jobs:
 
           # Push
           docker push $ECR_URI:$IMAGE_TAG
+
+      - name: Output Image Summary
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          IMAGE_NAME=prometheus
+          ECR_URI=$ACCOUNT_ID.dkr.ecr.eu-west-3.amazonaws.com/$IMAGE_NAME
+          
+          echo "### 🐳 Prometheus Image Built Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${IMAGE_NAME}" >> $GITHUB_STEP_SUMMARY
+          echo "**Region:** eu-west-3" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📦 Image Details:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **ECR URI:** \`${ECR_URI}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** \`latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🔧 Customizations Included:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Custom prometheus.yml configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Scrape configs for ECS services" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Retention policies configured" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🚀 Deployment:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The ECS service will automatically pull the new image on next deployment." >> $GITHUB_STEP_SUMMARY
+          echo "To force update the running service:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "aws ecs update-service --cluster iot-playground-cluster-dev \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --service iot-playground-prometheus-dev --force-new-deployment" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

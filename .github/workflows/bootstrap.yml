@@ -105,3 +105,70 @@ jobs:
         if: ${{ github.event.inputs.MODE == 'apply' }}
         working-directory: infra/envs/dev
         run: terraform apply -auto-approve -input=false -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" -var="xray_access_key_id=${{ secrets.XRAY_AWS_ACCESS_KEY_ID }}" -var="xray_secret_access_key=${{ secrets.XRAY_AWS_SECRET_ACCESS_KEY }}"
+
+      - name: Output Infrastructure Information
+        if: github.event.inputs.MODE == 'apply'
+        working-directory: infra/envs/dev
+        run: |
+          echo "### 🚀 Infrastructure Bootstrap Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** dev" >> $GITHUB_STEP_SUMMARY
+          echo "**Region:** ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**State Bucket:** ${{ github.event.inputs.STATE_BUCKET_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🌐 Network Resources:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **VPC ID:** \`$(terraform output -raw vpc_id 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **VPC CIDR:** \`$(terraform output -raw vpc_cidr 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🖥️ Compute Resources:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **ECS Cluster:** \`$(terraform output -raw ecs_cluster_name 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Spring App Service:** \`$(terraform output -raw spring_app_service_name 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🔗 Load Balancers:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          SPRING_ALB_DNS=$(terraform output -raw spring_app_alb_dns_name 2>/dev/null || echo "N/A")
+          echo "- **Spring App ALB:** \`${SPRING_ALB_DNS}\`" >> $GITHUB_STEP_SUMMARY
+          PROMETHEUS_ALB_DNS=$(terraform output -raw prometheus_alb_dns_name 2>/dev/null || echo "N/A")
+          echo "- **Prometheus ALB:** \`${PROMETHEUS_ALB_DNS}\`" >> $GITHUB_STEP_SUMMARY
+          GRAFANA_ALB_DNS=$(terraform output -raw grafana_alb_dns_name 2>/dev/null || echo "N/A")
+          echo "- **Grafana ALB:** \`${GRAFANA_ALB_DNS}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🗄️ Database:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **RDS Endpoint:** \`$(terraform output -raw rds_endpoint 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **RDS Database Name:** \`$(terraform output -raw rds_database_name 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📡 API Endpoints:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          REPORTS_API=$(terraform output -raw reports_api_url 2>/dev/null || echo "N/A")
+          echo "- **Reports Download API:** \`${REPORTS_API}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🌍 DNS (Route53):" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Spring App URL:** \`$(terraform output -raw spring_app_url 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Prometheus URL:** \`$(terraform output -raw prometheus_url 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Grafana URL:** \`$(terraform output -raw grafana_url 2>/dev/null || echo "N/A")\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📊 Monitoring:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          GRAFANA_URL=$(terraform output -raw grafana_url 2>/dev/null || echo "N/A")
+          PROMETHEUS_URL=$(terraform output -raw prometheus_url 2>/dev/null || echo "N/A")
+          echo "- [Open Grafana Dashboard](http://${GRAFANA_URL})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Open Prometheus](http://${PROMETHEUS_URL})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### ✅ Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Deploy your Spring Boot application to ECS" >> $GITHUB_STEP_SUMMARY
+          echo "2. Configure your frontend with the API endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "3. Access Grafana to monitor your infrastructure" >> $GITHUB_STEP_SUMMARY
+          echo "4. Check CloudWatch logs for application insights" >> $GITHUB_STEP_SUMMARY

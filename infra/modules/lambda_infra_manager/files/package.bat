@@ -31,48 +31,24 @@ powershell -Command "Compress-Archive -Path handler.py -DestinationPath destroy_
 del handler.py
 echo     OK destroy_infra.zip created
 
+REM Get Latest Deployment Lambda
+echo   -^> Packaging get_latest_deployment...
+if exist get_latest_deployment.zip del get_latest_deployment.zip
+powershell -Command "Compress-Archive -Path get_latest_deployment_handler.py -DestinationPath get_latest_deployment.zip -Force"
+echo     OK get_latest_deployment.zip created
+
+REM List Deployments Lambda
+echo   -^> Packaging list_deployments...
+if exist list_deployments.zip del list_deployments.zip
+powershell -Command "Compress-Archive -Path list_deployments_handler.py -DestinationPath list_deployments.zip -Force"
+echo     OK list_deployments.zip created
+
+REM Cancel Deployment Lambda
+echo   -^> Packaging cancel_deployment...
+if exist cancel_deployment.zip del cancel_deployment.zip
+powershell -Command "Compress-Archive -Path cancel_deployment_handler.py -DestinationPath cancel_deployment.zip -Force"
+echo     OK cancel_deployment.zip created
+
 echo.
 echo All Lambda functions packaged successfully!
-#!/bin/bash
-# Script pour packager les Lambda functions
-
-set -e
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FILES_DIR="$SCRIPT_DIR"
-
-echo "📦 Packaging Lambda functions..."
-
-# Create Infrastructure Lambda
-echo "  → Packaging create_infra..."
-cd "$FILES_DIR"
-if [ -f "create_infra.zip" ]; then
-    rm create_infra.zip
-fi
-cp create_infra_handler.py handler.py
-zip -q create_infra.zip handler.py
-rm handler.py
-echo "    ✓ create_infra.zip created"
-
-# Check Status Lambda
-echo "  → Packaging check_status..."
-if [ -f "check_status.zip" ]; then
-    rm check_status.zip
-fi
-cp check_status_handler.py handler.py
-zip -q check_status.zip handler.py
-rm handler.py
-echo "    ✓ check_status.zip created"
-
-# Destroy Infrastructure Lambda
-echo "  → Packaging destroy_infra..."
-if [ -f "destroy_infra.zip" ]; then
-    rm destroy_infra.zip
-fi
-cp destroy_infra_handler.py handler.py
-zip -q destroy_infra.zip handler.py
-rm handler.py
-echo "    ✓ destroy_infra.zip created"
-
-echo "✅ All Lambda functions packaged successfully!"
-
+pause
