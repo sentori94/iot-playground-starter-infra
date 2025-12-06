@@ -89,3 +89,24 @@ output "github_token_secret_name" {
   description = "AWS Secrets Manager secret name for GitHub token"
   value       = aws_secretsmanager_secret.github_token.name
 }
+
+output "github_token_secret_arn" {
+  description = "AWS Secrets Manager secret ARN for GitHub token"
+  value       = aws_secretsmanager_secret.github_token.arn
+}
+
+# Auto-Destroy outputs
+output "auto_destroy_lambda_arn" {
+  description = "ARN of the auto-destroy Lambda function"
+  value       = var.enable_auto_destroy ? module.auto_destroy_idle[0].lambda_function_arn : null
+}
+
+output "auto_destroy_lambda_name" {
+  description = "Name of the auto-destroy Lambda function"
+  value       = var.enable_auto_destroy ? module.auto_destroy_idle[0].lambda_function_name : null
+}
+
+output "auto_destroy_sns_topic_arn" {
+  description = "ARN of the SNS topic for auto-destroy notifications"
+  value       = var.enable_auto_destroy ? module.auto_destroy_idle[0].sns_topic_arn : null
+}

@@ -52,3 +52,39 @@ variable "github_repo_name" {
   type        = string
 }
 
+# Variables for auto-destroy idle infrastructure
+variable "enable_auto_destroy" {
+  description = "Enable automatic infrastructure destruction on idle"
+  type        = bool
+  default     = true
+}
+
+variable "notification_email" {
+  description = "Email address for auto-destroy notifications"
+  type        = string
+  default     = ""
+}
+
+variable "auto_destroy_cloudwatch_log_group" {
+  description = "CloudWatch log group to monitor for activity"
+  type        = string
+  default     = ""
+}
+
+variable "auto_destroy_log_filter_pattern" {
+  description = "Pattern to search in logs (e.g., 'finished SUCCESS')"
+  type        = string
+  default     = "finished SUCCESS"
+}
+
+variable "auto_destroy_idle_threshold_hours" {
+  description = "Number of hours of inactivity before triggering destroy"
+  type        = number
+  default     = 2
+}
+
+variable "auto_destroy_check_schedule" {
+  description = "EventBridge schedule expression for auto-destroy checks"
+  type        = string
+  default     = "rate(1 hour)"
+}

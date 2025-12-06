@@ -15,5 +15,12 @@ module "infra_manager" {
   # Configuration GitHub
   github_repo_owner = var.github_repo_owner
   github_repo_name  = var.github_repo_name
-}
 
+  # Configuration Auto-Destroy
+  enable_auto_destroy                  = true
+  notification_email                   = "walid.lamkharbech@gmail.com"
+  auto_destroy_cloudwatch_log_group    = "/ecs/${var.project}-spring-app-${var.environment}"
+  auto_destroy_log_filter_pattern      = "finished SUCCESS"
+  auto_destroy_idle_threshold_hours    = 2
+  auto_destroy_check_schedule          = "rate(1 hour)"
+}

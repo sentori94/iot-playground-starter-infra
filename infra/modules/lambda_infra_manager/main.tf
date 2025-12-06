@@ -672,3 +672,34 @@ resource "aws_lambda_permission" "periodic_status_updater_api_gw" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.infra_manager.execution_arn}/*/*"
 }
+
+# ===========================
+# Auto-Destroy Idle Infrastructure Module
+# ===========================
+
+module "auto_destroy_idle" {
+  count  = var.enable_auto_destroy ? 1 : 0
+  source = "../lambda_auto_destroy_idle"
+
+  project     = var.project
+  environment = var.environment
+  aws_region  = var.aws_region
+
+  # Utiliser le même secret GitHub
+  github_token_secret_arn = aws_secretsmanager_secret.github_token.arn
+  github_repo_owner       = var.github_repo_owner
+  github_repo_name        = var.github_repo_name
+
+  # Configuration email
+  notification_email = var.notification_email
+
+  # Configuration de surveillance
+  cloudwatch_log_group   = var.auto_destroy_cloudwatch_log_group != "" ? var.auto_destroy_cloudwatch_log_group : "/ecs/${var.project}-spring-app-${var.environment}"
+  log_filter_pattern     = var.auto_destroy_log_filter_pattern
+  idle_threshold_hours   = var.auto_destroy_idle_threshold_hours
+  check_schedule         = var.auto_destroy_check_schedule
+
+  # VPC Configuration (hérité du module parent)
+  subnet_ids         = var.subnet_ids
+  security_group_ids = var.security_group_ids
+}
