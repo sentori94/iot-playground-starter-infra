@@ -36,9 +36,16 @@ def get_github_token():
     """Récupérer le GitHub token depuis Secrets Manager"""
     try:
         response = secretsmanager.get_secret_value(SecretId=GITHUB_TOKEN_SECRET)
-        return json.loads(response['SecretString'])['token']
+        secret_data = json.loads(response['SecretString'])
+        token = secret_data.get('token')
+        if not token:
+            print(f"⚠️ Token field not found in secret")
+            return None
+        return token
     except Exception as e:
         print(f"⚠️ Failed to get GitHub token: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def check_and_update_github_status(deployment_data):
@@ -50,13 +57,15 @@ def check_and_update_github_status(deployment_data):
 
         # Si déjà terminé ou pas de workflow_run_id, ne pas vérifier
         if current_status in ['SUCCESS', 'FAILED', 'CANCELLED'] or not workflow_run_id:
+            print(f"ℹ️ Deployment {deployment_id} status: {current_status}, workflow_run_id: {workflow_run_id} - No need to check GitHub")
             return deployment_data
 
-        print(f"🔄 Checking GitHub status for active deployment {deployment_id}")
+        print(f"🔄 Checking GitHub status for active deployment {deployment_id} (workflow_run_id: {workflow_run_id})")
 
         # Récupérer le token GitHub
         github_token = get_github_token()
         if not github_token:
+            print(f"⚠️ Cannot check GitHub status without token")
             return deployment_data
 
         # Interroger l'API GitHub
@@ -68,14 +77,16 @@ def check_and_update_github_status(deployment_data):
             'User-Agent': 'Lambda-Infrastructure-Manager'
         }
 
-        response = http.request('GET', url, headers=headers)
+        print(f"📡 Calling GitHub API: {url}")
+        response = http.request('GET', url, headers=headers, timeout=10.0)
 
         if response.status != 200:
             print(f"⚠️ Failed to fetch workflow: HTTP {response.status}")
+            print(f"Response body: {response.data.decode('utf-8')[:500]}")
             return deployment_data
 
         run = json.loads(response.data.decode('utf-8'))
-        github_status = run['status']
+        github_status = run.get('status')
         conclusion = run.get('conclusion')
 
         print(f"📊 GitHub status: {github_status}, conclusion: {conclusion}")
@@ -92,7 +103,7 @@ def check_and_update_github_status(deployment_data):
                 new_status = 'FAILED'
 
             # Mettre à jour DynamoDB
-            print(f"✅ Updating deployment to {new_status}")
+            print(f"✅ Updating deployment {deployment_id} to {new_status}")
             table.update_item(
                 Key={'deployment_id': deployment_id},
                 UpdateExpression='SET #status = :status, updated_at = :timestamp, completed_at = :completed',
@@ -108,7 +119,7 @@ def check_and_update_github_status(deployment_data):
 
         elif github_status == 'in_progress' and current_status != 'IN_PROGRESS':
             new_status = 'IN_PROGRESS'
-            print(f"🔄 Updating deployment to IN_PROGRESS")
+            print(f"🔄 Updating deployment {deployment_id} to IN_PROGRESS")
             table.update_item(
                 Key={'deployment_id': deployment_id},
                 UpdateExpression='SET #status = :status, updated_at = :timestamp',
@@ -120,10 +131,19 @@ def check_and_update_github_status(deployment_data):
             )
             deployment_data['status'] = 'IN_PROGRESS'
 
+        elif github_status == 'queued' and current_status == 'TRIGGERED':
+            # Le workflow est en queue, on garde TRIGGERED
+            print(f"ℹ️ Deployment {deployment_id} is queued in GitHub")
+
+        else:
+            print(f"ℹ️ No status update needed. GitHub: {github_status}, Current: {current_status}")
+
         return deployment_data
 
     except Exception as e:
         print(f"⚠️ Error checking GitHub status: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return deployment_data
 
 def lambda_handler(event, context):
