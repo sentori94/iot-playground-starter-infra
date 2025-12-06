@@ -2,8 +2,6 @@ name: "Stop Resources (Save Costs)"
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 22 * * *"  # Tous les jours à 22h00 UTC (00h00 Paris hiver / 01h00 Paris été)
 
 env:
   AWS_REGION: eu-west-3
@@ -77,4 +75,3 @@ jobs:
           echo "  - 💰 Cost savings: ~90% on compute costs while stopped"
           echo ""
           echo "ℹ️  To restart resources, run the 'Start Resources' workflow"
-

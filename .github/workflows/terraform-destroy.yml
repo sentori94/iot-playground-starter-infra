@@ -1,8 +1,8 @@
 name: "Terraform Destroy"
 
 on:
-  schedule:
-    - cron: "30 0 * * *"   # Tous les jours à 00h30 UTC
+  repository_dispatch:
+    types: [trigger-destroy]
   workflow_dispatch:
     inputs:
       CONFIRM:
@@ -23,7 +23,7 @@ jobs:
   destroy-infra:
     name: "Destroy Infra (Terraform)"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' && github.event.inputs.STATE_BUCKET_NAME == 'iot-playground-tfstate' || github.event_name == 'schedule' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' && github.event.inputs.STATE_BUCKET_NAME == 'iot-playground-tfstate' || github.event_name == 'repository_dispatch' }}
     steps:
       - uses: actions/checkout@v4
 

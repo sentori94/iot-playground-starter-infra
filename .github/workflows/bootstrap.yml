@@ -1,7 +1,13 @@
 name: "Terraform Bootstrap"
+
 on:
   repository_dispatch:
     types: [trigger-bootstrap]
+
+# Empêcher les exécutions concurrentes
+concurrency:
+  group: bootstrap-infrastructure
+  cancel-in-progress: false
 
 env:
   AWS_REGION: eu-west-3
