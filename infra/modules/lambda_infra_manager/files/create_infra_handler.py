@@ -28,8 +28,8 @@ def get_github_token():
     return json.loads(response['SecretString'])['token']
 
 def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
-    """Déclencher le workflow GitHub Actions bootstrap.yml"""
-    url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/workflows/{GITHUB_WORKFLOW_FILE}/dispatches'
+    """Déclencher le workflow GitHub Actions bootstrap.yml via repository_dispatch"""
+    url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/dispatches'
 
     headers = {
         'Authorization': f'token {token}',
@@ -39,8 +39,8 @@ def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
     }
 
     payload = {
-        'ref': 'master',
-        'inputs': {
+        'event_type': 'trigger-bootstrap',
+        'client_payload': {
             'MODE': mode,
             'STATE_BUCKET_NAME': state_bucket_name,
             'CLEAN_SECRETS': 'false'
@@ -57,12 +57,12 @@ def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
     if response.status != 204:
         return response.status, response.data, None
 
-    # ✅ NOUVEAU : Récupérer le workflow_run_id juste après le déclenchement
+    # ✅ Récupérer le workflow_run_id juste après le déclenchement
     print("🔍 Fetching workflow run ID...")
     import time
-    time.sleep(2)  # Attendre 2 secondes pour que GitHub crée le run
+    time.sleep(3)  # Attendre 3 secondes pour que GitHub crée le run
 
-    # Interroger l'API GitHub pour récupérer le dernier run du workflow
+    # Interroger l'API GitHub pour récupérer le dernier run du workflow bootstrap
     runs_url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/workflows/{GITHUB_WORKFLOW_FILE}/runs?per_page=1'
 
     runs_response = http.request('GET', runs_url, headers=headers)
