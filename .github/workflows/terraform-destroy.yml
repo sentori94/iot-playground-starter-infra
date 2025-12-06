@@ -113,6 +113,13 @@ jobs:
             -var="xray_access_key_id=dummy" \
             -var="xray_secret_access_key=dummy"
 
+      - name: Clean existing secrets before destroy
+        run: |
+          echo "Cleaning existing secrets to allow recreation..."
+          aws secretsmanager delete-secret --secret-id iot-playground-rds-credentials-dev --force-delete-without-recovery || echo "RDS secret not found or already deleted"
+          aws secretsmanager delete-secret --secret-id iot-playground-xray-credentials-dev --force-delete-without-recovery || echo "X-Ray secret not found or already deleted"
+          echo "Secrets cleanup completed"
+
   teardown-backend:
     name: "Teardown Backend (S3 + DynamoDB)"
     runs-on: ubuntu-latest
