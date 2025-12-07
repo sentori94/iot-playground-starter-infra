@@ -1,6 +1,6 @@
 output "api_endpoint" {
   description = "API Gateway endpoint URL"
-  value       = "${aws_api_gateway_stage.main.invoke_url}/download"
+  value       = var.domain_name != "" ? "https://${var.domain_name}/download" : "${aws_api_gateway_stage.main.invoke_url}/download"
 }
 
 output "api_key_id" {
@@ -32,4 +32,14 @@ output "api_gateway_id" {
 output "api_key_secret_arn" {
   description = "ARN of the Secrets Manager secret containing the API Key"
   value       = aws_secretsmanager_secret.api_key.arn
+}
+
+output "custom_domain_name" {
+  description = "Custom domain name for the API (if configured)"
+  value       = var.domain_name != "" ? var.domain_name : null
+}
+
+output "custom_domain_regional_domain_name" {
+  description = "Regional domain name for the custom domain (for Route53 alias)"
+  value       = var.domain_name != "" && var.certificate_arn != "" ? aws_api_gateway_domain_name.custom_domain[0].regional_domain_name : null
 }

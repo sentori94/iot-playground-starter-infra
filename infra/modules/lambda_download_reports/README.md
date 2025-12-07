@@ -1,105 +1,110 @@
-# Lambda Download Reports + API Gateway
+# Configuration d'un Domaine Personnalisé pour l'API Gateway Lambda
 
-Ce module crée une API Gateway REST avec un Lambda qui permet de télécharger tous les rapports du bucket S3 sous forme de fichier ZIP.
+## Vue d'ensemble
 
-## Architecture
+Ce module supporte maintenant l'utilisation d'un nom de domaine personnalisé pour votre API Gateway Lambda de téléchargement de rapports. C'est simple à configurer !
 
-- **Lambda Function** : Récupère tous les fichiers du bucket S3 reports et les compresse en ZIP
-- **API Gateway** : Expose une API REST avec endpoint GET `/download`
-- **API Key** : Sécurisation avec clé API et throttling pour limiter l'utilisation
-- **Usage Plan** : 
-  - Rate limit: 2 requêtes/seconde (configurable)
-  - Burst limit: 5 requêtes max (configurable)
-  - Quota: 100 requêtes/jour
+## Ce qui a été ajouté
 
-## Utilisation
+1. **Module ACM Certificate** (`infra/modules/acm_certificate/`) : Gère automatiquement les certificats SSL via AWS Certificate Manager avec validation DNS
+2. **Configuration du domaine personnalisé** dans le module `lambda_download_reports` : Crée le domaine API Gateway et le mapping
+3. **Enregistrement Route53** : Associe automatiquement votre domaine à l'API Gateway
 
-### 1. Récupérer l'API Key
+## Comment l'utiliser
 
-Après le déploiement Terraform, récupérez l'API Key :
+### 1. Dans votre fichier `terraform.tfvars`
+
+Ajoutez simplement ces variables :
+
+```hcl
+# Zone Route53 (obligatoire)
+route53_zone_name = "example.com"
+
+# Domaine personnalisé pour l'API Reports (optionnel)
+api_reports_domain_name = "api-reports.example.com"
+```
+
+### 2. Déploiement
 
 ```bash
-terraform output -raw reports_api_key
+cd infra/envs/dev
+terraform init
+terraform plan
+terraform apply
 ```
 
-### 2. Récupérer l'URL de l'API
+## Ce qui se passe automatiquement
 
-```bash
-terraform output reports_api_endpoint
+1. **Certificat SSL** : Un certificat ACM est créé pour votre domaine avec validation DNS automatique via Route53
+2. **Domaine API Gateway** : Un domaine personnalisé régional est créé et associé au certificat
+3. **Mapping** : L'API est automatiquement mappée au domaine personnalisé
+4. **Route53** : Un enregistrement A (alias) est créé pointant vers le domaine API Gateway
+5. **URL mise à jour** : L'output `api_endpoint` retourne automatiquement l'URL avec votre domaine personnalisé
+
+## Résultat
+
+### Avant (sans domaine personnalisé)
+```
+API Endpoint: https://abc123xyz.execute-api.eu-west-3.amazonaws.com/dev/download
 ```
 
-### 3. Télécharger les rapports
-
-Utilisez curl avec l'API Key dans le header `x-api-key` :
-
-```bash
-curl -H "x-api-key: VOTRE_API_KEY" \
-     "https://xxxxx.execute-api.eu-west-3.amazonaws.com/prod/download" \
-     -o reports.zip
+### Après (avec domaine personnalisé)
+```
+API Endpoint: https://api-reports.example.com/download
 ```
 
-Ou avec wget :
+## Configuration optionnelle
 
-```bash
-wget --header="x-api-key: VOTRE_API_KEY" \
-     "https://xxxxx.execute-api.eu-west-3.amazonaws.com/prod/download" \
-     -O reports.zip
-```
+Si vous ne configurez pas `api_reports_domain_name`, l'API Gateway continuera de fonctionner avec son URL par défaut. C'est totalement optionnel !
 
-### 4. Exemple avec Python
+## Variables disponibles
 
-```python
-import requests
-
-api_key = "votre_api_key"
-endpoint = "https://xxxxx.execute-api.eu-west-3.amazonaws.com/prod/download"
-
-headers = {
-    "x-api-key": api_key
-}
-
-response = requests.get(endpoint, headers=headers)
-
-if response.status_code == 200:
-    with open("reports.zip", "wb") as f:
-        f.write(response.content)
-    print("Rapports téléchargés avec succès!")
-else:
-    print(f"Erreur: {response.status_code} - {response.text}")
-```
-
-## Variables
-
-| Variable | Description | Défaut |
+| Variable | Description | Requis |
 |----------|-------------|--------|
-| `project` | Nom du projet | - |
-| `environment` | Environnement (dev, prod) | - |
-| `reports_bucket` | Nom du bucket S3 contenant les rapports | - |
-| `api_throttle_rate_limit` | Limite de requêtes par seconde | 2 |
-| `api_throttle_burst_limit` | Limite de burst | 5 |
+| `route53_zone_name` | Nom de votre zone Route53 hébergée | Oui (pour domaine personnalisé) |
+| `api_reports_domain_name` | Nom de domaine pour l'API (ex: api-reports.example.com) | Non |
 
-## Outputs
+## Notes importantes
 
-| Output | Description |
-|--------|-------------|
-| `api_endpoint` | URL complète de l'API |
-| `api_key_id` | ID de l'API Key |
-| `api_key_value` | Valeur de l'API Key (sensible) |
-| `lambda_function_name` | Nom de la fonction Lambda |
-| `api_gateway_id` | ID de l'API Gateway |
+- **Propagation DNS** : La première fois, la validation du certificat peut prendre 5-10 minutes
+- **Région** : Le certificat ACM doit être dans la même région que votre API Gateway (eu-west-3 dans votre cas)
+- **HTTPS uniquement** : Les domaines personnalisés API Gateway utilisent toujours HTTPS
+- **Coût** : Pas de coût supplémentaire pour le domaine personnalisé API Gateway ni pour les certificats ACM
 
-## Sécurité
+## Exemple de configuration complète
 
-- ✅ API Key obligatoire pour accéder à l'API
-- ✅ Throttling configuré (2 req/s, burst 5)
-- ✅ Quota journalier (100 requêtes/jour)
-- ✅ Lambda avec permissions IAM minimales (lecture seule sur le bucket S3)
-- ✅ API Key marquée comme sensible dans les outputs Terraform
+```hcl
+# terraform.tfvars
+project                  = "iot-playground"
+env                      = "dev"
+route53_zone_name        = "sentori-studio.com"
+api_reports_domain_name  = "api-reports.sentori-studio.com"
+backend_domain_name      = "api.sentori-studio.com"
+grafana_domain_name      = "grafana.sentori-studio.com"
+prometheus_domain_name   = "prometheus.sentori-studio.com"
+```
 
-## Notes
+## Outputs disponibles
 
-- Le Lambda a un timeout de 60 secondes et 512 MB de mémoire
-- Les fichiers sont zippés en mémoire (BytesIO) pour économiser l'espace disque
-- Le nom du fichier ZIP contient un timestamp pour faciliter l'organisation
-- Si le bucket est vide, l'API retourne un 404 avec le message "No reports found"
+Après le déploiement, vous pouvez voir :
+
+```bash
+terraform output
+```
+
+- `lambda_download_reports_api_endpoint` : URL complète de l'API (avec domaine personnalisé si configuré)
+- `lambda_download_reports_custom_domain` : Nom du domaine personnalisé
+- `lambda_download_reports_api_key_id` : ID de la clé API
+
+## Dépannage
+
+### Le certificat ne se valide pas
+- Vérifiez que la zone Route53 est bien configurée
+- Attendez 10-15 minutes pour la propagation DNS
+- Vérifiez les enregistrements de validation dans Route53
+
+### L'API ne répond pas sur le domaine personnalisé
+- Attendez quelques minutes après le déploiement pour la propagation
+- Vérifiez que le mapping est créé dans la console API Gateway
+- Testez avec `curl -v https://votre-domaine.com/download`
 

@@ -400,6 +400,28 @@ module "lambda_download_reports" {
   reports_bucket            = module.s3_reports.bucket_name
   api_throttle_rate_limit   = 2   # 2 requêtes par seconde
   api_throttle_burst_limit  = 5   # Burst de 5 requêtes max
+
+  # Configuration du domaine personnalisé (optionnel)
+  domain_name               = var.api_reports_domain_name
+  route53_zone_id           = var.route53_zone_name != "" ? module.route53[0].zone_id : ""
+  certificate_arn           = var.api_reports_domain_name != "" && var.route53_zone_name != "" ? module.acm_api_reports[0].certificate_arn : ""
+
+  depends_on = [
+    module.route53,
+    module.acm_api_reports
+  ]
+}
+
+# ===========================
+# ACM Certificate pour l'API Reports (optionnel)
+# ===========================
+module "acm_api_reports" {
+  count  = var.api_reports_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
+  source = "../../modules/acm_certificate"
+
+  domain_name     = var.api_reports_domain_name
+  route53_zone_id = module.route53[0].zone_id
+  tags            = local.common_tags
 }
 
 # Note: Les configurations Prometheus et Grafana sont maintenant gérées dynamiquement

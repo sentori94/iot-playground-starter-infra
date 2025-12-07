@@ -68,6 +68,12 @@ variable "grafana_domain_name" {
   default     = ""
 }
 
+variable "api_reports_domain_name" {
+  description = "Nom de domaine pour l'API de téléchargement des rapports (ex: api-reports.example.com)"
+  type        = string
+  default     = ""
+}
+
 variable "frontend_url" {
   description = "URL complète du frontend pour CORS (ex: https://app.sentori-studio.com)"
   type        = string

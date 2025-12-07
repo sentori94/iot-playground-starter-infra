@@ -213,3 +213,48 @@ resource "aws_secretsmanager_secret_version" "api_key" {
     api_key = aws_api_gateway_api_key.reports_api_key.value
   })
 }
+
+# ===========================
+# Custom Domain pour API Gateway (optionnel)
+# ===========================
+
+resource "aws_api_gateway_domain_name" "custom_domain" {
+  count = var.domain_name != "" && var.certificate_arn != "" ? 1 : 0
+
+  domain_name              = var.domain_name
+  regional_certificate_arn = var.certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Mapping du domaine personnalisé vers l'API et le stage
+resource "aws_api_gateway_base_path_mapping" "custom_domain_mapping" {
+  count = var.domain_name != "" && var.certificate_arn != "" ? 1 : 0
+
+  api_id      = aws_api_gateway_rest_api.reports_api.id
+  stage_name  = aws_api_gateway_stage.main.stage_name
+  domain_name = aws_api_gateway_domain_name.custom_domain[0].domain_name
+}
+
+# Enregistrement Route53 pour le domaine personnalisé
+resource "aws_route53_record" "api_domain" {
+  count = var.domain_name != "" && var.route53_zone_id != "" && var.certificate_arn != "" ? 1 : 0
+
+  zone_id = var.route53_zone_id
+  name    = var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_api_gateway_domain_name.custom_domain[0].regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.custom_domain[0].regional_zone_id
+    evaluate_target_health = true
+  }
+}

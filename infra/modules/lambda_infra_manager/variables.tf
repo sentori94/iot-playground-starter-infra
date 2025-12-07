@@ -88,3 +88,21 @@ variable "auto_destroy_check_schedule" {
   type        = string
   default     = "rate(1 hour)"
 }
+
+variable "domain_name" {
+  description = "Custom domain name for API Gateway (ex: infra-manager.example.com)"
+  type        = string
+  default     = ""
+}
+
+variable "route53_zone_id" {
+  description = "Route53 hosted zone ID for the domain"
+  type        = string
+  default     = ""
+}
+
+variable "certificate_arn" {
+  description = "ARN of ACM certificate for the custom domain (must be in the same region)"
+  type        = string
+  default     = ""
+}

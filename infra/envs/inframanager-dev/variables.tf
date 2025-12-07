@@ -31,3 +31,15 @@ variable "github_repo_name" {
   type        = string
   default     = "iot-playground-starter-infra"
 }
+
+variable "route53_zone_name" {
+  description = "Nom de la zone Route53 hébergée (ex: sentori-studio.com)"
+  type        = string
+  default     = ""
+}
+
+variable "infra_manager_domain_name" {
+  description = "Nom de domaine pour l'API Infrastructure Manager (ex: infra-manager.sentori-studio.com)"
+  type        = string
+  default     = ""
+}

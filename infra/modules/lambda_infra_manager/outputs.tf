@@ -60,24 +60,34 @@ output "cancel_deployment_lambda_name" {
 
 output "api_gateway_url" {
   description = "API Gateway invoke URL"
-  value       = aws_apigatewayv2_stage.default.invoke_url
+  value       = var.domain_name != "" ? "https://${var.domain_name}" : aws_apigatewayv2_stage.default.invoke_url
 }
 
 output "api_endpoints" {
   description = "All API endpoints"
   value = {
-    create_infra         = "${aws_apigatewayv2_stage.default.invoke_url}/infra/create"
-    destroy_infra        = "${aws_apigatewayv2_stage.default.invoke_url}/infra/destroy"
-    check_status         = "${aws_apigatewayv2_stage.default.invoke_url}/infra/status/{deploymentId}"
-    latest_deployment    = "${aws_apigatewayv2_stage.default.invoke_url}/infra/latest-deployment"
-    list_deployments     = "${aws_apigatewayv2_stage.default.invoke_url}/infra/list-deployments"
-    cancel_deployment    = "${aws_apigatewayv2_stage.default.invoke_url}/infra/cancel-deployment"
+    create_infra         = var.domain_name != "" ? "https://${var.domain_name}/infra/create" : "${aws_apigatewayv2_stage.default.invoke_url}/infra/create"
+    destroy_infra        = var.domain_name != "" ? "https://${var.domain_name}/infra/destroy" : "${aws_apigatewayv2_stage.default.invoke_url}/infra/destroy"
+    check_status         = var.domain_name != "" ? "https://${var.domain_name}/infra/status/{deploymentId}" : "${aws_apigatewayv2_stage.default.invoke_url}/infra/status/{deploymentId}"
+    latest_deployment    = var.domain_name != "" ? "https://${var.domain_name}/infra/latest-deployment" : "${aws_apigatewayv2_stage.default.invoke_url}/infra/latest-deployment"
+    list_deployments     = var.domain_name != "" ? "https://${var.domain_name}/infra/list-deployments" : "${aws_apigatewayv2_stage.default.invoke_url}/infra/list-deployments"
+    cancel_deployment    = var.domain_name != "" ? "https://${var.domain_name}/infra/cancel-deployment" : "${aws_apigatewayv2_stage.default.invoke_url}/infra/cancel-deployment"
   }
 }
 
 output "api_gateway_id" {
   description = "API Gateway ID"
   value       = aws_apigatewayv2_api.infra_manager.id
+}
+
+output "custom_domain_name" {
+  description = "Custom domain name for the API (if configured)"
+  value       = var.domain_name != "" ? var.domain_name : null
+}
+
+output "custom_domain_target" {
+  description = "Target domain name for the custom domain (for Route53 alias)"
+  value       = var.domain_name != "" && var.certificate_arn != "" ? aws_apigatewayv2_domain_name.custom_domain[0].domain_name_configuration[0].target_domain_name : null
 }
 
 output "deployments_table_name" {

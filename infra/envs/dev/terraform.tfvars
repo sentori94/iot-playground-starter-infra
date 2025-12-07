@@ -16,10 +16,11 @@ prom_image_ecr    = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/prometheus:lat
 image_url = "908518190934.dkr.ecr.eu-west-3.amazonaws.com/iot-playground-starter:latest"
 
 # Route53 - Domaine personnalisé
-route53_zone_name      = "sentori-studio.com"
-backend_domain_name    = "api-iot.sentori-studio.com"
-prometheus_domain_name = "prometheus-iot.sentori-studio.com"
-grafana_domain_name    = "grafana-iot.sentori-studio.com"
+route53_zone_name       = "sentori-studio.com"
+backend_domain_name     = "api-iot.sentori-studio.com"
+prometheus_domain_name  = "prometheus-iot.sentori-studio.com"
+grafana_domain_name     = "grafana-iot.sentori-studio.com"
+api_reports_domain_name = "api-reports-iot.sentori-studio.com"
 
 # Frontend URL pour CORS (inclut localhost pour développement)
 frontend_url = "https://app-iot.sentori-studio.com,http://app-iot.sentori-studio.com,http://localhost:3000,http://localhost:4200,http://localhost:5173,http://localhost:8080"
