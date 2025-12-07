@@ -53,23 +53,171 @@ jobs:
         run: |
           set -e
 
-          # 1) Dissocier et libérer toutes les EIP actuellement associées
-          echo "Detaching and releasing associated Elastic IPs..."
-          aws ec2 describe-addresses --filters Name=domain,Values=vpc --query 'Addresses[?AssociationId!=`null`].[AssociationId,AllocationId]' --output text | \
-          while read -r assoc alloc; do
-            if [ -n "$assoc" ] && [ "$assoc" != "None" ]; then
-              echo "Disassociate $assoc"
-              aws ec2 disassociate-address --association-id "$assoc" || true
-            fi
-            if [ -n "$alloc" ] && [ "$alloc" != "None" ]; then
-              echo "Release allocation $alloc"
-              aws ec2 release-address --allocation-id "$alloc" || true
-            fi
-          done || true
+          # Identifier le VPC du projet pour éviter de toucher aux autres ressources
+          echo "🔍 Identifying project VPC..."
+          PROJECT_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Project,Values=iot-playground" "Name=tag:Environment,Values=dev" --query 'Vpcs[0].VpcId' --output text 2>/dev/null || echo "")
+          
+          if [ -z "$PROJECT_VPC_ID" ] || [ "$PROJECT_VPC_ID" = "None" ]; then
+            echo "⚠️ Project VPC not found, will proceed with caution"
+          else
+            echo "✅ Found project VPC: $PROJECT_VPC_ID"
+          fi
 
-          # 2) Vider uniquement le bucket reports (PAS le bucket backend terraform)
+          # 0) Arrêter et terminer toutes les instances EC2 du projet (elles bloquent l'IGW)
+          echo "🛑 Stopping and terminating EC2 instances in project VPC..."
+          if [ -n "$PROJECT_VPC_ID" ] && [ "$PROJECT_VPC_ID" != "None" ]; then
+            aws ec2 describe-instances --filters "Name=vpc-id,Values=$PROJECT_VPC_ID" "Name=instance-state-name,Values=running,stopped,stopping" --query 'Reservations[*].Instances[*].InstanceId' --output text | tr '\t' '\n' | \
+            while read -r instance_id; do
+              if [ -n "$instance_id" ] && [ "$instance_id" != "None" ]; then
+                echo "Terminating instance: $instance_id"
+                aws ec2 terminate-instances --instance-ids "$instance_id" || true
+              fi
+            done || true
+            
+            # Attendre que les instances soient terminées
+            echo "⏳ Waiting for instances to terminate (max 2 minutes)..."
+            for i in {1..24}; do
+              instance_count=$(aws ec2 describe-instances --filters "Name=vpc-id,Values=$PROJECT_VPC_ID" "Name=instance-state-name,Values=running,stopped,stopping,shutting-down" --query 'length(Reservations[*].Instances[*])' --output text 2>/dev/null || echo "0")
+              if [ "$instance_count" = "0" ]; then
+                echo "✅ All instances terminated"
+                break
+              fi
+              echo "Still waiting... ($instance_count instances remaining)"
+              sleep 5
+            done || true
+          else
+            echo "⚠️ Skipping EC2 instance cleanup (VPC not identified)"
+          fi
+
+          # 1) Dissocier et libérer TOUTES les EIP du VPC (y compris celles sans tags)
+          echo "🔌 Detaching and releasing ALL Elastic IPs in project VPC..."
+          if [ -n "$PROJECT_VPC_ID" ] && [ "$PROJECT_VPC_ID" != "None" ]; then
+            # Méthode 1: Via tags (si présents)
+            aws ec2 describe-addresses --filters "Name=tag:Project,Values=iot-playground" --query 'Addresses[*].[AssociationId,AllocationId]' --output text | \
+            while read -r assoc alloc; do
+              if [ -n "$assoc" ] && [ "$assoc" != "None" ] && [ "$assoc" != "null" ]; then
+                echo "Disassociate tagged EIP: $assoc"
+                aws ec2 disassociate-address --association-id "$assoc" || true
+              fi
+              if [ -n "$alloc" ] && [ "$alloc" != "None" ]; then
+                echo "Release tagged EIP: $alloc"
+                aws ec2 release-address --allocation-id "$alloc" || true
+              fi
+            done || true
+            
+            # Méthode 2: Via toutes les ENI du VPC (pour attraper les EIP sans tags)
+            aws ec2 describe-network-interfaces --filters "Name=vpc-id,Values=$PROJECT_VPC_ID" --query 'NetworkInterfaces[?Association.PublicIp].Association.AllocationId' --output text | tr '\t' '\n' | \
+            while read -r alloc; do
+              if [ -n "$alloc" ] && [ "$alloc" != "None" ] && [ "$alloc" != "null" ]; then
+                echo "Found EIP allocation in VPC ENI: $alloc"
+                # Dissocier d'abord
+                assoc_id=$(aws ec2 describe-addresses --allocation-ids "$alloc" --query 'Addresses[0].AssociationId' --output text 2>/dev/null || echo "")
+                if [ -n "$assoc_id" ] && [ "$assoc_id" != "None" ] && [ "$assoc_id" != "null" ]; then
+                  echo "Disassociate EIP: $assoc_id"
+                  aws ec2 disassociate-address --association-id "$assoc_id" || true
+                  sleep 2
+                fi
+                echo "Release EIP: $alloc"
+                aws ec2 release-address --allocation-id "$alloc" || true
+              fi
+            done || true
+          else
+            echo "⚠️ Skipping EIP cleanup (VPC not identified)"
+          fi
+
+          # 2) Forcer la suppression des NAT Gateways DU PROJET (ils gardent des EIP)
+          echo "🗑️ Deleting NAT Gateways from project VPC..."
+          if [ -n "$PROJECT_VPC_ID" ] && [ "$PROJECT_VPC_ID" != "None" ]; then
+            aws ec2 describe-nat-gateways --filter "Name=vpc-id,Values=$PROJECT_VPC_ID" "Name=state,Values=available,pending,deleting" --query 'NatGateways[*].[NatGatewayId,State]' --output text | \
+            while read -r nat_id state; do
+              if [ -n "$nat_id" ] && [ "$nat_id" != "None" ]; then
+                echo "Deleting NAT Gateway: $nat_id (state: $state)"
+                aws ec2 delete-nat-gateway --nat-gateway-id "$nat_id" || true
+              fi
+            done || true
+            
+            # Attendre que les NAT Gateways soient supprimés
+            echo "⏳ Waiting for NAT Gateways to be deleted (max 3 minutes)..."
+            for i in {1..36}; do
+              nat_count=$(aws ec2 describe-nat-gateways --filter "Name=vpc-id,Values=$PROJECT_VPC_ID" "Name=state,Values=available,pending,deleting" --query 'length(NatGateways)' --output text)
+              if [ "$nat_count" = "0" ]; then
+                echo "✅ All NAT Gateways deleted"
+                break
+              fi
+              echo "Still waiting... ($nat_count NAT Gateways remaining)"
+              sleep 5
+            done || true
+            
+            # Après suppression des NAT Gateways, libérer leurs EIP orphelines DU PROJET uniquement
+            echo "🔌 Releasing NAT Gateway Elastic IPs (project only)..."
+            # Récupérer toutes les EIP ET vérifier si elles sont dans notre VPC
+            aws ec2 describe-addresses --filters "Name=domain,Values=vpc" --query 'Addresses[].[AllocationId,PublicIp,NetworkInterfaceId]' --output text | \
+            while read -r alloc pub_ip eni_id; do
+              if [ -n "$alloc" ] && [ "$alloc" != "None" ]; then
+                # Si l'EIP n'a pas d'ENI (orpheline), vérifier si elle était dans notre VPC
+                if [ -z "$eni_id" ] || [ "$eni_id" = "None" ] || [ "$eni_id" = "null" ]; then
+                  # Vérifier via les tags si elle appartient au projet
+                  vpc_check=$(aws ec2 describe-addresses --allocation-ids "$alloc" --query 'Addresses[0].Tags[?Key==`Project`].Value' --output text 2>/dev/null || echo "")
+                  # ⚠️ SÉCURITÉ : Ne libérer QUE les EIP taggées avec Project=iot-playground
+                  if [ "$vpc_check" = "iot-playground" ]; then
+                    echo "Release orphaned EIP: $alloc ($pub_ip)"
+                    aws ec2 release-address --allocation-id "$alloc" || true
+                  elif [ -z "$vpc_check" ]; then
+                    # Pour les EIP sans tags, vérifier si elles étaient attachées au VPC du projet via l'historique
+                    eip_vpc=$(aws ec2 describe-addresses --allocation-ids "$alloc" --query 'Addresses[0].NetworkInterfaceOwnerId' --output text 2>/dev/null || echo "")
+                    if [ -n "$eip_vpc" ] && [ "$eip_vpc" != "None" ] && [ "$eip_vpc" != "null" ]; then
+                      # Vérifier si le propriétaire correspond à notre VPC
+                      echo "⚠️ Skipping untagged EIP $alloc (cannot confirm ownership, being cautious)"
+                    else
+                      echo "⚠️ Skipping untagged EIP $alloc (no project tag, being cautious)"
+                    fi
+                  else
+                    echo "Skipping EIP $alloc (belongs to another project: $vpc_check)"
+                  fi
+                fi
+              fi
+            done || true
+          else
+            echo "⚠️ Skipping NAT Gateway cleanup (VPC not identified)"
+          fi
+
+          # 3) Supprimer les ENI non attachées DU VPC DU PROJET
+          echo "🔌 Deleting unattached ENIs from project VPC..."
+          if [ -n "$PROJECT_VPC_ID" ] && [ "$PROJECT_VPC_ID" != "None" ]; then
+            aws ec2 describe-network-interfaces --filters "Name=vpc-id,Values=$PROJECT_VPC_ID" "Name=status,Values=available" --query 'NetworkInterfaces[*].[NetworkInterfaceId,Description]' --output text | \
+            while read -r eni_id description; do
+              if [ -n "$eni_id" ] && [ "$eni_id" != "None" ]; then
+                # Ne pas toucher aux ENI par défaut
+                if [[ "$description" != *"Primary network interface"* ]] && [[ "$description" != *"ELB"* ]]; then
+                  echo "Deleting ENI: $eni_id"
+                  aws ec2 delete-network-interface --network-interface-id "$eni_id" || true
+                fi
+              fi
+            done || true
+          else
+            echo "⚠️ Skipping ENI cleanup (VPC not identified)"
+          fi
+
+          # 4) Détacher et supprimer l'IGW DU PROJET
+          echo "🌐 Detaching Internet Gateway from project VPC..."
+          if [ -n "$PROJECT_VPC_ID" ] && [ "$PROJECT_VPC_ID" != "None" ]; then
+            aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$PROJECT_VPC_ID" --query 'InternetGateways[*].InternetGatewayId' --output text | \
+            while read -r igw_id; do
+              if [ -n "$igw_id" ] && [ "$igw_id" != "None" ]; then
+                echo "Detaching IGW $igw_id from VPC $PROJECT_VPC_ID"
+                aws ec2 detach-internet-gateway --internet-gateway-id "$igw_id" --vpc-id "$PROJECT_VPC_ID" || true
+                sleep 2
+                echo "Deleting IGW $igw_id"
+                aws ec2 delete-internet-gateway --internet-gateway-id "$igw_id" || true
+              fi
+            done || true
+          else
+            echo "⚠️ Skipping IGW cleanup (VPC not identified)"
+          fi
+
+          # 5) Vider uniquement le bucket reports (PAS le bucket backend terraform)
           BUCKET="iot-playground-dev-reports"
-          echo "Cleaning bucket: $BUCKET"
+          echo "🗑️ Cleaning bucket: $BUCKET"
           # Vérifier si le bucket existe
           if aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
             # Supprime toutes les versions
@@ -97,7 +245,7 @@ jobs:
             echo "Bucket $BUCKET does not exist, skipping"
           fi
 
-          echo "Pre-destroy cleanup finished."
+          echo "✅ Pre-destroy cleanup finished (only project resources affected)."
 
       # Terraform demande toujours les variables déclarées ; on passe les secrets même pour destroy
       - name: Terraform destroy
@@ -160,8 +308,8 @@ jobs:
           if aws dynamodb describe-table --table-name "$TABLE" >/dev/null 2>&1; then
             echo "Table exists, scanning and deleting all items..."
             
-            # Scanner la table et supprimer tous les items
-            aws dynamodb scan --table-name "$TABLE" --attributes-to-get "deployment_id" --query "Items[].deployment_id.S" --output text | \
+            # Scanner la table et supprimer tous les items (un par ligne)
+            aws dynamodb scan --table-name "$TABLE" --attributes-to-get "deployment_id" --query "Items[].deployment_id.S" --output text | tr '\t' '\n' | \
             while read -r deployment_id; do
               if [ -n "$deployment_id" ] && [ "$deployment_id" != "None" ]; then
                 echo "Deleting deployment: $deployment_id"
