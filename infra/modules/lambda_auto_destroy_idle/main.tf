@@ -62,7 +62,13 @@ resource "aws_iam_role_policy" "auto_destroy_policy" {
       {
         Effect = "Allow"
         Action = [
-          "logs:DescribeLogGroups",
+          "logs:DescribeLogGroups"
+        ]
+        Resource = "arn:aws:logs:${var.aws_region}:*:log-group:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:DescribeLogStreams",
           "logs:FilterLogEvents",
           "logs:GetLogEvents"

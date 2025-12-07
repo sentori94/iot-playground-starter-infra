@@ -54,7 +54,7 @@ variable "idle_threshold_hours" {
 variable "check_schedule" {
   description = "EventBridge schedule expression (default: every hour)"
   type        = string
-  default     = "rate(1 hour)"
+  default     = "rate(6 hours)"
 }
 
 variable "subnet_ids" {
@@ -68,4 +68,3 @@ variable "security_group_ids" {
   type        = list(string)
   default     = []
 }
-

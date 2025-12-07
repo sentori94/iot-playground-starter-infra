@@ -212,7 +212,7 @@ module "spring_app_service" {
     },
     {
       name  = "REPORTS_API_GATEWAY_URL"
-      value = module.lambda_download_reports.api_endpoint
+      value = var.api_reports_domain_name != "" ? "https://${var.api_reports_domain_name}/download" : module.lambda_download_reports.api_endpoint
     },
     {
       name  = "CORS_ALLOWED_ORIGINS"
