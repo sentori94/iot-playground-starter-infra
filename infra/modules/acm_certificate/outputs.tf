@@ -13,3 +13,7 @@ output "certificate_validation_status" {
   value       = aws_acm_certificate_validation.cert.id
 }
 
+output "certificate_validated_arn" {
+  description = "ARN of the validated certificate (use this for dependencies)"
+  value       = aws_acm_certificate_validation.cert.certificate_arn
+}

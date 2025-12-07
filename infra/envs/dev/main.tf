@@ -404,7 +404,8 @@ module "lambda_download_reports" {
   # Configuration du domaine personnalisé (optionnel)
   domain_name               = var.api_reports_domain_name
   route53_zone_id           = var.route53_zone_name != "" ? module.route53[0].zone_id : ""
-  certificate_arn           = var.api_reports_domain_name != "" && var.route53_zone_name != "" ? module.acm_api_reports[0].certificate_arn : ""
+  # Utiliser le certificat VALIDÉ pour garantir qu'il est prêt
+  certificate_arn           = var.api_reports_domain_name != "" && var.route53_zone_name != "" ? module.acm_api_reports[0].certificate_validated_arn : ""
 
   depends_on = [
     module.route53,

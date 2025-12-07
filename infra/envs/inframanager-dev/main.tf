@@ -43,7 +43,8 @@ module "infra_manager" {
   # Configuration du domaine personnalisé (optionnel)
   domain_name      = var.infra_manager_domain_name
   route53_zone_id  = var.route53_zone_name != "" ? module.route53[0].zone_id : ""
-  certificate_arn  = var.infra_manager_domain_name != "" && var.route53_zone_name != "" ? module.acm_infra_manager[0].certificate_arn : ""
+  # Utiliser le certificat VALIDÉ pour garantir qu'il est prêt
+  certificate_arn  = var.infra_manager_domain_name != "" && var.route53_zone_name != "" ? module.acm_infra_manager[0].certificate_validated_arn : ""
 
   # Configuration Auto-Destroy
   enable_auto_destroy                  = true

@@ -38,9 +38,13 @@ resource "aws_route53_record" "cert_validation" {
   zone_id         = var.route53_zone_id
 }
 
-# Attendre la validation du certificat
+# Attendre la validation du certificat - IMPORTANT pour éviter les problèmes de timing
 resource "aws_acm_certificate_validation" "cert" {
   certificate_arn         = aws_acm_certificate.cert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
-}
 
+  # Timeout plus long pour la validation DNS
+  timeouts {
+    create = "15m"
+  }
+}
