@@ -380,11 +380,11 @@ resource "aws_lambda_function" "periodic_status_updater" {
   }
 }
 
-# EventBridge Rule pour déclencher la lambda toutes les 30 secondes
+# EventBridge Rule pour déclencher la lambda toutes les minutes
 resource "aws_cloudwatch_event_rule" "periodic_status_update" {
   name                = "${var.project}-${var.environment}-periodic-status-update"
-  description         = "Trigger status updater lambda every 30 seconds"
-  schedule_expression = "rate(30 seconds)"
+  description         = "Trigger status updater lambda every minute"
+  schedule_expression = "rate(1 minute)"
 
   tags = {
     Name        = "${var.project}-${var.environment}-periodic-status-update"
