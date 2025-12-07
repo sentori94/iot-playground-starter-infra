@@ -3,16 +3,6 @@ name: "Terraform Destroy"
 on:
   repository_dispatch:
     types: [trigger-destroy]
-  workflow_dispatch:
-    inputs:
-      CONFIRM:
-        description: "Tapez EXACTEMENT: DESTROY-MY-INFRA"
-        required: true
-        default: "type here"
-      STATE_BUCKET_NAME:
-        description: "Nom du bucket S3 du backend (ex: iot-playground-tfstate)"
-        default: "iot-playground-tfstate"
-        required: true
 
 # Empêcher les exécutions concurrentes avec bootstrap.yml et bootstrap-manual.yml
 concurrency:
@@ -23,12 +13,12 @@ env:
   AWS_REGION: eu-west-3
   DDB_LOCK_TABLE: terraform-locks
   STATE_KEY: envs/dev/terraform.tfstate
+  STATE_BUCKET_NAME: iot-playground-tfstate
 
 jobs:
   destroy-infra:
     name: "Destroy Infra (Terraform)"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' && github.event.inputs.STATE_BUCKET_NAME == 'iot-playground-tfstate' || github.event_name == 'repository_dispatch' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -44,14 +34,14 @@ jobs:
 
       - name: Fail if backend bucket missing (safety)
         run: |
-          aws s3api head-bucket --bucket "${{ github.event.inputs.STATE_BUCKET_NAME }}" >/dev/null 2>&1 \
+          aws s3api head-bucket --bucket "${{ env.STATE_BUCKET_NAME }}" >/dev/null 2>&1 \
             || { echo "Backend bucket not found"; exit 1; }
 
       - name: Terraform init (S3 backend)
         working-directory: infra/envs/dev
         run: |
           terraform init -input=false \
-            -backend-config="bucket=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
+            -backend-config="bucket=${{ env.STATE_BUCKET_NAME }}" \
             -backend-config="key=${{ env.STATE_KEY }}" \
             -backend-config="region=${{ env.AWS_REGION }}" \
             -backend-config="dynamodb_table=${{ env.DDB_LOCK_TABLE }}" \
@@ -114,7 +104,7 @@ jobs:
         working-directory: infra/envs/dev
         run: |
           terraform destroy -auto-approve -input=false \
-            -var="state_bucket_name=${{ github.event.inputs.STATE_BUCKET_NAME }}" \
+            -var="state_bucket_name=${{ env.STATE_BUCKET_NAME }}" \
             -var="xray_access_key_id=dummy" \
             -var="xray_secret_access_key=dummy"
 
@@ -129,7 +119,7 @@ jobs:
     name: "Teardown Backend (S3 + DynamoDB)"
     runs-on: ubuntu-latest
     needs: destroy-infra
-    if: ${{ needs.destroy-infra.result == 'success' && github.event.inputs.CONFIRM == 'DESTROY-MY-INFRA' }}
+    if: ${{ needs.destroy-infra.result == 'success' }}
     steps:
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -140,9 +130,9 @@ jobs:
 
       - name: Delete state object(s) from S3 (idempotent)
         run: |
-          BUCKET="${{ github.event.inputs.STATE_BUCKET_NAME }}"
+          BUCKET="${{ env.STATE_BUCKET_NAME }}"
           KEY="${{ env.STATE_KEY }}"
-          # Supprime la clé de state et d’éventuelles versions/locks
+          # Supprime la clé de state et d'éventuelles versions/locks
           aws s3 rm "s3://$BUCKET/$KEY" --recursive || true
           # Si le bucket est versionné, on purge tout
           aws s3api list-object-versions --bucket "$BUCKET" --query 'Versions[].{K:Key,V:VersionId}' --output text 2>/dev/null | \
@@ -156,10 +146,33 @@ jobs:
 
       - name: Delete S3 bucket (idempotent)
         run: |
-          BUCKET="${{ github.event.inputs.STATE_BUCKET_NAME }}"
+          BUCKET="${{ env.STATE_BUCKET_NAME }}"
           # s3 rm récursif (au cas où) puis delete-bucket
           aws s3 rm "s3://$BUCKET" --recursive || true
           aws s3api delete-bucket --bucket "$BUCKET" || true
+
+      - name: Clean DynamoDB deployments table
+        run: |
+          TABLE="iot-playground-dev-deployments"
+          echo "Cleaning DynamoDB table: $TABLE"
+          
+          # Vérifier si la table existe
+          if aws dynamodb describe-table --table-name "$TABLE" >/dev/null 2>&1; then
+            echo "Table exists, scanning and deleting all items..."
+            
+            # Scanner la table et supprimer tous les items
+            aws dynamodb scan --table-name "$TABLE" --attributes-to-get "deployment_id" --query "Items[].deployment_id.S" --output text | \
+            while read -r deployment_id; do
+              if [ -n "$deployment_id" ] && [ "$deployment_id" != "None" ]; then
+                echo "Deleting deployment: $deployment_id"
+                aws dynamodb delete-item --table-name "$TABLE" --key "{\"deployment_id\":{\"S\":\"$deployment_id\"}}" || true
+              fi
+            done || true
+            
+            echo "DynamoDB table $TABLE cleaned"
+          else
+            echo "Table $TABLE does not exist, skipping"
+          fi
 
       - name: Delete DynamoDB lock table (idempotent)
         run: |

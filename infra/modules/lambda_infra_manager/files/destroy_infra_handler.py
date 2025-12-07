@@ -28,8 +28,8 @@ def get_github_token():
     return json.loads(response['SecretString'])['token']
 
 def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
-    """Déclencher le workflow GitHub Actions terraform-destroy.yml"""
-    url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/workflows/{GITHUB_WORKFLOW_FILE}/dispatches'
+    """Déclencher le workflow GitHub Actions terraform-destroy.yml via repository_dispatch"""
+    url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/dispatches'
 
     headers = {
         'Authorization': f'token {token}',
@@ -39,10 +39,10 @@ def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
     }
 
     payload = {
-        'ref': 'master',
-        'inputs': {
-            'CONFIRM': 'DESTROY-MY-INFRA',
-            'STATE_BUCKET_NAME': state_bucket_name
+        'event_type': 'trigger-destroy',
+        'client_payload': {
+            'state_bucket_name': state_bucket_name,
+            'environment': target_environment
         }
     }
 
@@ -56,28 +56,13 @@ def trigger_github_workflow(token, mode, state_bucket_name, target_environment):
     if response.status != 204:
         return response.status, response.data, None
 
-    # ✅ NOUVEAU : Récupérer le workflow_run_id juste après le déclenchement
-    print("🔍 Fetching workflow run ID...")
-    import time
-    time.sleep(2)  # Attendre 2 secondes pour que GitHub crée le run
+    # ✅ Le workflow démarre automatiquement via repository_dispatch
+    print(f"✅ Repository dispatch event 'trigger-destroy' sent successfully")
 
-    # Interroger l'API GitHub pour récupérer le dernier run du workflow
-    runs_url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/workflows/{GITHUB_WORKFLOW_FILE}/runs?per_page=1'
+    # Pour repository_dispatch, on ne peut pas récupérer le workflow_run_id immédiatement
+    # car GitHub ne retourne pas d'ID. On laisse le periodic_status_updater le récupérer.
 
-    runs_response = http.request('GET', runs_url, headers=headers)
-
-    workflow_run_id = None
-    workflow_url = None
-
-    if runs_response.status == 200:
-        runs_data = json.loads(runs_response.data.decode('utf-8'))
-        if runs_data.get('workflow_runs'):
-            latest_run = runs_data['workflow_runs'][0]
-            workflow_run_id = latest_run['id']
-            workflow_url = latest_run['html_url']
-            print(f"✅ Retrieved workflow_run_id: {workflow_run_id}")
-
-    return response.status, response.data, {'workflow_run_id': workflow_run_id, 'workflow_url': workflow_url}
+    return response.status, response.data, None
 
 def lambda_handler(event, context):
     """
@@ -166,13 +151,6 @@ def lambda_handler(event, context):
                 ':timestamp': int(datetime.utcnow().timestamp())
             }
 
-            # ✅ NOUVEAU : Enregistrer le workflow_run_id et l'URL si récupérés
-            if workflow_info and workflow_info.get('workflow_run_id'):
-                update_expression += ', workflow_run_id = :run_id, github_url = :url'
-                expression_values[':run_id'] = workflow_info['workflow_run_id']
-                expression_values[':url'] = workflow_info['workflow_url']
-                print(f"💾 Storing workflow_run_id: {workflow_info['workflow_run_id']}")
-
             table.update_item(
                 Key={'deployment_id': destruction_id},
                 UpdateExpression=update_expression,
@@ -193,11 +171,6 @@ def lambda_handler(event, context):
                 'check_status_url': f'/infra/status/{destruction_id}',
                 'github_actions_url': f'https://github.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions'
             }
-
-            # Ajouter workflow_run_id dans la réponse si disponible
-            if workflow_info and workflow_info.get('workflow_run_id'):
-                response_body['workflow_run_id'] = workflow_info['workflow_run_id']
-                response_body['github_url'] = workflow_info['workflow_url']
 
             return {
                 'statusCode': 200,
