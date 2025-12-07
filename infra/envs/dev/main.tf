@@ -204,7 +204,7 @@ module "spring_app_service" {
   environment_variables = [
     {
       name  = "APP_GRAFANA_BASE_URL"
-      value = "http://${module.grafana_alb.alb_dns_name}"
+      value = var.grafana_domain_name != "" ? "http://${var.grafana_domain_name}" : "http://${module.grafana_alb.alb_dns_name}"
     },
     {
       name  = "AWS_XRAY_DAEMON_ADDRESS"
@@ -317,7 +317,7 @@ module "grafana_service" {
   environment_variables = [
     {
       name  = "PROMETHEUS_URL"
-      value = module.prometheus_alb.alb_dns_name
+      value = var.prometheus_domain_name != "" ? var.prometheus_domain_name : module.prometheus_alb.alb_dns_name
     },
     {
       name  = "GF_AUTH_ANONYMOUS_ENABLED"
