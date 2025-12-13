@@ -76,3 +76,4 @@ output "reports_api_usage_instructions" {
   description = "Instructions pour utiliser l'API"
   value       = "Utilisez: curl -H 'x-api-key: <API_KEY>' ${module.lambda_download_reports.api_endpoint}"
 }
+

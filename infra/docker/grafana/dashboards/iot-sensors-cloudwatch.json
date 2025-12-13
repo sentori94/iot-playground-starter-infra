@@ -1,0 +1,238 @@
+{
+  "dashboard": {
+    "title": "IoT Sensors - CloudWatch Metrics",
+    "uid": "iot-sensors-cloudwatch",
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Sensor Readings (Temperature)",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "IoTPlayground/Sensors",
+            "metricName": "SensorReading",
+            "dimensions": {
+              "Type": "temperature"
+            },
+            "statistics": ["Average"],
+            "period": "60"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "celsius",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Data Ingestion Rate",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "IoTPlayground/Sensors",
+            "metricName": "DataIngested",
+            "statistics": ["Sum"],
+            "period": "60"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Sensor Readings by Sensor ID",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 24,
+          "h": 8
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "IoTPlayground/Sensors",
+            "metricName": "SensorReading",
+            "dimensions": {
+              "SensorId": "*"
+            },
+            "statistics": ["Average"],
+            "period": "60"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Lambda Invocations",
+        "type": "stat",
+        "gridPos": {
+          "x": 0,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "AWS/Lambda",
+            "metricName": "Invocations",
+            "dimensions": {
+              "FunctionName": "iot-playground-sensor-api-dev"
+            },
+            "statistics": ["Sum"],
+            "period": "300"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Lambda Errors",
+        "type": "stat",
+        "gridPos": {
+          "x": 6,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "AWS/Lambda",
+            "metricName": "Errors",
+            "dimensions": {
+              "FunctionName": "iot-playground-sensor-api-dev"
+            },
+            "statistics": ["Sum"],
+            "period": "300"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Lambda Duration (ms)",
+        "type": "gauge",
+        "gridPos": {
+          "x": 12,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "AWS/Lambda",
+            "metricName": "Duration",
+            "dimensions": {
+              "FunctionName": "iot-playground-sensor-api-dev"
+            },
+            "statistics": ["Average"],
+            "period": "300"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "max": 30000,
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 10000, "color": "yellow"},
+                {"value": 20000, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "DynamoDB Consumed Read Capacity",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 18,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "AWS/DynamoDB",
+            "metricName": "ConsumedReadCapacityUnits",
+            "dimensions": {
+              "TableName": "iot-playground-sensor-data-dev"
+            },
+            "statistics": ["Sum"],
+            "period": "60"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "region",
+          "type": "custom",
+          "options": [
+            {"text": "eu-west-3", "value": "eu-west-3"}
+          ],
+          "current": {
+            "text": "eu-west-3",
+            "value": "eu-west-3"
+          }
+        }
+      ]
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}
+

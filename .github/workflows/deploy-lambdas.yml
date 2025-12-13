@@ -1,0 +1,70 @@
+name: Deploy Lambda APIs (Serverless)
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'infra/modules/serverless/**'
+      - 'infra/envs/serverless-dev/**'
+      - '.github/workflows/deploy-lambdas.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-lambdas:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: eu-west-3
+      TF_WORKING_DIR: ./infra/envs/serverless-dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Get API Gateway URL
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "🚀 Lambda APIs deployed successfully!"
+          echo ""
+          echo "API Gateway Endpoints:"
+          terraform output -raw api_gateway_url || echo "API Gateway URL not available"
+          echo ""
+          echo "Custom Domain:"
+          terraform output -raw lambda_api_custom_domain || echo "Custom domain not configured"
+          echo ""
+          echo "Test endpoints:"
+          echo "  - GET  https://api-lambda-iot.sentori-studio.com/api/runs"
+          echo "  - GET  https://api-lambda-iot.sentori-studio.com/api/runs/all"
+          echo "  - GET  https://api-lambda-iot.sentori-studio.com/api/runs/{id}"
+          echo "  - POST https://api-lambda-iot.sentori-studio.com/sensors/data"
+          echo "  - GET  https://api-lambda-iot.sentori-studio.com/sensors/data"
+
