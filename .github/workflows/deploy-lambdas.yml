@@ -1,22 +1,29 @@
 name: Deploy Lambda APIs (Serverless)
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'infra/modules/serverless/**'
-      - 'infra/envs/serverless-dev/**'
-      - '.github/workflows/deploy-lambdas.yml'
   workflow_dispatch:
+    inputs:
+      MODE:
+        description: "Terraform mode"
+        type: choice
+        required: true
+        default: plan
+        options: [plan, apply]
+      ENVIRONMENT:
+        description: "Environment"
+        type: choice
+        required: true
+        default: serverless-dev
+        options: [serverless-dev, serverless-staging, serverless-prod]
 
 jobs:
   deploy-lambdas:
+    name: "Deploy Lambdas [${{ github.event.inputs.MODE }}] - ${{ github.event.inputs.ENVIRONMENT }}"
     runs-on: ubuntu-latest
 
     env:
       AWS_REGION: eu-west-3
-      TF_WORKING_DIR: ./infra/envs/serverless-dev
+      TF_WORKING_DIR: ./infra/envs/${{ github.event.inputs.ENVIRONMENT }}
 
     steps:
       - name: Checkout code
@@ -97,28 +104,38 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
+        if: github.event.inputs.MODE == 'plan'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan -out=tfplan
+        run: terraform plan
 
       - name: Terraform Apply
+        if: github.event.inputs.MODE == 'apply'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
 
-      - name: Get API Gateway URL
+      - name: Show Outputs
+        if: github.event.inputs.MODE == 'apply'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
           echo "🚀 Lambda APIs deployed successfully!"
           echo ""
-          echo "API Gateway Endpoints:"
-          terraform output -raw api_gateway_url || echo "API Gateway URL not available"
+          echo "📋 Outputs:"
+          terraform output
           echo ""
-          echo "Custom Domain:"
-          terraform output -raw lambda_api_custom_domain || echo "Custom domain not configured"
+          echo "🌐 API Endpoints:"
+          API_URL=$(terraform output -raw api_gateway_url 2>/dev/null || echo "Not available yet")
+          echo "  Base URL: $API_URL"
           echo ""
-          echo "Test endpoints:"
-          echo "  - GET  https://api-lambda-iot.sentori-studio.com/api/runs"
-          echo "  - GET  https://api-lambda-iot.sentori-studio.com/api/runs/all"
-          echo "  - GET  https://api-lambda-iot.sentori-studio.com/api/runs/{id}"
-          echo "  - POST https://api-lambda-iot.sentori-studio.com/sensors/data"
-          echo "  - GET  https://api-lambda-iot.sentori-studio.com/sensors/data"
+          echo "  Available endpoints:"
+          echo "  - GET  $API_URL/api/runs"
+          echo "  - GET  $API_URL/api/runs/all"
+          echo "  - GET  $API_URL/api/runs/{id}"
+          echo "  - POST $API_URL/sensors/data"
+          echo "  - GET  $API_URL/sensors/data"
+
+      - name: Plan Summary
+        if: github.event.inputs.MODE == 'plan'
+        run: |
+          echo "📋 Terraform plan completed!"
+          echo "To apply these changes, run this workflow again with MODE=apply"
 

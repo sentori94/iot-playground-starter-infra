@@ -13,8 +13,8 @@ output "lambda_api_custom_domain" {
 }
 
 output "certificate_arn_used" {
-  description = "ARN du certificat ACM utilisé (existant ou nouveau)"
-  value       = var.lambda_api_domain_name != "" ? local.certificate_arn : "Aucun certificat"
+  description = "ARN du certificat ACM utilisé"
+  value       = length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : "Aucun certificat configuré"
 }
 
 output "dynamodb_runs_table" {

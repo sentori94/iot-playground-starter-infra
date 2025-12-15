@@ -289,7 +289,7 @@ resource "aws_api_gateway_stage" "lambda_iot" {
 # ===========================
 
 resource "aws_api_gateway_domain_name" "lambda_iot" {
-  count = var.custom_domain_name != "" && var.certificate_arn != "" ? 1 : 0
+  count = var.custom_domain_name != "" ? 1 : 0
 
   domain_name              = var.custom_domain_name
   regional_certificate_arn = var.certificate_arn
@@ -299,10 +299,13 @@ resource "aws_api_gateway_domain_name" "lambda_iot" {
   }
 
   tags = var.tags
+
+  # Attendre que le certificat soit créé
+  depends_on = []
 }
 
 resource "aws_api_gateway_base_path_mapping" "lambda_iot" {
-  count = var.custom_domain_name != "" && var.certificate_arn != "" ? 1 : 0
+  count = var.custom_domain_name != "" ? 1 : 0
 
   api_id      = aws_api_gateway_rest_api.lambda_iot.id
   stage_name  = aws_api_gateway_stage.lambda_iot.stage_name
@@ -311,7 +314,7 @@ resource "aws_api_gateway_base_path_mapping" "lambda_iot" {
 
 # Route53 Record pour le custom domain
 resource "aws_route53_record" "lambda_iot" {
-  count = var.custom_domain_name != "" && var.certificate_arn != "" && var.route53_zone_id != "" ? 1 : 0
+  count = var.custom_domain_name != "" && var.route53_zone_id != "" ? 1 : 0
 
   zone_id = var.route53_zone_id
   name    = var.custom_domain_name

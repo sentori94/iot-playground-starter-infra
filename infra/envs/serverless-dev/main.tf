@@ -9,9 +9,6 @@ locals {
     ManagedBy    = "Terraform"
     Architecture = "Serverless"
   }
-
-  # Certificat ACM pour le custom domain
-  certificate_arn = var.lambda_api_domain_name != "" && var.route53_zone_name != "" && length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : ""
 }
 
 # ===========================
@@ -23,6 +20,34 @@ module "dynamodb_tables" {
   project     = var.project
   environment = var.env
   tags        = local.common_tags
+}
+
+# ===========================
+# Certificat ACM - Nouveau certificat pour lambdas
+# ===========================
+module "acm_lambda_api" {
+  count  = var.lambda_api_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
+  source = "../../modules/acm_certificate"
+
+  domain_name     = var.lambda_api_domain_name
+  route53_zone_id = data.aws_route53_zone.main[0].zone_id
+  tags            = local.common_tags
+}
+
+# ===========================
+# Module API Gateway Lambda IoT (sans lambdas d'abord)
+# ===========================
+module "api_gateway_lambda_iot" {
+  source = "../../modules/serverless/api_gateway_lambda_iot"
+
+  project                       = var.project
+  environment                   = var.env
+  lambda_run_api_invoke_arn     = module.lambda_run_api.invoke_arn
+  lambda_sensor_api_invoke_arn  = module.lambda_sensor_api.invoke_arn
+  custom_domain_name            = var.lambda_api_domain_name
+  certificate_arn               = length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : ""
+  route53_zone_id               = var.route53_zone_name != "" ? data.aws_route53_zone.main[0].zone_id : ""
+  tags                          = local.common_tags
 }
 
 # ===========================
@@ -51,34 +76,6 @@ module "lambda_sensor_api" {
   sensor_data_table_arn     = module.dynamodb_tables.sensor_data_table_arn
   api_gateway_execution_arn = module.api_gateway_lambda_iot.api_execution_arn
   tags                      = local.common_tags
-}
-
-# ===========================
-# Module API Gateway Lambda IoT
-# ===========================
-module "api_gateway_lambda_iot" {
-  source = "../../modules/serverless/api_gateway_lambda_iot"
-
-  project                       = var.project
-  environment                   = var.env
-  lambda_run_api_invoke_arn     = module.lambda_run_api.invoke_arn
-  lambda_sensor_api_invoke_arn  = module.lambda_sensor_api.invoke_arn
-  custom_domain_name            = var.lambda_api_domain_name != "" ? var.lambda_api_domain_name : ""
-  certificate_arn               = var.lambda_api_domain_name != "" ? local.certificate_arn : ""
-  route53_zone_id               = var.route53_zone_name != "" ? data.aws_route53_zone.main[0].zone_id : ""
-  tags                          = local.common_tags
-}
-
-# ===========================
-# Certificat ACM - Nouveau certificat pour lambdas
-# ===========================
-module "acm_lambda_api" {
-  count  = var.lambda_api_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
-  source = "../../modules/acm_certificate"
-
-  domain_name     = var.lambda_api_domain_name
-  route53_zone_id = data.aws_route53_zone.main[0].zone_id
-  tags            = local.common_tags
 }
 
 
