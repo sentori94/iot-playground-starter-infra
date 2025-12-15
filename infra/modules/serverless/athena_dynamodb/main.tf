@@ -9,6 +9,15 @@ resource "aws_s3_bucket" "athena_results" {
   tags = var.tags
 }
 
+resource "aws_s3_bucket_public_access_block" "athena_results" {
+  bucket = aws_s3_bucket.athena_results.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "athena_results" {
   bucket = aws_s3_bucket.athena_results.id
 
@@ -24,6 +33,65 @@ resource "aws_s3_bucket_lifecycle_configuration" "athena_results" {
   }
 }
 
+# Bucket Policy pour permettre l'accès depuis Athena et le compte AWS
+resource "aws_s3_bucket_policy" "athena_results" {
+  bucket = aws_s3_bucket.athena_results.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowAthenaWorkgroupAccess"
+        Effect = "Allow"
+        Principal = {
+          Service = "athena.amazonaws.com"
+        }
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.athena_results.arn,
+          "${aws_s3_bucket.athena_results.arn}/*"
+        ]
+      },
+      {
+        Sid    = "AllowGrafanaRoleAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.grafana_athena.arn
+        }
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:GetBucketLocation"
+        ]
+        Resource = [
+          aws_s3_bucket.athena_results.arn,
+          "${aws_s3_bucket.athena_results.arn}/*"
+        ]
+      },
+      {
+        Sid    = "AllowAccountRootAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.athena_results.arn,
+          "${aws_s3_bucket.athena_results.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
 # Workgroup Athena
 resource "aws_athena_workgroup" "grafana" {
   name = "${var.project}-grafana-${var.environment}"
@@ -32,6 +100,8 @@ resource "aws_athena_workgroup" "grafana" {
     result_configuration {
       output_location = "s3://${aws_s3_bucket.athena_results.bucket}/results/"
     }
+
+    enforce_workgroup_configuration = true
   }
 
   tags = var.tags

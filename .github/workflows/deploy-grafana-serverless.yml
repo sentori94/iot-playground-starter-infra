@@ -135,7 +135,9 @@ jobs:
       - name: Terraform Apply (Full)
         if: github.event.inputs.MODE == 'apply' && github.event.inputs.ACTION == 'full'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve
+        run: |
+          echo "🚀 Deploying full Grafana Serverless infrastructure..."
+          terraform apply -auto-approve
 
       - name: Terraform Apply (Athena Only)
         if: github.event.inputs.MODE == 'apply' && github.event.inputs.ACTION == 'athena-only'
