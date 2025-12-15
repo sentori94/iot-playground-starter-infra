@@ -95,8 +95,8 @@ jobs:
         if: github.event_name == 'push'
         run: |
           echo "🔄 Checking if ECS service exists..."
-          SERVICE_NAME="iot-playground-grafana-serverless-serverless-dev"
-          CLUSTER_NAME="iot-playground-serverless-dev"
+          SERVICE_NAME="iot-playground-grafana-serverless-grafana-serverless-dev"
+          CLUSTER_NAME="iot-playground-grafana-serverless-dev"
           
           if aws ecs describe-services \
             --cluster $CLUSTER_NAME \
