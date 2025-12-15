@@ -37,3 +37,4 @@ output "lambda_sensor_api_function_name" {
   value       = module.lambda_sensor_api.function_name
 }
 
+

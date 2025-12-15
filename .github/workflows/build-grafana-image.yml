@@ -1,0 +1,117 @@
+name: Build & Push Grafana Serverless Image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'infra/docker/grafana-serverless/**'
+      - '.github/workflows/build-grafana-image.yml'
+
+env:
+  AWS_REGION: eu-west-3
+  ECR_REPOSITORY: iot-playground-grafana-serverless
+  IMAGE_TAG: latest
+
+jobs:
+  build-and-push:
+    name: "Build & Push Grafana Image"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create ECR Repository (if not exists)
+        run: |
+          echo "🔍 Checking if ECR repository exists..."
+          if aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} --region ${{ env.AWS_REGION }} 2>/dev/null; then
+            echo "✅ Repository ${{ env.ECR_REPOSITORY }} already exists"
+          else
+            echo "📦 Creating ECR repository ${{ env.ECR_REPOSITORY }}..."
+            aws ecr create-repository \
+              --repository-name ${{ env.ECR_REPOSITORY }} \
+              --region ${{ env.AWS_REGION }} \
+              --image-scanning-configuration scanOnPush=true \
+              --tags Key=Project,Value=iot-playground Key=ManagedBy,Value=GitHub-Actions
+            echo "✅ Repository created successfully"
+          fi
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Get ECR Registry
+        id: ecr-registry
+        run: |
+          REGISTRY="${{ steps.login-ecr.outputs.registry }}"
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+          echo "📦 ECR Registry: $REGISTRY"
+
+      - name: Build Docker Image
+        working-directory: infra/docker/grafana-serverless
+        run: |
+          echo "🔨 Building Grafana Serverless image..."
+          docker build \
+            --tag ${{ steps.ecr-registry.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+            --tag ${{ steps.ecr-registry.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} \
+            .
+          echo "✅ Image built successfully"
+
+      - name: Push to ECR
+        run: |
+          echo "📤 Pushing image to ECR..."
+          docker push ${{ steps.ecr-registry.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          docker push ${{ steps.ecr-registry.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          echo "✅ Image pushed successfully"
+
+      - name: Image Details
+        run: |
+          echo "🎉 Image pushed to ECR!"
+          echo ""
+          echo "📋 Image Details:"
+          echo "  Repository: ${{ env.ECR_REPOSITORY }}"
+          echo "  Registry: ${{ steps.ecr-registry.outputs.registry }}"
+          echo "  Tags:"
+          echo "    - ${{ env.IMAGE_TAG }}"
+          echo "    - ${{ github.sha }}"
+          echo ""
+          echo "🔗 Full Image URI:"
+          echo "  ${{ steps.ecr-registry.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
+          echo ""
+          echo "📝 To use this image in Terraform:"
+          echo '  grafana_image_uri = "${{ steps.ecr-registry.outputs.registry }}/${{ env.ECR_REPOSITORY }}"'
+          echo '  grafana_image_tag = "${{ env.IMAGE_TAG }}"'
+
+      - name: Trigger ECS Update (Optional)
+        if: github.event_name == 'push'
+        run: |
+          echo "🔄 Checking if ECS service exists..."
+          SERVICE_NAME="iot-playground-grafana-serverless-serverless-dev"
+          CLUSTER_NAME="iot-playground-serverless-dev"
+          
+          if aws ecs describe-services \
+            --cluster $CLUSTER_NAME \
+            --services $SERVICE_NAME \
+            --region ${{ env.AWS_REGION }} 2>/dev/null | grep -q "ACTIVE"; then
+            
+            echo "🔄 Forcing new deployment of ECS service..."
+            aws ecs update-service \
+              --cluster $CLUSTER_NAME \
+              --service $SERVICE_NAME \
+              --force-new-deployment \
+              --region ${{ env.AWS_REGION }}
+            echo "✅ ECS service update triggered"
+          else
+            echo "⚠️ ECS service not found. Skipping deployment update."
+            echo "   Deploy the Terraform infrastructure first."
+          fi
+

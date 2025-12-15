@@ -11,6 +11,7 @@ locals {
   }
 }
 
+
 # ===========================
 # Module DynamoDB Tables
 # ===========================
@@ -77,6 +78,7 @@ module "lambda_sensor_api" {
   api_gateway_execution_arn = module.api_gateway_lambda_iot.api_execution_arn
   tags                      = local.common_tags
 }
+
 
 
 # ===========================

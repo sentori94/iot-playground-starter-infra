@@ -1,0 +1,168 @@
+name: Destroy Grafana Serverless (ECS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      CONFIRM_DESTROY:
+        description: "Tapez 'DESTROY' pour confirmer la destruction"
+        required: true
+      DESTROY_BACKEND:
+        description: "Détruire aussi le backend S3 + DynamoDB ?"
+        type: choice
+        required: true
+        default: "no"
+        options:
+          - "no"
+          - "yes"
+
+env:
+  AWS_REGION: eu-west-3
+  TF_WORKING_DIR: ./infra/envs/grafana-serverless-dev
+
+jobs:
+  destroy-grafana:
+    name: "Destroy Grafana Serverless Infrastructure"
+    runs-on: ubuntu-latest
+    if: github.event.inputs.CONFIRM_DESTROY == 'DESTROY'
+
+    env:
+      AWS_REGION: eu-west-3
+      TF_WORKING_DIR: ./infra/envs/grafana-serverless-dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform Destroy - Infrastructure
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "🗑️ Destroying Grafana Serverless infrastructure..."
+          terraform destroy -auto-approve
+          echo "✅ Infrastructure destroyed successfully"
+
+      - name: Empty S3 Bucket (if destroying backend)
+        if: github.event.inputs.DESTROY_BACKEND == 'yes'
+        run: |
+          set -e
+          BUCKET="iot-playground-tfstate-grafana-serverless"
+          REGION="${{ env.AWS_REGION }}"
+          
+          echo "🗑️ Emptying S3 bucket $BUCKET..."
+          
+          # Check if bucket exists
+          if aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
+            # Delete all objects
+            aws s3 rm s3://$BUCKET --recursive --region $REGION || true
+            
+            # Delete all versions (if versioning enabled)
+            aws s3api list-object-versions \
+              --bucket $BUCKET \
+              --region $REGION \
+              --query 'Versions[].{Key:Key,VersionId:VersionId}' \
+              --output json | \
+            jq -r '.[] | "--key \(.Key) --version-id \(.VersionId)"' | \
+            xargs -I {} aws s3api delete-object --bucket $BUCKET --region $REGION {} || true
+            
+            # Delete all delete markers
+            aws s3api list-object-versions \
+              --bucket $BUCKET \
+              --region $REGION \
+              --query 'DeleteMarkers[].{Key:Key,VersionId:VersionId}' \
+              --output json | \
+            jq -r '.[] | "--key \(.Key) --version-id \(.VersionId)"' | \
+            xargs -I {} aws s3api delete-object --bucket $BUCKET --region $REGION {} || true
+            
+            echo "✅ S3 bucket emptied"
+          else
+            echo "⚠️ Bucket $BUCKET does not exist, skipping"
+          fi
+
+      - name: Delete S3 Bucket (if destroying backend)
+        if: github.event.inputs.DESTROY_BACKEND == 'yes'
+        run: |
+          set -e
+          BUCKET="iot-playground-tfstate-grafana-serverless"
+          REGION="${{ env.AWS_REGION }}"
+          
+          echo "🗑️ Deleting S3 bucket $BUCKET..."
+          
+          if aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
+            aws s3api delete-bucket --bucket $BUCKET --region $REGION
+            echo "✅ S3 bucket deleted"
+          else
+            echo "⚠️ Bucket $BUCKET does not exist, skipping"
+          fi
+
+      - name: Delete DynamoDB Table (if destroying backend)
+        if: github.event.inputs.DESTROY_BACKEND == 'yes'
+        run: |
+          set -e
+          TABLE="terraform-lock-grafana-serverless"
+          REGION="${{ env.AWS_REGION }}"
+          
+          echo "🗑️ Deleting DynamoDB table $TABLE..."
+          
+          if aws dynamodb describe-table --table-name $TABLE --region $REGION >/dev/null 2>&1; then
+            aws dynamodb delete-table --table-name $TABLE --region $REGION
+            echo "✅ DynamoDB table deleted"
+          else
+            echo "⚠️ Table $TABLE does not exist, skipping"
+          fi
+
+      - name: Summary
+        run: |
+          echo "=========================================="
+          echo "  ✅ DESTRUCTION COMPLETED"
+          echo "=========================================="
+          echo ""
+          echo "📋 Resources destroyed:"
+          echo "  ✅ Grafana ECS Service + Task"
+          echo "  ✅ ALB + Target Group"
+          echo "  ✅ ECS Cluster"
+          echo "  ✅ VPC + Subnets + NAT Gateways"
+          echo "  ✅ Athena Workgroup + Database"
+          echo "  ✅ Security Groups"
+          echo "  ✅ IAM Roles"
+          echo ""
+          if [ "${{ github.event.inputs.DESTROY_BACKEND }}" == "yes" ]; then
+            echo "  ✅ S3 Backend Bucket (iot-playground-tfstate-grafana-serverless)"
+            echo "  ✅ DynamoDB Lock Table (terraform-lock-grafana-serverless)"
+            echo ""
+            echo "⚠️  Backend détruit : vous devrez le recréer pour redéployer"
+          else
+            echo "  ℹ️  S3 Backend conservé (peut être réutilisé)"
+            echo "  ℹ️  DynamoDB Lock conservé"
+          fi
+          echo ""
+          echo "=========================================="
+
+  abort-if-no-confirmation:
+    name: "❌ Confirmation Required"
+    runs-on: ubuntu-latest
+    if: github.event.inputs.CONFIRM_DESTROY != 'DESTROY'
+
+    steps:
+      - name: Abort
+        run: |
+          echo "❌ DESTRUCTION ANNULÉE"
+          echo ""
+          echo "Pour détruire l'infrastructure, vous devez taper 'DESTROY' dans le champ de confirmation."
+          echo ""
+          exit 1
+
