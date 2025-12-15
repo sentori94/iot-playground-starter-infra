@@ -4,11 +4,14 @@
 
 locals {
   common_tags = {
-    Project     = var.project
-    Environment = var.env
-    ManagedBy   = "Terraform"
+    Project      = var.project
+    Environment  = var.env
+    ManagedBy    = "Terraform"
     Architecture = "Serverless"
   }
+
+  # Certificat ACM pour le custom domain
+  certificate_arn = var.lambda_api_domain_name != "" && var.route53_zone_name != "" && length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : ""
 }
 
 # ===========================
@@ -60,14 +63,14 @@ module "api_gateway_lambda_iot" {
   environment                   = var.env
   lambda_run_api_invoke_arn     = module.lambda_run_api.invoke_arn
   lambda_sensor_api_invoke_arn  = module.lambda_sensor_api.invoke_arn
-  custom_domain_name            = var.lambda_api_domain_name
-  certificate_arn               = var.lambda_api_domain_name != "" && var.route53_zone_name != "" ? module.acm_lambda_api[0].certificate_validated_arn : ""
+  custom_domain_name            = var.lambda_api_domain_name != "" ? var.lambda_api_domain_name : ""
+  certificate_arn               = var.lambda_api_domain_name != "" ? local.certificate_arn : ""
   route53_zone_id               = var.route53_zone_name != "" ? data.aws_route53_zone.main[0].zone_id : ""
   tags                          = local.common_tags
 }
 
 # ===========================
-# ACM Certificate pour Lambda API (optionnel)
+# Certificat ACM - Nouveau certificat pour lambdas
 # ===========================
 module "acm_lambda_api" {
   count  = var.lambda_api_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
@@ -77,6 +80,7 @@ module "acm_lambda_api" {
   route53_zone_id = data.aws_route53_zone.main[0].zone_id
   tags            = local.common_tags
 }
+
 
 # ===========================
 # Data Sources

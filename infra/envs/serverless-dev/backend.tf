@@ -1,8 +1,3 @@
-# Backend configuration
-# Le bucket S3 doit être créé manuellement avant terraform init
-bucket         = "iot-playground-tfstate-serverless"
-key            = "serverless-dev/terraform.tfstate"
-region         = "eu-west-3"
-encrypt        = true
-dynamodb_table = "terraform-lock"
+# Backend configuration is in providers.tf
+# This file can be removed or kept empty
 

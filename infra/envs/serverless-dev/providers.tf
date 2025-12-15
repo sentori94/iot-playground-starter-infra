@@ -13,7 +13,7 @@ terraform {
     key            = "serverless-dev/terraform.tfstate"
     region         = "eu-west-3"
     encrypt        = true
-    dynamodb_table = "terraform-lock"
+    dynamodb_table = "terraform-lock-serverless"
   }
 }
 

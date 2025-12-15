@@ -8,8 +8,13 @@ output "api_gateway_url" {
 }
 
 output "lambda_api_custom_domain" {
-  description = "Domaine personnalisé pour les Lambda APIs (si configuré)"
-  value       = module.api_gateway_lambda_iot.custom_domain_url
+  description = "Domaine personnalisé pour les Lambda APIs"
+  value       = module.api_gateway_lambda_iot.custom_domain_url != "" ? module.api_gateway_lambda_iot.custom_domain_url : "Custom domain non configuré - utilisez api_gateway_url"
+}
+
+output "certificate_arn_used" {
+  description = "ARN du certificat ACM utilisé (existant ou nouveau)"
+  value       = var.lambda_api_domain_name != "" ? local.certificate_arn : "Aucun certificat"
 }
 
 output "dynamodb_runs_table" {
