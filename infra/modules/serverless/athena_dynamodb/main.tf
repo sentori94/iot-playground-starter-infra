@@ -16,6 +16,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "athena_results" {
     id     = "delete-old-results"
     status = "Enabled"
 
+    filter {}
+
     expiration {
       days = 7
     }
@@ -37,7 +39,7 @@ resource "aws_athena_workgroup" "grafana" {
 
 # Database Athena pour DynamoDB
 resource "aws_athena_database" "iot_data" {
-  name   = "${replace(var.project, "-", "_")}_${var.environment}"
+  name   = "${replace(var.project, "-", "_")}_${replace(var.environment, "-", "_")}"
   bucket = aws_s3_bucket.athena_results.bucket
 }
 

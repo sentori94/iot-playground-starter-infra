@@ -5,7 +5,7 @@ output "alb_dns_name" {
 
 output "grafana_url" {
   description = "URL d'accès à Grafana"
-  value       = var.custom_domain_name != "" ? "https://${var.custom_domain_name}" : "https://${aws_lb.grafana.dns_name}"
+  value       = var.custom_domain_name != "" ? "https://${var.custom_domain_name}" : (var.certificate_arn != "" ? "https://${aws_lb.grafana.dns_name}" : "http://${aws_lb.grafana.dns_name}")
 }
 
 output "ecs_service_name" {

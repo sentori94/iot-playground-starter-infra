@@ -81,7 +81,7 @@ resource "aws_ecs_service" "grafana_serverless" {
     container_port   = 3000
   }
 
-  depends_on = [aws_lb_listener.https]
+  depends_on = [aws_lb_listener.http]
 
   tags = var.tags
 }
@@ -152,7 +152,7 @@ resource "aws_security_group" "alb" {
 # Application Load Balancer
 # ===========================
 resource "aws_lb" "grafana" {
-  name               = "${var.project}-grafana-slss-${var.environment}"
+  name               = "grafana-${var.environment}"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
@@ -165,7 +165,7 @@ resource "aws_lb" "grafana" {
 # Target Group
 # ===========================
 resource "aws_lb_target_group" "grafana" {
-  name        = "${var.project}-grafana-slss-${var.environment}"
+  name        = "grf-${var.environment}"
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -187,9 +187,11 @@ resource "aws_lb_target_group" "grafana" {
 }
 
 # ===========================
-# HTTPS Listener
+# HTTPS Listener (désactivé si pas de certificat)
 # ===========================
 resource "aws_lb_listener" "https" {
+  count = var.certificate_arn != "" ? 1 : 0
+
   load_balancer_arn = aws_lb.grafana.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -203,7 +205,7 @@ resource "aws_lb_listener" "https" {
 }
 
 # ===========================
-# HTTP Listener (redirect to HTTPS)
+# HTTP Listener (forward si pas de certificat, sinon redirect to HTTPS)
 # ===========================
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.grafana.arn
@@ -211,11 +213,17 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    type = var.certificate_arn != "" ? "redirect" : "forward"
+
+    target_group_arn = var.certificate_arn != "" ? null : aws_lb_target_group.grafana.arn
+
+    dynamic "redirect" {
+      for_each = var.certificate_arn != "" ? [1] : []
+      content {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
     }
   }
 }

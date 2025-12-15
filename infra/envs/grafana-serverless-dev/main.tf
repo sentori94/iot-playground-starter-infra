@@ -60,11 +60,13 @@ module "athena_dynamodb" {
 # ===========================
 # Data: Certificat ACM (depuis serverless-dev)
 # ===========================
-data "aws_acm_certificate" "lambda_api" {
-  domain      = "sentori-studio.com"
-  statuses    = ["ISSUED"]
-  most_recent = true
-}
+# DÉSACTIVÉ - Décommenter quand le certificat sera créé par serverless-dev
+# data "aws_acm_certificate" "lambda_api" {
+#   count       = 1
+#   domain      = "sentori-studio.com"
+#   statuses    = ["ISSUED"]
+#   most_recent = true
+# }
 
 # ===========================
 # Data: Route53 Zone
@@ -89,9 +91,9 @@ module "grafana_serverless" {
   grafana_image_uri      = var.grafana_image_uri
   grafana_image_tag      = var.grafana_image_tag
   grafana_admin_password = var.grafana_admin_password
-  custom_domain_name     = var.grafana_domain_name
-  certificate_arn        = data.aws_acm_certificate.lambda_api.arn
-  route53_zone_id        = var.route53_zone_name != "" ? data.aws_route53_zone.main[0].zone_id : ""
+  custom_domain_name     = ""  # Désactivé - utilisera l'URL ALB
+  certificate_arn        = ""
+  route53_zone_id        = ""
   grafana_task_role_arn  = module.athena_dynamodb.grafana_task_role_arn
   athena_workgroup_name  = module.athena_dynamodb.athena_workgroup_name
   athena_database_name   = module.athena_dynamodb.athena_database_name
