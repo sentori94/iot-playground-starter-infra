@@ -13,8 +13,8 @@ table = dynamodb.Table(TABLE_NAME)
 def lambda_handler(event, context):
     """
     Handler pour les endpoints Sensor API:
-    - POST /sensors/data (ingestion)
-    - GET /sensors/data (liste)
+    - POST /api/sensors/data (ingestion)
+    - GET /api/sensors/data (liste)
     """
 
     http_method = event.get('httpMethod', '')
@@ -38,7 +38,7 @@ def lambda_handler(event, context):
 
 def ingest_sensor_data(event):
     """
-    POST /sensors/data
+    POST /api/sensors/data
     Ingestion de données capteur avec métriques CloudWatch
     """
     headers = event.get('headers', {})
@@ -92,7 +92,7 @@ def ingest_sensor_data(event):
 
 def list_sensor_data(event):
     """
-    GET /sensors/data
+    GET /api/sensors/data
     Liste toutes les données capteur (ou filtré par query params)
     """
     query_params = event.get('queryStringParameters') or {}
