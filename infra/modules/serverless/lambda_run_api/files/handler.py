@@ -32,9 +32,20 @@ def lambda_handler(event, context):
     print(f"[RUN-API] {http_method} {path} - Query: {query_params}")
 
     try:
+        # Routes spécifiques d'abord (avant {id})
+
         # GET /api/runs/can-start
         if http_method == 'GET' and 'can-start' in path:
             return can_start_simulation(event)
+
+        # GET /api/runs/running
+        elif http_method == 'GET' and 'running' in path:
+            return get_running_simulations(event)
+
+        # GET /api/runs/all
+        elif http_method == 'GET' and 'all' in path:
+            print(f"[RUN-API] Fetching all runs")
+            return get_all_runs()
 
         # POST /api/runs/start
         elif http_method == 'POST' and 'start' in path:
@@ -45,20 +56,12 @@ def lambda_handler(event, context):
             run_id = path_params['id']
             return finish_run(run_id, event)
 
-        # GET /api/runs/running
-        elif http_method == 'GET' and 'running' in path:
-            return get_running_simulations(event)
-
-        # GET /api/runs/{id}
+        # GET /api/runs/{id} (après toutes les routes spécifiques)
         elif http_method == 'GET' and path_params.get('id'):
             run_id = path_params['id']
             print(f"[RUN-API] Fetching run: {run_id}")
             return get_run_by_id(run_id)
 
-        # GET /api/runs/all
-        elif http_method == 'GET' and 'all' in path:
-            print(f"[RUN-API] Fetching all runs")
-            return get_all_runs()
 
         # GET /api/runs (avec pagination)
         elif http_method == 'GET':

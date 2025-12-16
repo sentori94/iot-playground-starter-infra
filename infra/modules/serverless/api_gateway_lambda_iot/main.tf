@@ -369,9 +369,21 @@ resource "aws_api_gateway_deployment" "lambda_iot" {
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.runs.id,
+      aws_api_gateway_resource.runs_start.id,
+      aws_api_gateway_resource.runs_can_start.id,
+      aws_api_gateway_resource.runs_running.id,
+      aws_api_gateway_resource.runs_id_finish.id,
+      aws_api_gateway_resource.runs_all.id,
+      aws_api_gateway_resource.runs_id.id,
       aws_api_gateway_resource.sensors.id,
+      aws_api_gateway_resource.sensors_data.id,
       aws_api_gateway_method.runs_get.id,
+      aws_api_gateway_method.runs_start_post.id,
+      aws_api_gateway_method.runs_can_start_get.id,
+      aws_api_gateway_method.runs_running_get.id,
+      aws_api_gateway_method.runs_id_finish_post.id,
       aws_api_gateway_method.sensors_data_post.id,
+      aws_api_gateway_method.sensors_data_get.id,
     ]))
   }
 
