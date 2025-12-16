@@ -3,7 +3,7 @@ import boto3
 import os
 from datetime import datetime
 from decimal import Decimal
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
 cloudwatch = boto3.client('cloudwatch')
@@ -160,40 +160,35 @@ def list_runs_paginated(query_params):
 def can_start_simulation(event):
     """
     GET /api/runs/can-start
-    Vérifie si l'utilisateur peut démarrer une nouvelle simulation
-    Limite: 5 runs en cours maximum par utilisateur
+    Vérifie si on peut démarrer une nouvelle simulation
+    Limite: 5 runs en cours maximum GLOBAUX (tous utilisateurs confondus)
     """
-    headers = event.get('headers', {})
-    user = headers.get('X-User') or headers.get('x-user', 'unknown')
+    print(f"[RUN-API] can-start: Checking global running simulations")
 
-    print(f"[RUN-API] can-start: Checking for user '{user}'")
-    print(f"[RUN-API] can-start: Headers received: {headers}")
-
-    # Compter les runs en cours pour cet utilisateur
+    # Compter TOUS les runs en cours (tous utilisateurs)
     try:
-        # Scan avec FilterExpression
-        from boto3.dynamodb.conditions import Attr
-
         result = table.scan(
-            FilterExpression=Attr('username').eq(user) & Attr('status').eq('RUNNING')
+            FilterExpression=Attr('status').eq('RUNNING')
         )
 
         items = result.get('Items', [])
         running_count = len(items)
 
-        print(f"[RUN-API] can-start: Found {running_count} RUNNING items for user '{user}'")
+        print(f"[RUN-API] can-start: Found {running_count} RUNNING items (ALL users)")
 
         # Log les IDs des runs trouvés pour debug
         if running_count > 0:
             run_ids = [item.get('id', 'no-id') for item in items]
+            users = [item.get('username', 'no-user') for item in items]
             print(f"[RUN-API] can-start: Running run IDs: {run_ids}")
+            print(f"[RUN-API] can-start: Users: {users}")
 
     except Exception as e:
         print(f"[RUN-API] can-start: ERROR scanning DynamoDB: {str(e)}")
         # En cas d'erreur, on retourne une réponse safe
         running_count = 0
 
-    max_concurrent_runs = 5  # Limite configurable (Spring Boot par défaut: 5)
+    max_concurrent_runs = 5  # Limite GLOBALE (Spring Boot par défaut: 5)
     can_start = running_count < max_concurrent_runs
     available = max(0, max_concurrent_runs - running_count)
 
@@ -215,7 +210,9 @@ def start_run(event):
     Body: { "params": {...} }
     """
     headers = event.get('headers', {})
-    user = headers.get('X-User') or headers.get('x-user', 'unknown')
+    user = headers.get('x-user') or headers.get('X-User') or 'unknown'
+    if not user or user.strip() == '':
+        user = 'unknown'
 
     try:
         body = json.loads(event.get('body', '{}'))
@@ -248,7 +245,7 @@ def start_run(event):
         'status': 'RUNNING',
         'startedAt': started_at,
         'params': json.dumps(params) if isinstance(params, dict) else str(params),
-        'grafanaUrl': f'/grafana/d/iot-serverless-cloudwatch?var-RunId={run_id}'
+        'grafanaUrl': f'http://grafana-grafana-serverless-dev-20113386.eu-west-3.elb.amazonaws.com/grafana/d/iot-serverless-cloudwatch?var-RunId={run_id}'
     }
 
     table.put_item(Item=item)
@@ -321,18 +318,13 @@ def finish_run(run_id, event):
 def get_running_simulations(event):
     """
     GET /api/runs/running
-    Récupère tous les runs en cours pour l'utilisateur
+    Récupère TOUS les runs en cours (tous utilisateurs confondus)
     """
-    headers = event.get('headers', {})
-    user = headers.get('X-User') or headers.get('x-user', 'unknown')
+    print(f"[RUN-API] Fetching running simulations (ALL users)")
 
-    print(f"[RUN-API] Fetching running simulations for user '{user}'")
-
-    # Scanner pour récupérer les runs RUNNING de l'utilisateur
-    from boto3.dynamodb.conditions import Attr
-
+    # Scanner pour récupérer TOUS les runs RUNNING
     result = table.scan(
-        FilterExpression=Attr('username').eq(user) & Attr('status').eq('RUNNING')
+        FilterExpression=Attr('status').eq('RUNNING')
     )
 
     items = result.get('Items', [])
@@ -342,7 +334,7 @@ def get_running_simulations(event):
 
     items = [convert_decimals(item) for item in items]
 
-    print(f"[RUN-API] Found {len(items)} running simulations for user '{user}'")
+    print(f"[RUN-API] Found {len(items)} running simulations (ALL users)")
 
     return response(200, items)
 
@@ -350,29 +342,24 @@ def get_running_simulations(event):
 def interrupt_all_runs(event):
     """
     POST /api/runs/interrupt-all
-    Interrompt tous les runs en cours pour l'utilisateur
+    Interrompt TOUS les runs en cours (tous utilisateurs confondus)
     """
-    headers = event.get('headers', {})
-    user = headers.get('X-User') or headers.get('x-user', 'unknown')
+    print(f"[RUN-API] Interrupting ALL running simulations (ALL users)")
 
-    print(f"[RUN-API] Interrupting all runs for user '{user}'")
-
-    # Récupérer tous les runs RUNNING de l'utilisateur
+    # Récupérer TOUS les runs RUNNING (tous utilisateurs)
     try:
-        from boto3.dynamodb.conditions import Attr
-
         result = table.scan(
-            FilterExpression=Attr('username').eq(user) & Attr('status').eq('RUNNING')
+            FilterExpression=Attr('status').eq('RUNNING')
         )
     except Exception as e:
         print(f"[RUN-API] Error scanning for running simulations: {str(e)}")
         return response(500, {'error': 'Failed to fetch running simulations'})
 
     items = result.get('Items', [])
-    print(f"[RUN-API] Found {len(items)} running simulations to interrupt")
+    print(f"[RUN-API] Found {len(items)} running simulations to interrupt (ALL users)")
 
     if len(items) == 0:
-        print(f"[RUN-API] No running simulations to interrupt for user '{user}'")
+        print(f"[RUN-API] No running simulations to interrupt")
         return response(200, {
             'interrupted': 0,
             'message': 'No running simulations to interrupt'
@@ -385,6 +372,7 @@ def interrupt_all_runs(event):
     # Terminer chaque run avec status INTERRUPTED
     for item in items:
         run_id = item['id']
+        username = item.get('username', 'unknown')
         try:
             table.update_item(
                 Key={'id': run_id},
@@ -397,12 +385,12 @@ def interrupt_all_runs(event):
                 }
             )
             interrupted_count += 1
-            print(f"[RUN-API] Successfully interrupted run: {run_id}")
+            print(f"[RUN-API] Successfully interrupted run: {run_id} (user: {username})")
         except Exception as e:
             failed_count += 1
             print(f"[RUN-API] ERROR - Failed to interrupt run {run_id}: {str(e)}")
 
-    print(f"[RUN-API] Interrupted {interrupted_count}/{len(items)} runs for user '{user}' (failed: {failed_count})")
+    print(f"[RUN-API] Interrupted {interrupted_count}/{len(items)} runs (ALL users) (failed: {failed_count})")
 
     # Retourner la réponse (match Spring Boot)
     return response(200, {
