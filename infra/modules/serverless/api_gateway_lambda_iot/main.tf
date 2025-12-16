@@ -156,6 +156,13 @@ resource "aws_api_gateway_resource" "runs_running" {
   path_part   = "running"
 }
 
+# /api/runs/interrupt-all
+resource "aws_api_gateway_resource" "runs_interrupt_all" {
+  rest_api_id = aws_api_gateway_rest_api.lambda_iot.id
+  parent_id   = aws_api_gateway_resource.runs.id
+  path_part   = "interrupt-all"
+}
+
 # GET /api/runs/running
 resource "aws_api_gateway_method" "runs_running_get" {
   rest_api_id   = aws_api_gateway_rest_api.lambda_iot.id
@@ -168,6 +175,24 @@ resource "aws_api_gateway_integration" "runs_running_get" {
   rest_api_id = aws_api_gateway_rest_api.lambda_iot.id
   resource_id = aws_api_gateway_resource.runs_running.id
   http_method = aws_api_gateway_method.runs_running_get.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.lambda_run_api_invoke_arn
+}
+
+# POST /api/runs/interrupt-all
+resource "aws_api_gateway_method" "runs_interrupt_all_post" {
+  rest_api_id   = aws_api_gateway_rest_api.lambda_iot.id
+  resource_id   = aws_api_gateway_resource.runs_interrupt_all.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "runs_interrupt_all_post" {
+  rest_api_id = aws_api_gateway_rest_api.lambda_iot.id
+  resource_id = aws_api_gateway_resource.runs_interrupt_all.id
+  http_method = aws_api_gateway_method.runs_interrupt_all_post.http_method
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
@@ -266,6 +291,7 @@ resource "aws_api_gateway_deployment" "lambda_iot" {
     aws_api_gateway_integration.runs_can_start_get,
     aws_api_gateway_integration.runs_start_post,
     aws_api_gateway_integration.runs_running_get,
+    aws_api_gateway_integration.runs_interrupt_all_post,
     aws_api_gateway_integration.runs_id_finish_post,
     aws_api_gateway_integration.sensors_data_post,
     aws_api_gateway_integration.sensors_data_get,
@@ -279,6 +305,7 @@ resource "aws_api_gateway_deployment" "lambda_iot" {
       aws_api_gateway_resource.runs_start.id,
       aws_api_gateway_resource.runs_can_start.id,
       aws_api_gateway_resource.runs_running.id,
+      aws_api_gateway_resource.runs_interrupt_all.id,
       aws_api_gateway_resource.runs_id_finish.id,
       aws_api_gateway_resource.runs_all.id,
       aws_api_gateway_resource.runs_id.id,
@@ -288,6 +315,7 @@ resource "aws_api_gateway_deployment" "lambda_iot" {
       aws_api_gateway_method.runs_start_post.id,
       aws_api_gateway_method.runs_can_start_get.id,
       aws_api_gateway_method.runs_running_get.id,
+      aws_api_gateway_method.runs_interrupt_all_post.id,
       aws_api_gateway_method.runs_id_finish_post.id,
       aws_api_gateway_method.sensors_data_post.id,
       aws_api_gateway_method.sensors_data_get.id,

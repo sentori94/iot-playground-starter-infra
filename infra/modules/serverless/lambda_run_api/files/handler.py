@@ -20,6 +20,7 @@ def lambda_handler(event, context):
     - GET /api/runs/running (runs en cours)
     - GET /api/runs/can-start (vérifier si on peut démarrer)
     - POST /api/runs/start (démarrer un run)
+    - POST /api/runs/interrupt-all (interrompre tous les runs)
     - POST /api/runs/{id}/finish (terminer un run)
     """
 
@@ -46,6 +47,10 @@ def lambda_handler(event, context):
         elif http_method == 'GET' and 'all' in path:
             print(f"[RUN-API] Fetching all runs")
             return get_all_runs()
+
+        # POST /api/runs/interrupt-all
+        elif http_method == 'POST' and 'interrupt-all' in path:
+            return interrupt_all_runs(event)
 
         # POST /api/runs/start
         elif http_method == 'POST' and 'start' in path:
@@ -156,34 +161,50 @@ def can_start_simulation(event):
     """
     GET /api/runs/can-start
     Vérifie si l'utilisateur peut démarrer une nouvelle simulation
-    Limite: 2 runs en cours maximum par utilisateur
+    Limite: 5 runs en cours maximum par utilisateur
     """
     headers = event.get('headers', {})
     user = headers.get('X-User') or headers.get('x-user', 'unknown')
 
-    print(f"[RUN-API] Checking if user '{user}' can start simulation")
+    print(f"[RUN-API] can-start: Checking for user '{user}'")
+    print(f"[RUN-API] can-start: Headers received: {headers}")
 
     # Compter les runs en cours pour cet utilisateur
-    result = table.scan(
-        FilterExpression='username = :user AND #s = :status',
-        ExpressionAttributeNames={'#s': 'status'},
-        ExpressionAttributeValues={
-            ':user': user,
-            ':status': 'RUNNING'
-        }
-    )
+    try:
+        # Scan avec FilterExpression
+        from boto3.dynamodb.conditions import Attr
 
-    running_count = len(result.get('Items', []))
-    max_concurrent_runs = 5  # Limite configurable
+        result = table.scan(
+            FilterExpression=Attr('username').eq(user) & Attr('status').eq('RUNNING')
+        )
 
+        items = result.get('Items', [])
+        running_count = len(items)
+
+        print(f"[RUN-API] can-start: Found {running_count} RUNNING items for user '{user}'")
+
+        # Log les IDs des runs trouvés pour debug
+        if running_count > 0:
+            run_ids = [item.get('id', 'no-id') for item in items]
+            print(f"[RUN-API] can-start: Running run IDs: {run_ids}")
+
+    except Exception as e:
+        print(f"[RUN-API] can-start: ERROR scanning DynamoDB: {str(e)}")
+        # En cas d'erreur, on retourne une réponse safe
+        running_count = 0
+
+    max_concurrent_runs = 5  # Limite configurable (Spring Boot par défaut: 5)
     can_start = running_count < max_concurrent_runs
+    available = max(0, max_concurrent_runs - running_count)
 
-    print(f"[RUN-API] User '{user}' has {running_count}/{max_concurrent_runs} running simulations")
+    print(f"[RUN-API] can-start: Result - canStart={can_start}, currentRunning={running_count}, maxAllowed={max_concurrent_runs}, available={available}")
 
+    # Match exact du modèle Java CanStartRunResponse
     return response(200, {
         'canStart': can_start,
-        'runningCount': running_count,
-        'maxConcurrentRuns': max_concurrent_runs
+        'currentRunning': running_count,
+        'maxAllowed': max_concurrent_runs,
+        'available': available
     })
 
 
@@ -209,8 +230,8 @@ def start_run(event):
         print(f"[RUN-API] User '{user}' cannot start simulation (limit reached)")
         return response(400, {
             'error': 'Maximum concurrent runs reached',
-            'runningCount': can_start_data['runningCount'],
-            'maxConcurrentRuns': can_start_data['maxConcurrentRuns']
+            'currentRunning': can_start_data['currentRunning'],
+            'maxAllowed': can_start_data['maxAllowed']
         })
 
     # Générer un ID unique pour le run
@@ -308,13 +329,10 @@ def get_running_simulations(event):
     print(f"[RUN-API] Fetching running simulations for user '{user}'")
 
     # Scanner pour récupérer les runs RUNNING de l'utilisateur
+    from boto3.dynamodb.conditions import Attr
+
     result = table.scan(
-        FilterExpression='username = :user AND #s = :status',
-        ExpressionAttributeNames={'#s': 'status'},
-        ExpressionAttributeValues={
-            ':user': user,
-            ':status': 'RUNNING'
-        }
+        FilterExpression=Attr('username').eq(user) & Attr('status').eq('RUNNING')
     )
 
     items = result.get('Items', [])
@@ -327,6 +345,70 @@ def get_running_simulations(event):
     print(f"[RUN-API] Found {len(items)} running simulations for user '{user}'")
 
     return response(200, items)
+
+
+def interrupt_all_runs(event):
+    """
+    POST /api/runs/interrupt-all
+    Interrompt tous les runs en cours pour l'utilisateur
+    """
+    headers = event.get('headers', {})
+    user = headers.get('X-User') or headers.get('x-user', 'unknown')
+
+    print(f"[RUN-API] Interrupting all runs for user '{user}'")
+
+    # Récupérer tous les runs RUNNING de l'utilisateur
+    try:
+        from boto3.dynamodb.conditions import Attr
+
+        result = table.scan(
+            FilterExpression=Attr('username').eq(user) & Attr('status').eq('RUNNING')
+        )
+    except Exception as e:
+        print(f"[RUN-API] Error scanning for running simulations: {str(e)}")
+        return response(500, {'error': 'Failed to fetch running simulations'})
+
+    items = result.get('Items', [])
+    print(f"[RUN-API] Found {len(items)} running simulations to interrupt")
+
+    if len(items) == 0:
+        print(f"[RUN-API] No running simulations to interrupt for user '{user}'")
+        return response(200, {
+            'interrupted': 0,
+            'message': 'No running simulations to interrupt'
+        })
+
+    interrupted_count = 0
+    failed_count = 0
+    finished_at = datetime.utcnow().isoformat() + 'Z'
+
+    # Terminer chaque run avec status INTERRUPTED
+    for item in items:
+        run_id = item['id']
+        try:
+            table.update_item(
+                Key={'id': run_id},
+                UpdateExpression='SET #s = :status, finishedAt = :finished_at, errorMessage = :error_msg',
+                ExpressionAttributeNames={'#s': 'status'},
+                ExpressionAttributeValues={
+                    ':status': 'INTERRUPTED',
+                    ':finished_at': finished_at,
+                    ':error_msg': 'Interrupted by user'
+                }
+            )
+            interrupted_count += 1
+            print(f"[RUN-API] Successfully interrupted run: {run_id}")
+        except Exception as e:
+            failed_count += 1
+            print(f"[RUN-API] ERROR - Failed to interrupt run {run_id}: {str(e)}")
+
+    print(f"[RUN-API] Interrupted {interrupted_count}/{len(items)} runs for user '{user}' (failed: {failed_count})")
+
+    # Retourner la réponse (match Spring Boot)
+    return response(200, {
+        'interrupted': interrupted_count,
+        'message': f'{interrupted_count} simulation(s) interrupted'
+    })
 
 
 def convert_decimals(obj):
