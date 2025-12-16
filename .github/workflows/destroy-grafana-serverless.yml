@@ -136,9 +136,8 @@ jobs:
           echo "  ✅ ALB + Target Group"
           echo "  ✅ ECS Cluster"
           echo "  ✅ VPC + Subnets + NAT Gateways"
-          echo "  ✅ Athena Workgroup + Database"
+          echo "  ✅ IAM Role CloudWatch"
           echo "  ✅ Security Groups"
-          echo "  ✅ IAM Roles"
           echo ""
           if [ "${{ github.event.inputs.DESTROY_BACKEND }}" == "yes" ]; then
             echo "  ✅ S3 Backend Bucket (iot-playground-tfstate-grafana-serverless)"

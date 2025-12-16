@@ -9,14 +9,7 @@ on:
         required: true
         default: plan
         options: [plan, apply]
-      ACTION:
-        description: "Action spécifique"
-        type: choice
-        required: false
-        default: full
-        options:
-          - full
-          - grafana-only
+
 
 env:
   AWS_REGION: eu-west-3
@@ -24,7 +17,7 @@ env:
 
 jobs:
   deploy-grafana:
-    name: "Deploy Grafana [${{ github.event.inputs.MODE }}] - ${{ github.event.inputs.ACTION }}"
+    name: "Deploy Grafana [${{ github.event.inputs.MODE }}]"
     runs-on: ubuntu-latest
 
     env:
@@ -109,40 +102,21 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
-      - name: Terraform Plan (Full)
-        if: github.event.inputs.MODE == 'plan' && github.event.inputs.ACTION == 'full'
+      - name: Terraform Plan
+        if: github.event.inputs.MODE == 'plan'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan
 
-      - name: Terraform Plan (Grafana Only)
-        if: github.event.inputs.MODE == 'plan' && github.event.inputs.ACTION == 'grafana-only'
+      - name: Terraform Apply
+        if: github.event.inputs.MODE == 'apply'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          terraform plan \
-            -target=module.vpc_serverless \
-            -target=module.ecs_cluster_serverless \
-            -target=module.grafana_serverless
-
-      - name: Terraform Apply (Full)
-        if: github.event.inputs.MODE == 'apply' && github.event.inputs.ACTION == 'full'
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          echo "🚀 Deploying full Grafana Serverless infrastructure..."
+          echo "🚀 Deploying Grafana Serverless infrastructure..."
           terraform apply -auto-approve
 
 
-      - name: Terraform Apply (Grafana Only)
-        if: github.event.inputs.MODE == 'apply' && github.event.inputs.ACTION == 'grafana-only'
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform apply -auto-approve \
-            -target=module.vpc_serverless \
-            -target=module.ecs_cluster_serverless \
-            -target=module.athena_dynamodb \
-            -target=module.grafana_serverless
-
       - name: Show Grafana Outputs
-        if: github.event.inputs.MODE == 'apply' && (github.event.inputs.ACTION == 'full' || github.event.inputs.ACTION == 'grafana-only')
+        if: github.event.inputs.MODE == 'apply'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
           echo "🎉 Grafana Serverless deployed successfully!"
@@ -157,24 +131,9 @@ jobs:
           echo "  1. Accéder à Grafana: $GRAFANA_URL"
           echo "  2. Login: admin / [votre mot de passe]"
           echo "  3. Dashboard disponible: IoT Serverless - CloudWatch Monitoring"
-          echo "  2. Créer les tables Athena (voir GRAFANA-DEPLOYMENT-GUIDE.md)"
-          echo "  3. Vérifier les datasources dans Grafana"
-
-      - name: Show Athena Outputs
-        if: github.event.inputs.MODE == 'apply' && github.event.inputs.ACTION == 'athena-only'
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          echo "📊 Athena deployed successfully!"
           echo ""
-          ATHENA_WG=$(terraform output -raw athena_workgroup_name 2>/dev/null || echo "Not available yet")
-          ATHENA_DB=$(terraform output -raw athena_database_name 2>/dev/null || echo "Not available yet")
-          ATHENA_BUCKET=$(terraform output -raw athena_results_bucket 2>/dev/null || echo "Not available yet")
-          
-          echo "  Workgroup: $ATHENA_WG"
-          echo "  Database: $ATHENA_DB"
-          echo "  Results Bucket: $ATHENA_BUCKET"
-          echo ""
-          echo "📝 Next: Create Athena tables using named queries"
+          echo "ℹ️  CloudWatch Logs et Metrics sont automatiques (pas de configuration)"
+          echo "ℹ️  Les logs apparaîtront dès la première requête Lambda"
 
       - name: Plan Summary
         if: github.event.inputs.MODE == 'plan'
