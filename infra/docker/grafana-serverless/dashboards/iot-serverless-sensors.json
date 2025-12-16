@@ -89,13 +89,16 @@
       "targets": [
         {
           "dimensions": {
-            "Type": "temperature"
+            "Type": "temperature",
+            "SensorId": "$SensorId",
+            "User": "$User",
+            "RunId": "$RunId"
           },
           "expression": "",
           "id": "",
-          "label": "${PROP('Dim.SensorId')} - ${PROP('Dim.User')}",
+          "label": "${PROP('Dim.SensorId')} - ${PROP('Dim.User')} - Run: ${PROP('Dim.RunId')}",
           "logGroups": [],
-          "matchExact": true,
+          "matchExact": false,
           "metricEditorMode": 0,
           "metricName": "SensorReading",
           "metricQueryType": 0,
@@ -107,7 +110,7 @@
           "statistic": "Average"
         }
       ],
-      "title": "🌡️ Temperature Evolution by Sensor & User",
+      "title": "🌡️ Temperature Evolution (Filtered by Sensor/User/Run)",
       "type": "timeseries"
     },
     {
@@ -821,7 +824,95 @@
   "style": "dark",
   "tags": ["serverless", "lambda", "cloudwatch", "iot", "sensors"],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "SensorId",
+        "options": [],
+        "query": {
+          "queryType": "dimensionValues",
+          "namespace": "IoTPlayground/Sensors",
+          "metricName": "SensorReading",
+          "dimensionKey": "SensorId",
+          "region": "default"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "User",
+        "options": [],
+        "query": {
+          "queryType": "dimensionValues",
+          "namespace": "IoTPlayground/Sensors",
+          "metricName": "SensorReading",
+          "dimensionKey": "User",
+          "region": "default"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "RunId",
+        "options": [],
+        "query": {
+          "queryType": "dimensionValues",
+          "namespace": "IoTPlayground/Sensors",
+          "metricName": "SensorReading",
+          "dimensionKey": "RunId",
+          "region": "default"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
