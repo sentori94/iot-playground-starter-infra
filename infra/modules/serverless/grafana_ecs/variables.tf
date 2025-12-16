@@ -61,17 +61,7 @@ variable "route53_zone_id" {
 }
 
 variable "grafana_task_role_arn" {
-  description = "ARN du rôle IAM pour la tâche Grafana (accès Athena+DynamoDB)"
-  type        = string
-}
-
-variable "athena_workgroup_name" {
-  description = "Nom du workgroup Athena"
-  type        = string
-}
-
-variable "athena_database_name" {
-  description = "Nom de la database Athena"
+  description = "ARN du rôle IAM pour la tâche Grafana (accès CloudWatch)"
   type        = string
 }
 

@@ -16,7 +16,6 @@ on:
         default: full
         options:
           - full
-          - athena-only
           - grafana-only
 
 env:
@@ -115,13 +114,6 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan
 
-      - name: Terraform Plan (Athena Only)
-        if: github.event.inputs.MODE == 'plan' && github.event.inputs.ACTION == 'athena-only'
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform plan \
-            -target=module.athena_dynamodb
-
       - name: Terraform Plan (Grafana Only)
         if: github.event.inputs.MODE == 'plan' && github.event.inputs.ACTION == 'grafana-only'
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -129,7 +121,6 @@ jobs:
           terraform plan \
             -target=module.vpc_serverless \
             -target=module.ecs_cluster_serverless \
-            -target=module.athena_dynamodb \
             -target=module.grafana_serverless
 
       - name: Terraform Apply (Full)
@@ -139,12 +130,6 @@ jobs:
           echo "🚀 Deploying full Grafana Serverless infrastructure..."
           terraform apply -auto-approve
 
-      - name: Terraform Apply (Athena Only)
-        if: github.event.inputs.MODE == 'apply' && github.event.inputs.ACTION == 'athena-only'
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform apply -auto-approve \
-            -target=module.athena_dynamodb
 
       - name: Terraform Apply (Grafana Only)
         if: github.event.inputs.MODE == 'apply' && github.event.inputs.ACTION == 'grafana-only'
@@ -165,15 +150,13 @@ jobs:
           echo "📋 Grafana Outputs:"
           echo ""
           GRAFANA_URL=$(terraform output -raw grafana_url 2>/dev/null || echo "Not available yet")
-          ATHENA_WG=$(terraform output -raw athena_workgroup_name 2>/dev/null || echo "Not available yet")
-          ATHENA_DB=$(terraform output -raw athena_database_name 2>/dev/null || echo "Not available yet")
           
           echo "  🌐 Grafana URL: $GRAFANA_URL"
-          echo "  📊 Athena Workgroup: $ATHENA_WG"
-          echo "  🗄️  Athena Database: $ATHENA_DB"
           echo ""
           echo "📝 Prochaines étapes:"
           echo "  1. Accéder à Grafana: $GRAFANA_URL"
+          echo "  2. Login: admin / [votre mot de passe]"
+          echo "  3. Dashboard disponible: IoT Serverless - CloudWatch Monitoring"
           echo "  2. Créer les tables Athena (voir GRAFANA-DEPLOYMENT-GUIDE.md)"
           echo "  3. Vérifier les datasources dans Grafana"
 

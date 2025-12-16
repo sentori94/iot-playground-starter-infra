@@ -35,14 +35,6 @@ resource "aws_ecs_task_definition" "grafana_serverless" {
       {
         name  = "AWS_REGION"
         value = data.aws_region.current.name
-      },
-      {
-        name  = "ATHENA_WORKGROUP"
-        value = var.athena_workgroup_name
-      },
-      {
-        name  = "ATHENA_DATABASE"
-        value = var.athena_database_name
       }
     ]
 

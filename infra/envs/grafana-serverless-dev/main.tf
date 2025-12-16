@@ -32,29 +32,58 @@ module "ecs_cluster_serverless" {
 }
 
 # ===========================
-# Data: DynamoDB Tables (depuis serverless-dev)
+# IAM Role pour Grafana accéder à CloudWatch
 # ===========================
-data "aws_dynamodb_table" "runs" {
-  name = "iot-playground-runs-serverless-dev"
+resource "aws_iam_role" "grafana_cloudwatch" {
+  name = "${var.project}-grafana-cw-${var.env}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.common_tags
 }
 
-data "aws_dynamodb_table" "sensor_data" {
-  name = "iot-playground-sensor-data-serverless-dev"
-}
+resource "aws_iam_role_policy" "grafana_cloudwatch" {
+  name = "${var.project}-grafana-cw-access-${var.env}"
+  role = aws_iam_role.grafana_cloudwatch.id
 
-# ===========================
-# Module Athena pour DynamoDB
-# ===========================
-module "athena_dynamodb" {
-  source = "../../modules/serverless/athena_dynamodb"
-
-  project                = var.project
-  environment            = var.env
-  runs_table_name        = data.aws_dynamodb_table.runs.name
-  runs_table_arn         = data.aws_dynamodb_table.runs.arn
-  sensor_data_table_name = data.aws_dynamodb_table.sensor_data.name
-  sensor_data_table_arn  = data.aws_dynamodb_table.sensor_data.arn
-  tags                   = local.common_tags
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:GetMetricData",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics",
+          "cloudwatch:DescribeAlarms"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:FilterLogEvents",
+          "logs:GetLogEvents",
+          "logs:GetLogGroupFields",
+          "logs:GetQueryResults",
+          "logs:StartQuery",
+          "logs:StopQuery"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 # ===========================
@@ -94,9 +123,7 @@ module "grafana_serverless" {
   custom_domain_name     = ""  # Désactivé - utilisera l'URL ALB
   certificate_arn        = ""
   route53_zone_id        = ""
-  grafana_task_role_arn  = module.athena_dynamodb.grafana_task_role_arn
-  athena_workgroup_name  = module.athena_dynamodb.athena_workgroup_name
-  athena_database_name   = module.athena_dynamodb.athena_database_name
+  grafana_task_role_arn  = aws_iam_role.grafana_cloudwatch.arn
   tags                   = local.common_tags
 }
 
