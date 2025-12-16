@@ -24,24 +24,33 @@ def lambda_handler(event, context):
     path_params = event.get('pathParameters') or {}
     query_params = event.get('queryStringParameters') or {}
 
+    # Log de la requête entrante
+    print(f"[RUN-API] {http_method} {path} - Query: {query_params}")
+
     try:
         # GET /api/runs/{id}
         if http_method == 'GET' and path_params.get('id'):
-            return get_run_by_id(path_params['id'])
+            run_id = path_params['id']
+            print(f"[RUN-API] Fetching run: {run_id}")
+            return get_run_by_id(run_id)
 
         # GET /api/runs/all
         elif http_method == 'GET' and 'all' in path:
+            print(f"[RUN-API] Fetching all runs")
             return get_all_runs()
 
         # GET /api/runs (avec pagination)
         elif http_method == 'GET':
+            limit = query_params.get('limit', 20)
+            print(f"[RUN-API] Listing runs (limit: {limit})")
             return list_runs_paginated(query_params)
 
         else:
+            print(f"[RUN-API] Method not allowed: {http_method} {path}")
             return response(405, {'error': 'Method not allowed'})
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"[RUN-API] ERROR: {str(e)}")
         return response(500, {'error': 'Internal server error', 'details': str(e)})
 
 
@@ -50,9 +59,11 @@ def get_run_by_id(run_id):
     result = table.get_item(Key={'id': run_id})
 
     if 'Item' not in result:
+        print(f"[RUN-API] Run not found: {run_id}")
         return response(404, {'error': 'Run not found'})
 
     item = convert_decimals(result['Item'])
+    print(f"[RUN-API] Run retrieved: {run_id} - Status: {item.get('status')}")
     return response(200, item)
 
 
@@ -67,6 +78,7 @@ def get_all_runs():
     items.sort(key=lambda x: x.get('startedAt', ''), reverse=True)
 
     items = [convert_decimals(item) for item in items]
+    print(f"[RUN-API] Retrieved {len(items)} runs")
     return response(200, items)
 
 
@@ -107,6 +119,9 @@ def list_runs_paginated(query_params):
         import base64
         next_key = base64.b64encode(json.dumps(result['LastEvaluatedKey']).encode()).decode()
         response_data['nextKey'] = next_key
+        print(f"[RUN-API] Paginated response: {len(items)} items, has next page")
+    else:
+        print(f"[RUN-API] Paginated response: {len(items)} items, last page")
 
     return response(200, response_data)
 

@@ -20,16 +20,19 @@ def lambda_handler(event, context):
     http_method = event.get('httpMethod', '')
     path = event.get('path', '')
 
+    print(f"[SENSOR-API] {http_method} {path}")
+
     try:
         if http_method == 'POST':
             return ingest_sensor_data(event)
         elif http_method == 'GET':
             return list_sensor_data(event)
         else:
+            print(f"[SENSOR-API] Method not allowed: {http_method}")
             return response(405, {'error': 'Method not allowed'})
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"[SENSOR-API] ERROR: {str(e)}")
         return response(500, {'error': 'Internal server error', 'details': str(e)})
 
 
@@ -53,10 +56,13 @@ def ingest_sensor_data(event):
     reading = body.get('reading')
 
     if not sensor_id or not sensor_type or reading is None:
+        print(f"[SENSOR-API] Validation failed: missing fields")
         return response(400, {'error': 'Missing required fields: sensorId, type, reading'})
 
     # Timestamp actuel
     timestamp = datetime.utcnow().isoformat() + 'Z'
+
+    print(f"[SENSOR-API] Ingesting data: sensor={sensor_id}, type={sensor_type}, reading={reading}, user={user}, runId={run_id}")
 
     # Préparer l'item DynamoDB
     item = {
@@ -73,6 +79,8 @@ def ingest_sensor_data(event):
 
     # Publier les métriques CloudWatch
     publish_metrics(sensor_id, reading, user, run_id, sensor_type)
+
+    print(f"[SENSOR-API] Data saved successfully: {sensor_id} at {timestamp}")
 
     # Retourner la réponse
     return response(200, {
@@ -93,6 +101,8 @@ def list_sensor_data(event):
     sensor_id = query_params.get('sensorId')
     run_id = query_params.get('runId')
     limit = int(query_params.get('limit', 100))
+
+    print(f"[SENSOR-API] Listing data: sensorId={sensor_id}, runId={run_id}, limit={limit}")
 
     if sensor_id:
         # Query par sensorId
@@ -116,6 +126,7 @@ def list_sensor_data(event):
         result = table.scan(Limit=limit)
 
     items = result.get('Items', [])
+    print(f"[SENSOR-API] Retrieved {len(items)} sensor data records")
     items = [convert_decimals(item) for item in items]
 
     return response(200, {
