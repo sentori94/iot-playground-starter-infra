@@ -100,13 +100,8 @@ resource "aws_iam_role_policy" "lambda_sensor_api_cloudwatch_metrics" {
   })
 }
 
-# CloudWatch Log Group
-resource "aws_cloudwatch_log_group" "lambda_sensor_api" {
-  name              = "/aws/lambda/${aws_lambda_function.sensor_api.function_name}"
-  retention_in_days = 14
-
-  tags = var.tags
-}
+# CloudWatch Log Group est créé automatiquement par Lambda
+# On ne le gère pas dans Terraform pour éviter ResourceAlreadyExistsException
 
 # Permission pour API Gateway d'invoquer la Lambda
 resource "aws_lambda_permission" "api_gateway" {
