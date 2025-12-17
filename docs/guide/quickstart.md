@@ -65,23 +65,35 @@ terraform output api_gateway_url
 # https://api-lambda-iot.sentori-studio.com
 ```
 
-### Étape 3 : Tester l'API
+### Étape 3 : Vérifier le Déploiement
+
+```mermaid
+graph LR
+    A[GitHub Actions] -->|Deploy| B[Terraform]
+    B -->|Créé| C[Lambda + DynamoDB]
+    C -->|URL| D[API Gateway]
+    D -->|Accessible| E[https://api-lambda-iot...]
+    
+    style C fill:#e8f5e9
+```
+
+### Étape 4 : Tester l'API
 
 ```bash
 # Can start ?
-curl https://api-lambda-iot.sentori-studio.com/api/runs/can-start
+curl /api/runs/can-start
 
 # Démarrer une simulation
-curl -X POST https://api-lambda-iot.sentori-studio.com/api/runs/start \
+curl -X POST /api/runs/start \
   -H "Content-Type: application/json" \
   -H "X-User: test-user" \
   -d '{"duration": 60, "interval": 5}'
 
 # Lister les runs
-curl https://api-lambda-iot.sentori-studio.com/api/runs
+curl /api/runs
 ```
 
-### Étape 4 : Déployer Grafana (Optionnel)
+### Étape 5 : Déployer Grafana (Optionnel)
 
 === "GitHub Actions"
 
@@ -103,7 +115,7 @@ curl https://api-lambda-iot.sentori-studio.com/api/runs
       -target=module.grafana_serverless
     ```
 
-### Étape 5 : Accéder à Grafana
+### Étape 6 : Accéder à Grafana
 
 ```bash
 # Récupérer l'URL

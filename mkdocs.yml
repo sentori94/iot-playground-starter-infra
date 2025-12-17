@@ -72,8 +72,7 @@ nav:
   - Déploiement:
       - Prérequis: deployment/prerequisites.md
       - Infrastructure ECS: deployment/ecs.md
-      - Infrastructure Serverless: deployment/serverless.md
-      - Grafana: deployment/grafana.md
+      - Infrastructure Serverless: guide/quickstart.md
       - GitHub Actions: deployment/github-actions.md
   - Modules Terraform:
       - Structure: modules/structure.md
@@ -89,5 +88,4 @@ nav:
   - Référence API:
       - Run Controller: api/run-controller.md
       - Sensor Controller: api/sensor-controller.md
-  - Coûts AWS: costs.md
 

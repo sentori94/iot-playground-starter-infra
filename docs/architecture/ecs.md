@@ -4,7 +4,37 @@
 
 L'architecture ECS représente l'approche traditionnelle avec des **conteneurs Docker** qui tournent en permanence sur AWS Fargate. Cette architecture est adaptée aux applications nécessitant une latence constante et prévisible, avec des connexions persistantes vers la base de données.
 
+```mermaid
+graph LR
+    FRONTEND[Frontend] -->|HTTPS| ALB[Application<br/>Load Balancer]
+    
+    ALB --> ECS[ECS Fargate<br/>Spring Boot]
+    
+    ECS --> RDS[(RDS<br/>PostgreSQL)]
+    
+    ECS -.expose.-> PROM[Prometheus<br/>ECS]
+    
+    PROM --> GRAFANA[Grafana<br/>ECS]
+    
+    style ECS fill:#fff3e0
+    style ALB fill:#e1f5ff
+    style GRAFANA fill:#e3f2fd
+```
+
 ## 🏗️ Composants Principaux
+
+### Services AWS Utilisés
+
+| Service | Usage | Justification |
+|---------|-------|---------------|
+| **ECS Fargate** | Exécution conteneurs | Pas de gestion EC2, scaling facile |
+| **RDS PostgreSQL** | Base relationnelle | Données structurées, transactions ACID |
+| **ALB** | Load balancing | Distribution trafic, terminaison SSL |
+| **ECR** | Registry Docker | Stockage images Spring Boot |
+| **VPC** | Réseau privé | Isolation, security groups |
+| **CloudWatch** | Logs conteneurs | Centralisation logs ECS |
+| **Route53** | DNS custom domain | Gestion domaine sentori-studio.com |
+| **ACM** | Certificat HTTPS | Gratuit, renouvellement auto |
 
 ### ECS Fargate
 Les conteneurs Spring Boot tournent sur **Fargate** (serverless containers) sans avoir à gérer les instances EC2. Chaque tâche ECS a 0.5 vCPU et 1 GB de mémoire, suffisant pour l'application IoT Playground.

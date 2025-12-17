@@ -2,10 +2,6 @@
 
 Gestion de l'ingestion et récupération des données de capteurs IoT.
 
-## 🎯 Base URL
-
-- **Serverless** : `https://api-lambda-iot.sentori-studio.com`
-- **ECS** : `https://api-ecs-iot.sentori-studio.com` (futur)
 
 ## 📋 Endpoints
 
@@ -165,13 +161,13 @@ Les headers suivants sont requis :
 
 ```bash
 # 1. Démarrer un run
-RUN_ID=$(curl -X POST https://api-lambda-iot.sentori-studio.com/api/runs/start \
+RUN_ID=$(curl -X POST /api/runs/start \
   -H "Content-Type: application/json" \
   -H "X-User: demo-user" \
   -d '{"duration": 60, "interval": 5}' | jq -r '.id')
 
 # 2. Ingérer des données
-curl -X POST https://api-lambda-iot.sentori-studio.com/api/sensors/data \
+curl -X POST /api/sensors/data \
   -H "Content-Type: application/json" \
   -H "X-User: demo-user" \
   -H "X-Run-Id: $RUN_ID" \
@@ -182,7 +178,7 @@ curl -X POST https://api-lambda-iot.sentori-studio.com/api/sensors/data \
   }"
 
 # 3. Récupérer les données
-curl "https://api-lambda-iot.sentori-studio.com/api/sensors/data?runId=$RUN_ID"
+curl "/api/sensors/data?runId=$RUN_ID"
 ```
 
 ## 🔗 Liens

@@ -4,6 +4,33 @@
 
 Ce projet permet de mesurer concrètement les différences entre une architecture conteneurisée (ECS) et une architecture serverless (Lambda) sur AWS. Les deux implémentent exactement la même fonctionnalité (simulation de capteurs IoT), permettant une comparaison objective.
 
+```mermaid
+graph TB
+    subgraph "Architecture ECS"
+        A1[Always-On]
+        A2[Conteneurs Docker]
+        A3[PostgreSQL]
+        A4[Coût fixe: $90/mois]
+    end
+    
+    subgraph "Architecture Serverless"
+        B1[On-Demand]
+        B2[Lambda Python]
+        B3[DynamoDB]
+        B4[Coût variable: $1-150/mois]
+    end
+    
+    subgraph "Frontend Unique"
+        C[Angular App]
+    end
+    
+    C -->|Même API| A2
+    C -->|Même API| B2
+    
+    style A2 fill:#fff3e0
+    style B2 fill:#e8f5e9
+```
+
 ## 📊 Tableau Comparatif
 
 | Aspect | ECS Classic | Serverless Lambda |

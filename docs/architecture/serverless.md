@@ -4,6 +4,26 @@
 
 L'architecture Serverless remplace complètement le backend Spring Boot par des **fonctions Lambda Python** et la base PostgreSQL par **DynamoDB**. Cette approche "sans serveur" permet de ne payer que pour les requêtes effectuées, réduisant drastiquement les coûts pour les applications à faible trafic.
 
+```mermaid
+graph LR
+    FRONTEND[Frontend] -->|HTTPS| APIGW[API Gateway]
+    
+    APIGW -->|invoke| LAMBDA_RUN[Lambda Run API<br/>Python 3.11]
+    APIGW -->|invoke| LAMBDA_SENSOR[Lambda Sensor API<br/>Python 3.11]
+    
+    LAMBDA_RUN --> DYNAMO_RUNS[(DynamoDB<br/>Runs)]
+    LAMBDA_SENSOR --> DYNAMO_DATA[(DynamoDB<br/>SensorData)]
+    
+    LAMBDA_RUN -.log.-> CW[CloudWatch Logs]
+    LAMBDA_SENSOR -.log.-> CW
+    
+    CW --> GRAFANA[Grafana]
+    
+    style LAMBDA_RUN fill:#e8f5e9
+    style LAMBDA_SENSOR fill:#e8f5e9
+    style APIGW fill:#e1f5ff
+```
+
 ### Composants Principaux
 
 **API Gateway** : Point d'entrée HTTPS (`api-lambda-iot.sentori-studio.com`) qui route les requêtes vers les Lambdas appropriées
@@ -19,6 +39,19 @@ L'architecture Serverless remplace complètement le backend Spring Boot par des 
 **CloudWatch Logs** : Collecte les logs et métriques custom des Lambdas
 
 **Grafana (Optionnel)** : Conteneur ECS qui query CloudWatch pour afficher les dashboards
+
+### Services AWS Utilisés
+
+| Service | Usage | Justification |
+|---------|-------|---------------|
+| **Lambda** | Exécution code Python | Pay-per-use, scaling automatique |
+| **API Gateway** | Endpoint REST | Gestion HTTPS, throttling, monitoring |
+| **DynamoDB** | Stockage NoSQL | Performance, pay-per-request, pas de gestion serveur |
+| **CloudWatch** | Logs et métriques | Natif AWS, gratuit jusqu'à 5 GB |
+| **Route53** | DNS custom domain | Gestion domaine sentori-studio.com |
+| **ACM** | Certificat HTTPS | Gratuit, renouvellement auto |
+| **VPC** (Grafana) | Réseau isolé | Sécurité pour Grafana |
+| **ECS Fargate** (Grafana) | Grafana container | Grafana non disponible en Lambda |
 
 ## 📋 Ressources AWS
 

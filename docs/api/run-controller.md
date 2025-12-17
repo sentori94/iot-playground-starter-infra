@@ -2,10 +2,6 @@
 
 Gestion du cycle de vie des simulations (runs).
 
-## 🎯 Base URL
-
-- **Serverless** : `https://api-lambda-iot.sentori-studio.com`
-- **ECS** : `https://api-ecs-iot.sentori-studio.com` (futur)
 
 ## 📋 Endpoints
 

@@ -4,6 +4,69 @@
 
 L'infrastructure IoT Playground permet de déployer **deux backends distincts** pour la même application frontend. L'utilisateur peut choisir dans l'interface web quel backend utiliser (ECS ou Serverless), permettant ainsi une comparaison directe des deux approches.
 
+```mermaid
+graph TB
+    subgraph "Utilisateur"
+        USER[Utilisateur]
+        FRONTEND[Frontend Angular]
+    end
+    
+    subgraph "AWS Infrastructure"
+        subgraph "Mode ECS"
+            ALB[Application Load Balancer]
+            ECS[ECS Fargate<br/>Spring Boot]
+            RDS[(RDS<br/>PostgreSQL)]
+            PROM[Prometheus]
+        end
+        
+        subgraph "Mode Serverless"
+            APIGW[API Gateway]
+            LAMBDA_RUN[Lambda Run API]
+            LAMBDA_SENSOR[Lambda Sensor API]
+            DYNAMO[(DynamoDB<br/>Runs + SensorData)]
+            CW[CloudWatch Logs]
+        end
+        
+        subgraph "Monitoring"
+            GRAFANA[Grafana ECS]
+        end
+        
+        subgraph "DNS & Security"
+            R53[Route53]
+            ACM[ACM Certificates]
+        end
+    end
+    
+    USER --> FRONTEND
+    FRONTEND -->|HTTPS| R53
+    
+    R53 --> ALB
+    R53 --> APIGW
+    R53 --> GRAFANA
+    
+    ACM -.certifie.-> ALB
+    ACM -.certifie.-> APIGW
+    ACM -.certifie.-> GRAFANA
+    
+    ALB --> ECS
+    ECS --> RDS
+    ECS --> PROM
+    PROM --> GRAFANA
+    
+    APIGW --> LAMBDA_RUN
+    APIGW --> LAMBDA_SENSOR
+    LAMBDA_RUN --> DYNAMO
+    LAMBDA_SENSOR --> DYNAMO
+    LAMBDA_RUN -.log.-> CW
+    LAMBDA_SENSOR -.log.-> CW
+    CW --> GRAFANA
+    
+    style ECS fill:#fff3e0
+    style LAMBDA_RUN fill:#e8f5e9
+    style LAMBDA_SENSOR fill:#e8f5e9
+    style GRAFANA fill:#e3f2fd
+```
+
 ### Backend ECS (Architecture Traditionnelle)
 
 L'application Spring Boot tourne sur **ECS Fargate** avec une base de données **PostgreSQL** hébergée sur RDS. Les métriques sont exposées via un endpoint Prometheus et visualisées dans Grafana. Cette architecture est **toujours active** (always-on) ce qui garantit une latence constante mais implique des coûts fixes.

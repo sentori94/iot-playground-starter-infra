@@ -22,6 +22,53 @@ Le projet implémente **deux backends distincts** pour répondre à la question 
 
 Le frontend Angular offre un **onglet de sélection** permettant de basculer entre les deux modes et de comparer l'expérience utilisateur.
 
+```mermaid
+graph TB
+    subgraph "Frontend"
+        A[Angular App]
+    end
+    
+    subgraph "Architecture ECS"
+        B[ALB]
+        C[ECS Fargate<br/>Spring Boot]
+        D[(RDS PostgreSQL)]
+    end
+    
+    subgraph "Architecture Serverless"
+        E[API Gateway]
+        F[Lambda Functions]
+        G[(DynamoDB)]
+    end
+    
+    A -->|Mode ECS| B
+    B --> C
+    C --> D
+    
+    A -->|Mode Serverless| E
+    E --> F
+    F --> G
+    
+    style C fill:#fff3e0
+    style F fill:#e8f5e9
+```
+
+## ☁️ Services AWS Utilisés
+
+| Service | Usage | Architecture |
+|---------|-------|--------------|
+| **ECS Fargate** | Exécution conteneurs sans serveur | ECS |
+| **RDS PostgreSQL** | Base de données relationnelle | ECS |
+| **Lambda** | Fonctions serverless (Python 3.11) | Serverless |
+| **DynamoDB** | Base de données NoSQL | Serverless |
+| **API Gateway** | Point d'entrée REST API | Serverless |
+| **ALB** | Load balancing HTTPS | ECS + Grafana |
+| **CloudWatch** | Logs et métriques | Serverless |
+| **Route53** | DNS et domaines personnalisés | Les deux |
+| **ACM** | Certificats SSL/TLS | Les deux |
+| **VPC** | Réseau isolé | Les deux |
+| **S3** | État Terraform | Les deux |
+| **ECR** | Registry images Docker | ECS |
+
 ## 🏗️ Structure du Projet
 
 Le projet est organisé en **modules Terraform réutilisables** permettant de déployer facilement l'une ou l'autre architecture :
@@ -41,9 +88,9 @@ Les workflows CI/CD sont configurés pour déployer automatiquement :
 
 ### Domaines Personnalisés
 
-Chaque architecture dispose de son propre domaine DNS avec certificat HTTPS :
-- `api-lambda-iot.sentori-studio.com` → API Gateway (Serverless)
-- `grafana-lambda-iot.sentori-studio.com` → Grafana (Serverless)
+- **Frontend** : `https://app-iot.sentori-studio.com`
+- **API Serverless** : `https://api-lambda-iot.sentori-studio.com`
+- **Grafana Serverless** : `https://grafana-lambda-iot.sentori-studio.com`
 
 ## 📊 Comparaison des Architectures
 
