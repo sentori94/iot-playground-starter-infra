@@ -247,6 +247,8 @@ def start_run(event):
     print(f"[RUN-API] Extracted params: duration={duration}, interval={interval}")
 
     # Créer le run dans DynamoDB
+    grafana_base_url = os.environ.get('GRAFANA_URL', 'http://localhost:3000')
+
     item = {
         'id': run_id,
         'username': user,
@@ -255,7 +257,7 @@ def start_run(event):
         'duration': duration,
         'interval': interval,
         'params': params,  # Stocker l'objet params complet
-        'grafanaUrl': f'http://grafana-grafana-serverless-dev-20113386.eu-west-3.elb.amazonaws.com/d/iot-serverless-cloudwatch/iot-serverless-sensor-monitoring-cloudwatch?orgId=1&from=now-3h&to=now&refresh=5s&var-SensorId=All&var-User=All&var-RunId={run_id}'
+        'grafanaUrl': f'{grafana_base_url}/d/iot-serverless-cloudwatch/iot-serverless-sensor-monitoring-cloudwatch?orgId=1&from=now-3h&to=now&refresh=5s&var-SensorId=All&var-User=All&var-RunId={run_id}'
     }
 
     table.put_item(Item=item)

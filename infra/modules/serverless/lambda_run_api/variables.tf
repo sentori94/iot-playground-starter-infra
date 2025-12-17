@@ -23,6 +23,11 @@ variable "api_gateway_execution_arn" {
   type        = string
 }
 
+variable "grafana_url" {
+  description = "Base URL of Grafana (e.g., http://grafana.example.com)"
+  type        = string
+}
+
 variable "tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

@@ -22,6 +22,7 @@ resource "aws_lambda_function" "run_api" {
     variables = {
       RUNS_TABLE_NAME = var.runs_table_name
       ENVIRONMENT     = var.environment
+      GRAFANA_URL     = var.grafana_url
     }
   }
 

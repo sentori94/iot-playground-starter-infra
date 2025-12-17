@@ -28,4 +28,10 @@ variable "lambda_api_domain_name" {
   default     = ""
 }
 
+variable "grafana_url" {
+  description = "Base URL de Grafana pour la génération des liens (ex: http://grafana.example.com)"
+  type        = string
+  default     = "http://localhost:3000"
+}
+
 
