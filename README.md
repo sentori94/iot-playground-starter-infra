@@ -2,6 +2,26 @@
 
 Infrastructure Terraform pour IoT Playground avec **2 architectures disponibles** : ECS classique et Serverless Lambda.
 
+## 📚 Documentation
+
+> ⚠️ **Première fois ?** La documentation sera en ligne après le premier push. Voir [DEPLOIEMENT-DOCS.md](./DEPLOIEMENT-DOCS.md) pour les étapes.
+
+Documentation complète disponible en ligne :
+
+**🌐 [https://sentori94.github.io/iot-playground-starter-infra/](https://sentori94.github.io/iot-playground-starter-infra/)**
+
+### Lancer la documentation en local
+
+```bash
+# Installer les dépendances
+pip install -r requirements-docs.txt
+
+# Lancer le serveur local
+mkdocs serve
+
+# Ouvrir http://localhost:8000
+```
+
 ## 🏗️ Architectures Disponibles
 
 ### ⚡ Architecture Serverless (Lambda + DynamoDB)
@@ -13,7 +33,6 @@ Infrastructure Terraform pour IoT Playground avec **2 architectures disponibles*
 - **Route53** : DNS `api-lambda-iot.sentori-studio.com`
 - **Coût** : ~$3/mois pour 10k req/jour
 
-📚 [Documentation Serverless](./infra/modules/README-LAMBDA-SERVERLESS.md)  
 📂 [Configuration](./infra/envs/serverless-dev/)
 
 ### 🐳 Architecture ECS (Fargate + RDS)
@@ -158,11 +177,10 @@ GET /sensors/data?sensorId=xxx&runId=yyy&limit=100
 2. Cliquer sur **Run workflow**
 3. Sélectionner la branche `main`
 
-## 📚 Documentation
+## 📚 Ressources Complémentaires
 
-- [Architecture Lambda Serverless](./infra/modules/README-LAMBDA-SERVERLESS.md)
-- [Guide de Migration](./MIGRATION-GUIDE.md)
-- [Documentation Modules](./infra/README-MODULES.md)
+- [Documentation Modules Terraform](./infra/README-MODULES.md)
+- [Guide de déploiement de la documentation](./DEPLOIEMENT-DOCS.md)
 
 ## 🛠️ Commandes Utiles
 

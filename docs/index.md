@@ -1,118 +1,92 @@
 # IoT Playground Infrastructure
 
-!!! info "Projet"
-    Infrastructure as Code pour une plateforme IoT de simulation de capteurs avec deux architectures déployables : **ECS (Classic)** et **Serverless (Lambda)**.
+## 🎯 But du Projet
 
-## 🎯 Objectif
+Ce projet est une **plateforme de démonstration** conçue pour comparer deux approches d'architecture cloud sur AWS dans un contexte IoT (Internet of Things). L'objectif est de permettre à des utilisateurs de simuler des capteurs IoT qui génèrent des données de température en temps réel, tout en mesurant les différences de coûts, performances et complexité entre deux architectures modernes.
 
-Comparer deux architectures AWS pour une application IoT :
+### Contexte Pédagogique
 
-- **ECS + RDS PostgreSQL** (architecture traditionnelle)
-- **Lambda + DynamoDB** (architecture serverless)
+L'application permet de :
+- **Démarrer des simulations** de capteurs IoT (runs) avec une durée et un intervalle configurables
+- **Ingérer des données** de capteurs (température, humidité, pression) en temps réel
+- **Visualiser les métriques** via des dashboards Grafana
+- **Comparer** les deux architectures côte à côte depuis une interface frontend unique
 
-## 🏗️ Architecture Globale
+### Pourquoi Deux Architectures ?
 
-```mermaid
-graph TB
-    subgraph "Frontend Angular"
-        A[Application Web]
-    end
-    
-    subgraph "Architecture ECS"
-        B[Spring Boot<br/>ECS Fargate]
-        C[RDS PostgreSQL]
-        D[Prometheus]
-        E[Grafana ECS]
-    end
-    
-    subgraph "Architecture Serverless"
-        F[Lambda Run API]
-        G[Lambda Sensor API]
-        H[DynamoDB]
-        I[CloudWatch Logs]
-        J[Grafana ECS]
-    end
-    
-    A -->|REST API| B
-    A -->|REST API| F
-    A -->|REST API| G
-    
-    B --> C
-    B --> D
-    D --> E
-    
-    F --> H
-    G --> H
-    F --> I
-    G --> I
-    I --> J
-    
-    style A fill:#e1f5ff
-    style B fill:#fff3e0
-    style F fill:#e8f5e9
-    style G fill:#e8f5e9
-```
+Le projet implémente **deux backends distincts** pour répondre à la question : *"Quelle architecture AWS choisir pour une application IoT ?"*
 
-## 📊 Comparaison Rapide
+1. **Architecture ECS (Classique)** : Approche traditionnelle avec conteneurs Docker, base de données relationnelle et monitoring Prometheus. Adaptée pour des charges constantes et prévisibles.
+
+2. **Architecture Serverless** : Approche moderne avec Lambda, DynamoDB et CloudWatch. Optimisée pour des charges variables avec un modèle de coûts pay-per-use.
+
+Le frontend Angular offre un **onglet de sélection** permettant de basculer entre les deux modes et de comparer l'expérience utilisateur.
+
+## 🏗️ Structure du Projet
+
+Le projet est organisé en **modules Terraform réutilisables** permettant de déployer facilement l'une ou l'autre architecture :
+
+### Organisation des Environnements
+
+- **`infra/envs/dev/`** : Configuration complète pour l'architecture ECS avec Spring Boot, RDS PostgreSQL, Prometheus et Grafana
+- **`infra/envs/serverless-dev/`** : Configuration pour l'architecture Serverless avec Lambda Python, DynamoDB et CloudWatch
+- **`infra/modules/`** : Modules Terraform partagés (réseau, base de données, compute, monitoring)
+
+### Déploiement avec GitHub Actions
+
+Les workflows CI/CD sont configurés pour déployer automatiquement :
+- Les **Lambdas** et l'**API Gateway** via `deploy-serverless-unified.yml`
+- L'infrastructure **Grafana** optionnelle (ECS + VPC) de manière indépendante
+- Destruction ciblée des ressources avec `destroy-serverless.yml`
+
+### Domaines Personnalisés
+
+Chaque architecture dispose de son propre domaine DNS avec certificat HTTPS :
+- `api-lambda-iot.sentori-studio.com` → API Gateway (Serverless)
+- `grafana-lambda-iot.sentori-studio.com` → Grafana (Serverless)
+
+## 📊 Comparaison des Architectures
 
 | Critère | ECS Classic | Serverless |
 |---------|-------------|------------|
-| **Coût (idle)** | ~$80/mois | ~$0/mois |
-| **Coût (actif)** | ~$80/mois | Variable |
-| **Scalabilité** | Manuelle | Automatique |
-| **Cold Start** | Non | Oui (~1s) |
-| **Base de données** | PostgreSQL | DynamoDB |
-| **Monitoring** | Prometheus | CloudWatch |
+| **Langage** | Java (Spring Boot) | Python 3.11 |
+| **Base de données** | PostgreSQL (RDS) | DynamoDB |
+| **Coût (idle)** | ~$80/mois | ~$1/mois |
+| **Coût (actif)** | ~$80/mois (fixe) | Variable selon usage |
+| **Scalabilité** | Auto-scaling ECS | Auto-scaling Lambda |
+| **Cold Start** | Aucun | ~1-2s |
+| **Monitoring** | Prometheus | CloudWatch Logs |
+
+### Cas d'Usage Recommandés
+
+**ECS** : Trafic constant et prévisible, latence critique, connexions persistantes  
+**Serverless** : Trafic sporadique, pics de charge, budget limité, pay-per-use
 
 ## 🚀 Démarrage Rapide
 
-=== "Serverless"
+Pour déployer l'architecture Serverless (recommandé pour commencer) :
 
-    ```bash
-    # 1. Déployer les lambdas
-    GitHub Actions → Deploy Serverless (Unified)
-    Component: lambdas
-    Action: apply
-    
-    # 2. Déployer Grafana (optionnel)
-    Component: grafana
-    Action: apply
-    ```
+1. Configurer AWS CLI avec les credentials
+2. Via GitHub Actions : **Deploy Serverless (Unified)** → Component: `lambdas` → Action: `apply`
+3. Attendre ~5 minutes
+4. Tester l'API : `curl https://api-lambda-iot.sentori-studio.com/api/runs/can-start`
 
-=== "ECS"
+Voir le [guide complet](guide/quickstart.md) pour plus de détails.
 
-    ```bash
-    # Déployer l'infrastructure complète
-    cd infra/envs/dev
-    terraform init
-    terraform apply
-    ```
+## 📁 Organisation du Projet
 
-## 🌐 URLs
+Le projet est structuré en **environnements Terraform séparés** :
 
-- **API Lambda** : `https://api-lambda-iot.sentori-studio.com`
-- **Grafana Serverless** : `https://grafana-lambda-iot.sentori-studio.com`
-- **Frontend** : À définir
+- **`infra/envs/dev/`** : Architecture ECS complète (Spring Boot + PostgreSQL)
+- **`infra/envs/serverless-dev/`** : Architecture Serverless (Lambda + DynamoDB)  
+- **`infra/modules/`** : Modules Terraform réutilisables (réseau, compute, BDD, monitoring)
+- **`.github/workflows/`** : Workflows CI/CD pour déploiement automatisé
 
-## 📁 Structure du Projet
+Les workflows GitHub Actions permettent de déployer chaque composant indépendamment (lambdas, grafana) ou ensemble (full).
 
-```
-iot-playground-starter-infra/
-├── infra/
-│   ├── envs/
-│   │   ├── dev/              # Infrastructure ECS
-│   │   ├── serverless-dev/   # Infrastructure Serverless
-│   │   └── cdn-dev/          # CDN pour le frontend
-│   ├── modules/              # Modules Terraform réutilisables
-│   └── docker/               # Images Docker (Grafana, Prometheus)
-├── scripts/                  # Scripts utilitaires
-└── .github/workflows/        # CI/CD GitHub Actions
-```
+## 🔗 Navigation
 
-## 🔗 Liens Utiles
-
-- [Architecture ECS](architecture/ecs.md)
-- [Architecture Serverless](architecture/serverless.md)
-- [Guide de déploiement](deployment/quickstart.md)
-- [API Reference](api/run-controller.md)
+- **Architecture** : [ECS](architecture/ecs.md) | [Serverless](architecture/serverless.md) | [Comparaison](architecture/comparison.md)
+- **Déploiement** : [Guide Rapide](guide/quickstart.md)
+- **API** : [Run Controller](api/run-controller.md) | [Sensor Controller](api/sensor-controller.md)
 

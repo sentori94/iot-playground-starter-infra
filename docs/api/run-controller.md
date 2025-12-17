@@ -28,19 +28,6 @@ Vérifie si on peut démarrer une nouvelle simulation.
 }
 ```
 
-**Diagramme**
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant API as Lambda Run API
-    participant DB as DynamoDB
-    
-    C->>API: GET /api/runs/can-start
-    API->>DB: Scan(status=RUNNING)
-    DB-->>API: Count = 2
-    API->>API: 2 < 5 ? Yes
-    API-->>C: {canStart: true, currentRunning: 2, ...}
-```
 
 ---
 
@@ -88,24 +75,6 @@ X-User: username
 }
 ```
 
-**Diagramme**
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant API as Lambda Run API
-    participant DB as DynamoDB
-    
-    C->>API: POST /api/runs/start
-    API->>API: Check can-start
-    
-    alt Limit reached
-        API-->>C: 400 Bad Request
-    else OK
-        API->>API: Generate UUID
-        API->>DB: PutItem(id, status:RUNNING, ...)
-        API-->>C: 201 Created {id, grafanaUrl, ...}
-    end
-```
 
 ---
 
@@ -197,23 +166,6 @@ Interrompt toutes les simulations en cours (tous utilisateurs).
 }
 ```
 
-**Diagramme**
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant API as Lambda Run API
-    participant DB as DynamoDB
-    
-    C->>API: POST /api/runs/interrupt-all
-    API->>DB: Scan(status=RUNNING)
-    DB-->>API: [run1, run2, run3]
-    
-    loop For each run
-        API->>DB: UpdateItem(status=INTERRUPTED)
-    end
-    
-    API-->>C: {interrupted: 3, message: "..."}
-```
 
 ---
 
@@ -297,18 +249,14 @@ Tous les runs sans pagination.
 
 ## 📊 États du Run
 
-```mermaid
-stateDiagram-v2
-    [*] --> RUNNING: POST /start
-    
-    RUNNING --> COMPLETED: POST /finish (success)
-    RUNNING --> FAILED: POST /finish (error)
-    RUNNING --> INTERRUPTED: POST /interrupt-all
-    
-    COMPLETED --> [*]
-    FAILED --> [*]
-    INTERRUPTED --> [*]
-```
+Un run peut avoir 4 états :
+
+- **RUNNING** : Simulation en cours
+- **COMPLETED** : Simulation terminée avec succès
+- **FAILED** : Simulation terminée avec erreur
+- **INTERRUPTED** : Simulation interrompue manuellement
+
+Transitions : `RUNNING` → `COMPLETED` / `FAILED` / `INTERRUPTED` (états finaux)
 
 ## 🔐 Authentification
 

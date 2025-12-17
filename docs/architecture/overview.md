@@ -1,218 +1,75 @@
 # Vue d'ensemble Architecture
 
-## 🎯 Deux Modes de Déploiement
+## 🎯 Principe du Projet
 
-```mermaid
-graph LR
-    A[Frontend Angular] --> B{Mode ?}
-    B -->|ECS| C[Spring Boot<br/>ECS Fargate]
-    B -->|Serverless| D[Lambda<br/>API Gateway]
-    
-    C --> E[RDS PostgreSQL]
-    D --> F[DynamoDB]
-    
-    C --> G[Prometheus]
-    D --> H[CloudWatch]
-    
-    G --> I[Grafana ECS]
-    H --> J[Grafana ECS]
-    
-    style C fill:#fff3e0
-    style D fill:#e8f5e9
-```
+L'infrastructure IoT Playground permet de déployer **deux backends distincts** pour la même application frontend. L'utilisateur peut choisir dans l'interface web quel backend utiliser (ECS ou Serverless), permettant ainsi une comparaison directe des deux approches.
 
-## 🏗️ Infrastructure Complète
+### Backend ECS (Architecture Traditionnelle)
 
-```mermaid
-graph TB
-    subgraph "DNS & CDN"
-        DNS[Route53<br/>sentori-studio.com]
-        CERT[ACM Certificates<br/>*.sentori-studio.com]
-    end
-    
-    subgraph "Mode ECS (dev)"
-        ECS[ECS Cluster]
-        ALB_ECS[Application Load Balancer]
-        RDS[(RDS PostgreSQL)]
-        PROM[Prometheus]
-        GRAF_ECS[Grafana]
-    end
-    
-    subgraph "Mode Serverless (serverless-dev)"
-        APIGW[API Gateway]
-        LAMBDA_RUN[Lambda Run API]
-        LAMBDA_SENSOR[Lambda Sensor API]
-        DYNAMO[(DynamoDB)]
-        CW[CloudWatch Logs]
-        GRAF_SLSS[Grafana]
-    end
-    
-    subgraph "Infrastructure Partagée"
-        VPC[VPC]
-        S3[S3 Terraform State]
-        LOCK[DynamoDB Lock Table]
-    end
-    
-    DNS --> CERT
-    DNS --> ALB_ECS
-    DNS --> APIGW
-    DNS --> GRAF_SLSS
-    
-    CERT --> ALB_ECS
-    CERT --> APIGW
-    CERT --> GRAF_SLSS
-    
-    ALB_ECS --> ECS
-    ECS --> RDS
-    ECS --> PROM
-    PROM --> GRAF_ECS
-    
-    APIGW --> LAMBDA_RUN
-    APIGW --> LAMBDA_SENSOR
-    LAMBDA_RUN --> DYNAMO
-    LAMBDA_SENSOR --> DYNAMO
-    LAMBDA_RUN --> CW
-    LAMBDA_SENSOR --> CW
-    CW --> GRAF_SLSS
-    
-    VPC -.-> ECS
-    VPC -.-> RDS
-    VPC -.-> GRAF_ECS
-    VPC -.-> GRAF_SLSS
-    
-    style ECS fill:#fff3e0
-    style LAMBDA_RUN fill:#e8f5e9
-    style LAMBDA_SENSOR fill:#e8f5e9
-```
+L'application Spring Boot tourne sur **ECS Fargate** avec une base de données **PostgreSQL** hébergée sur RDS. Les métriques sont exposées via un endpoint Prometheus et visualisées dans Grafana. Cette architecture est **toujours active** (always-on) ce qui garantit une latence constante mais implique des coûts fixes.
+
+**Composants** : VPC privé, ECS Cluster, RDS PostgreSQL, ALB, Prometheus, Grafana
+
+### Backend Serverless (Architecture Moderne)
+
+Les APIs sont implémentées en **Lambda Python** avec stockage dans **DynamoDB**. Les logs et métriques sont envoyés vers CloudWatch et visualisés dans Grafana. Cette architecture est **on-demand** : les Lambdas ne s'exécutent que lors des requêtes, ce qui réduit drastiquement les coûts pour les charges légères.
+
+**Composants** : Lambda Functions, DynamoDB, API Gateway, CloudWatch Logs, Grafana (optionnel)
+
+## 🏗️ Infrastructure Partagée
+
+Les deux architectures partagent certains composants communs :
+
+### DNS et Certificats
+- **Route53** gère le domaine `sentori-studio.com`
+- **ACM (AWS Certificate Manager)** fournit les certificats HTTPS pour chaque sous-domaine
+- Chaque architecture a son propre domaine personnalisé pour isoler les environnements
+
+### État Terraform
+- **S3 Bucket** stocke l'état Terraform de manière centralisée
+- **DynamoDB Lock Table** évite les modifications concurrentes
+- Chaque environnement (`dev`, `serverless-dev`) a sa propre clé d'état
 
 ## 📊 Flux de Données
 
-### Mode ECS
+### Mode ECS - Flux Typique
 
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur
-    participant F as Frontend
-    participant ALB as ALB
-    participant API as Spring Boot
-    participant DB as PostgreSQL
-    participant P as Prometheus
-    participant G as Grafana
-    
-    U->>F: Démarrer simulation
-    F->>ALB: POST /api/runs/start
-    ALB->>API: Forward
-    API->>DB: INSERT run
-    API->>DB: INSERT sensor_data
-    API-->>F: Run créé
-    
-    loop Monitoring
-        P->>API: Scrape /actuator/prometheus
-        U->>G: Consulter dashboard
-        G->>P: Query metrics
-        G-->>U: Afficher graphiques
-    end
-```
+1. **Démarrage simulation** : Le frontend envoie `POST /api/runs/start` à l'ALB qui route vers le conteneur Spring Boot
+2. **Stockage** : Spring Boot insère le run dans PostgreSQL et génère un UUID
+3. **Ingestion continue** : Le frontend envoie les données capteur via `POST /api/sensors/data` toutes les N secondes
+4. **Monitoring** : Prometheus scrape les métriques exposées par Spring Boot (`/actuator/prometheus`)
+5. **Visualisation** : Grafana query Prometheus et affiche les graphiques en temps réel
 
-### Mode Serverless
+### Mode Serverless - Flux Typique
 
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur
-    participant F as Frontend
-    participant AG as API Gateway
-    participant LR as Lambda Run
-    participant LS as Lambda Sensor
-    participant DB as DynamoDB
-    participant CW as CloudWatch
-    participant G as Grafana
-    
-    U->>F: Démarrer simulation
-    F->>AG: POST /api/runs/start
-    AG->>LR: Invoke
-    LR->>DB: PutItem (Run)
-    LR->>CW: Log metrics
-    LR-->>F: Run créé
-    
-    F->>AG: POST /api/sensors/data
-    AG->>LS: Invoke
-    LS->>DB: PutItem (SensorData)
-    LS->>CW: Log metrics
-    
-    loop Monitoring
-        U->>G: Consulter dashboard
-        G->>CW: Query logs
-        G-->>U: Afficher graphiques
-    end
-```
+1. **Démarrage simulation** : Le frontend envoie `POST /api/runs/start` à API Gateway qui invoque Lambda Run API
+2. **Stockage** : La Lambda écrit dans DynamoDB (table Runs) et log les métriques dans CloudWatch
+3. **Ingestion continue** : Chaque `POST /api/sensors/data` invoque Lambda Sensor API qui écrit dans DynamoDB (table SensorData)
+4. **Monitoring** : Les métriques custom sont loggées dans CloudWatch Logs
+5. **Visualisation** : Grafana query CloudWatch Logs avec le plugin Athena et affiche les graphiques
 
 ## 🔐 Sécurité
 
-```mermaid
-graph TB
-    subgraph "Authentification & Autorisation"
-        A[Headers HTTP]
-        B[X-User Header]
-        C[API Key Future]
-    end
-    
-    subgraph "Réseau"
-        D[VPC]
-        E[Security Groups]
-        F[Private Subnets]
-        G[Public Subnets]
-    end
-    
-    subgraph "Certificats"
-        H[ACM Wildcard]
-        I[HTTPS Only]
-    end
-    
-    A --> B
-    A --> C
-    
-    D --> E
-    D --> F
-    D --> G
-    
-    F --> RDS[(RDS)]
-    F --> ECS[ECS Tasks]
-    G --> ALB[Load Balancer]
-    
-    H --> I
-    I --> ALB
-    I --> AG[API Gateway]
-    
-    style D fill:#e3f2fd
-    style H fill:#fff9c4
-```
+### Authentification
+Actuellement, l'authentification est gérée via un simple **header HTTP `X-User`** qui identifie l'utilisateur. Ce mécanisme simple permet de séparer les simulations par utilisateur sans nécessiter un système d'authentification complet (JWT, OAuth).
+
+### Réseau
+- **VPC privé** : Les bases de données (RDS, ECS tasks) sont dans des subnets privés
+- **Security Groups** : Règles de pare-feu strictes limitant l'accès inter-services
+- **Public Subnets** : Uniquement les ALB et NAT Gateways sont exposés publiquement
+
+### Chiffrement
+- **HTTPS** : Tous les endpoints utilisent des certificats ACM
+- **Encryption at Rest** : DynamoDB et RDS chiffrent les données au repos
+- **Encryption in Transit** : TLS 1.2+ obligatoire sur tous les endpoints
 
 ## 🎛️ Environnements
 
-| Environnement | Architecture | Objectif |
-|---------------|-------------|----------|
-| **dev** | ECS + RDS | Architecture classique, toujours actif |
-| **serverless-dev** | Lambda + DynamoDB | Architecture serverless, pay-per-use |
-| **cdn-dev** | CloudFront + S3 | Hébergement frontend (futur) |
+Le projet définit plusieurs environnements Terraform isolés :
 
-## 🔄 Cycle de Vie
+- **`dev/`** : Architecture ECS complète (Spring Boot + PostgreSQL)
+- **`serverless-dev/`** : Architecture Serverless (Lambda + DynamoDB)
+- **`cdn-dev/`** : Hébergement frontend via CloudFront (futur)
 
-```mermaid
-stateDiagram-v2
-    [*] --> Provisioning: terraform apply
-    
-    Provisioning --> Running: Déploiement réussi
-    Provisioning --> Failed: Erreur
-    
-    Running --> Updating: Changement config
-    Updating --> Running: Mise à jour OK
-    
-    Running --> Scaling: Charge augmente
-    Scaling --> Running: Auto-scaling
-    
-    Running --> Destroying: terraform destroy
-    Destroying --> [*]: Ressources supprimées
-    
-    Failed --> Provisioning: Correction + Retry
-```
+Chaque environnement a son propre état Terraform, permettant de déployer/détruire les ressources indépendamment.
 

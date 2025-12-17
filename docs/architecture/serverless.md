@@ -2,56 +2,23 @@
 
 ## 🎯 Vue d'ensemble
 
-```mermaid
-graph TB
-    subgraph "API Gateway"
-        AG[API Gateway<br/>api-lambda-iot.sentori-studio.com]
-    end
-    
-    subgraph "Lambda Functions"
-        LR[Lambda Run API<br/>Python 3.11]
-        LS[Lambda Sensor API<br/>Python 3.11]
-    end
-    
-    subgraph "Stockage"
-        DR[(DynamoDB Runs)]
-        DS[(DynamoDB SensorData)]
-    end
-    
-    subgraph "Monitoring"
-        CW[CloudWatch Logs]
-        GRAF[Grafana ECS<br/>grafana-lambda-iot.sentori-studio.com]
-    end
-    
-    subgraph "Réseau"
-        VPC[VPC 10.1.0.0/16]
-        PUB[Public Subnets]
-        PRIV[Private Subnets]
-        ALB[ALB Grafana]
-    end
-    
-    AG -->|invoke| LR
-    AG -->|invoke| LS
-    
-    LR --> DR
-    LS --> DS
-    
-    LR -.log.-> CW
-    LS -.log.-> CW
-    
-    CW --> GRAF
-    
-    GRAF --> ALB
-    ALB --> PUB
-    PRIV --> GRAF
-    VPC --> PUB
-    VPC --> PRIV
-    
-    style LR fill:#e8f5e9
-    style LS fill:#e8f5e9
-    style AG fill:#e1f5ff
-    style GRAF fill:#fff3e0
-```
+L'architecture Serverless remplace complètement le backend Spring Boot par des **fonctions Lambda Python** et la base PostgreSQL par **DynamoDB**. Cette approche "sans serveur" permet de ne payer que pour les requêtes effectuées, réduisant drastiquement les coûts pour les applications à faible trafic.
+
+### Composants Principaux
+
+**API Gateway** : Point d'entrée HTTPS (`api-lambda-iot.sentori-studio.com`) qui route les requêtes vers les Lambdas appropriées
+
+**Lambda Functions** : Deux fonctions Python 3.11 isolées :
+- `lambda_run_api` : Gestion des simulations (démarrer, finir, lister)
+- `lambda_sensor_api` : Ingestion et récupération des données capteurs
+
+**DynamoDB** : Deux tables NoSQL en mode on-demand :
+- `Runs` : Stocke les métadonnées des simulations
+- `SensorData` : Stocke les mesures des capteurs
+
+**CloudWatch Logs** : Collecte les logs et métriques custom des Lambdas
+
+**Grafana (Optionnel)** : Conteneur ECS qui query CloudWatch pour afficher les dashboards
 
 ## 📋 Ressources AWS
 
@@ -95,48 +62,21 @@ Attributes:
 
 ### Démarrer une Simulation
 
-```mermaid
-sequenceDiagram
-    participant F as Frontend
-    participant AG as API Gateway
-    participant LR as Lambda Run
-    participant DR as DynamoDB Runs
-    participant CW as CloudWatch
-    
-    F->>AG: POST /api/runs/start<br/>{duration: 60, interval: 5}
-    AG->>LR: Invoke
-    
-    LR->>LR: Check can-start<br/>(max 5 concurrent)
-    
-    alt Limite atteinte
-        LR-->>F: 400 Bad Request<br/>Max concurrent reached
-    else OK
-        LR->>LR: Generate UUID
-        LR->>DR: PutItem<br/>{id, status: RUNNING, ...}
-        LR->>CW: PutMetricData<br/>run_started=1
-        LR-->>F: 201 Created<br/>{id, grafanaUrl, ...}
-    end
-```
+1. Frontend envoie `POST /api/runs/start` avec `{duration, interval}`
+2. API Gateway invoque `lambda_run_api`
+3. Lambda vérifie la limite (max 5 simulations concurrentes globales)
+4. Si OK : génère un UUID, écrit dans DynamoDB `Runs` avec status `RUNNING`
+5. Retourne `{id, grafanaUrl, ...}` au frontend
 
 ### Ingérer des Données Capteur
 
-```mermaid
-sequenceDiagram
-    participant F as Frontend
-    participant AG as API Gateway
-    participant LS as Lambda Sensor
-    participant DS as DynamoDB SensorData
-    participant CW as CloudWatch
-    
-    loop Toutes les 5 secondes
-        F->>AG: POST /api/sensors/data<br/>{runId, sensorId, temperature}
-        AG->>LS: Invoke
-        LS->>LS: Validate data
-        LS->>DS: PutItem<br/>{id, timestamp, ...}
-        LS->>CW: PutMetricData<br/>temperature=XX
-        LS-->>F: 201 Created
-    end
-```
+1. Frontend envoie `POST /api/sensors/data` avec `{runId, sensorId, temperature}`
+2. API Gateway invoque `lambda_sensor_api`
+3. Lambda valide les données et écrit dans DynamoDB `SensorData`
+4. Logs les métriques custom dans CloudWatch
+5. Retourne `201 Created`
+
+Le frontend répète cette opération toutes les N secondes (selon l'interval configuré) jusqu'à la fin de la simulation.
 
 ## 🎛️ Endpoints API
 
@@ -162,39 +102,25 @@ sequenceDiagram
 
 ## 📊 Monitoring CloudWatch
 
-```mermaid
-graph LR
-    subgraph "Lambda Metrics"
-        A[Invocations]
-        B[Duration]
-        C[Errors]
-        D[Throttles]
-    end
-    
-    subgraph "Custom Metrics"
-        E[run_started]
-        F[run_completed]
-        G[sensor_data_ingested]
-        H[temperature_avg]
-    end
-    
-    subgraph "DynamoDB Metrics"
-        I[ConsumedReadCapacity]
-        J[ConsumedWriteCapacity]
-    end
-    
-    A --> GRAF[Grafana Dashboard]
-    B --> GRAF
-    C --> GRAF
-    E --> GRAF
-    F --> GRAF
-    G --> GRAF
-    H --> GRAF
-    I --> GRAF
-    J --> GRAF
-    
-    style GRAF fill:#fff3e0
-```
+CloudWatch collecte automatiquement plusieurs types de métriques :
+
+### Métriques Lambda Standard
+- **Invocations** : Nombre d'appels aux fonctions
+- **Duration** : Temps d'exécution moyen
+- **Errors** : Taux d'erreur
+- **Throttles** : Invocations rejetées par limite de concurrence
+
+### Métriques Custom
+Les Lambdas loggent des métriques métier spécifiques :
+- `run_started` / `run_completed` : Suivi des simulations
+- `sensor_data_ingested` : Volume de données capteur
+- `temperature_avg` : Température moyenne par run
+
+### Métriques DynamoDB
+- **ConsumedReadCapacity** / **ConsumedWriteCapacity** : Utilisation des tables
+- **SuccessfulRequestLatency** : Latence des requêtes
+
+Grafana query ces métriques via le plugin CloudWatch pour afficher des dashboards temps réel.
 
 ## 💰 Coûts
 
@@ -220,54 +146,27 @@ graph LR
 
 ## 🔐 Sécurité
 
-```mermaid
-graph TB
-    subgraph "API Gateway"
-        A[HTTPS Only]
-        B[Custom Domain]
-        C[ACM Certificate]
-    end
-    
-    subgraph "Lambda"
-        D[IAM Execution Role]
-        E[VPC Endpoints Future]
-        F[Environment Variables]
-    end
-    
-    subgraph "DynamoDB"
-        G[Encryption at Rest]
-        H[IAM Permissions]
-    end
-    
-    A --> B
-    B --> C
-    D --> H
-    F -.contains.-> CREDS[Secrets]
-    
-    style A fill:#fff9c4
-    style D fill:#fff9c4
-    style G fill:#fff9c4
-```
+### API Gateway
+- **HTTPS obligatoire** : Certificat ACM wildcard pour `*.sentori-studio.com`
+- **Custom Domain** : Domaine personnalisé avec Route53
+- **CORS configuré** : Headers autorisés pour le frontend Angular
+
+### Lambda
+- **IAM Execution Role** : Permissions minimales (lecture/écriture DynamoDB, logs CloudWatch)
+- **Environment Variables** : Configuration injectée au runtime (tables DynamoDB, région)
+- **Pas de VPC** : Les Lambdas sont publiques pour réduire les coûts (pas de NAT Gateway)
+
+### DynamoDB
+- **Encryption at Rest** : Chiffrement automatique avec clés AWS
+- **IAM Permissions** : Accès restreint aux Lambdas uniquement
 
 ## 🚀 Déploiement
 
-```mermaid
-graph LR
-    A[Git Push] --> B[GitHub Actions]
-    B --> C{Component}
-    
-    C -->|lambdas| D[Deploy Lambdas]
-    C -->|grafana| E[Deploy Grafana]
-    C -->|full| F[Deploy All]
-    
-    D --> G[Terraform Apply<br/>-target=lambdas]
-    E --> H[Terraform Apply<br/>-target=grafana]
-    F --> I[Terraform Apply<br/>no target]
-    
-    G --> J[Lambda + DynamoDB + API Gateway]
-    H --> K[VPC + ECS + Grafana]
-    I --> L[Tout créé]
-    
-    style B fill:#e8f5e9
-```
+Le déploiement est géré via **GitHub Actions** avec un workflow unifié (`deploy-serverless-unified.yml`) qui permet de déployer :
+
+- **Lambdas uniquement** : DynamoDB + Lambda Functions + API Gateway (~5 min)
+- **Grafana uniquement** : VPC + ECS + ALB (~10 min)
+- **Full** : Tout l'environnement serverless (~15 min)
+
+Les ressources sont créées avec Terraform en utilisant des **targets** pour déployer/détruire de manière granulaire et indépendante.
 

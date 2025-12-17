@@ -1,4 +1,8 @@
-# Architecture ECS vs Serverless
+# Comparaison ECS vs Serverless
+
+## 🎯 Objectif de la Comparaison
+
+Ce projet permet de mesurer concrètement les différences entre une architecture conteneurisée (ECS) et une architecture serverless (Lambda) sur AWS. Les deux implémentent exactement la même fonctionnalité (simulation de capteurs IoT), permettant une comparaison objective.
 
 ## 📊 Tableau Comparatif
 
@@ -21,21 +25,11 @@
 
 ### ECS Classic
 
-```mermaid
-graph TB
-    A[Besoin d'ECS ?] --> B{Trafic continu ?}
-    B -->|Oui| C[✅ ECS recommandé]
-    B -->|Non| D{Budget fixe ?}
-    D -->|Oui| E[✅ ECS si <100 req/min]
-    D -->|Non| F[❌ Serverless mieux]
-    
-    G[Performance critique ?] --> H{Latence <50ms ?}
-    H -->|Oui| I[✅ ECS recommandé]
-    H -->|Non| J[✅ Les deux OK]
-    
-    style C fill:#e8f5e9
-    style I fill:#e8f5e9
-```
+**Quand choisir ECS :**
+- Trafic constant et prévisible (> 100 req/min en continu)
+- Besoin de latence ultra-faible (< 50ms)
+- Applications avec état ou connexions persistantes
+- Workloads de longue durée (> 15 minutes)
 
 **Avantages ECS :**
 - ✅ Pas de cold start
@@ -51,20 +45,11 @@ graph TB
 
 ### Serverless Lambda
 
-```mermaid
-graph TB
-    A[Besoin de Serverless ?] --> B{Trafic sporadique ?}
-    B -->|Oui| C[✅ Serverless recommandé]
-    B -->|Non| D{Budget limité ?}
-    D -->|Oui| E[✅ Serverless recommandé]
-    D -->|Non| F{Pic de charge ?}
-    F -->|Oui| G[✅ Serverless excellent]
-    F -->|Non| H[✅ ECS peut suffire]
-    
-    style C fill:#e8f5e9
-    style E fill:#e8f5e9
-    style G fill:#e8f5e9
-```
+**Quand choisir Serverless :**
+- Trafic sporadique ou imprévisible
+- Budget limité (pay-per-use)
+- Pics de charge importants nécessitant un scaling rapide
+- Prototypes ou applications en phase de test
 
 **Avantages Serverless :**
 - ✅ Pay-per-use (coût = usage réel)
@@ -131,57 +116,22 @@ graph TB
     | VPC | ~$40 |
     | **TOTAL** | **~$156/mois** |
 
-```mermaid
-graph LR
-    A[0 req/jour] -->|ECS| B[$90]
-    A -->|Serverless| C[$3]
-    
-    D[1k req/jour] -->|ECS| E[$90]
-    D -->|Serverless| F[$83]
-    
-    G[100k req/jour] -->|ECS| H[$140]
-    G -->|Serverless| I[$156]
-    
-    J[1M req/jour] -->|ECS| K[$200]
-    J -->|Serverless| L[$800+]
-    
-    style C fill:#e8f5e9
-    style F fill:#e8f5e9
-```
+### Conclusion Coûts
 
-!!! tip "Conclusion Coûts"
+!!! tip "Analyse"
     - **< 10k req/jour** → Serverless **beaucoup** moins cher
     - **10k - 50k req/jour** → Équivalent
     - **> 100k req/jour** → ECS plus économique
 
 ## ⚡ Performance
 
-### Latence
+### Latence Observée
 
-```mermaid
-graph LR
-    subgraph "ECS"
-        A[P50: 50ms]
-        B[P95: 100ms]
-        C[P99: 150ms]
-    end
-    
-    subgraph "Serverless (warm)"
-        D[P50: 80ms]
-        E[P95: 200ms]
-        F[P99: 500ms]
-    end
-    
-    subgraph "Serverless (cold)"
-        G[P50: 1500ms]
-        H[P95: 2500ms]
-        I[P99: 3500ms]
-    end
-    
-    style A fill:#e8f5e9
-    style D fill:#fff9c4
-    style G fill:#ffebee
-```
+**ECS (toujours chaud)** : P50 ~50ms, P95 ~100ms, P99 ~150ms  
+**Serverless (warm)** : P50 ~80ms, P95 ~200ms, P99 ~500ms  
+**Serverless (cold start)** : P50 ~1500ms, P95 ~2500ms, P99 ~3500ms
+
+Le cold start est le principal inconvénient du Serverless, mais il ne se produit que sur la première requête ou après une période d'inactivité.
 
 ### Throughput
 
@@ -190,71 +140,9 @@ graph LR
 | **ECS** | ~1000 req/s (2 tasks) | 2-3 minutes |
 | **Serverless** | ~10000 req/s (1000 lambdas) | < 10 secondes |
 
-## 🔄 Migration
+## 🎓 Recommandation pour ce Projet
 
-### ECS → Serverless
-
-```mermaid
-graph TB
-    A[Spring Boot API] -->|1. Analyser| B[Endpoints REST]
-    B -->|2. Convertir| C[Lambda Handlers Python]
-    C -->|3. Adapter| D[DynamoDB Schema]
-    
-    E[PostgreSQL] -->|4. Exporter| F[Data JSON]
-    F -->|5. Importer| D
-    
-    G[Prometheus] -->|6. Remplacer| H[CloudWatch Metrics]
-    
-    I[Grafana] -->|7. Changer datasource| J[CloudWatch Logs]
-    
-    style C fill:#e8f5e9
-    style D fill:#e8f5e9
-```
-
-### Serverless → ECS
-
-```mermaid
-graph TB
-    A[Lambda Python] -->|1. Convertir| B[Spring Boot Controllers]
-    B -->|2. Adapter| C[JPA Entities]
-    
-    D[DynamoDB] -->|3. Exporter| E[Data JSON]
-    E -->|4. Importer| F[PostgreSQL]
-    
-    G[CloudWatch] -->|5. Migrer| H[Prometheus]
-    
-    I[Grafana] -->|6. Changer datasource| J[Prometheus]
-    
-    style B fill:#fff3e0
-    style C fill:#fff3e0
-```
-
-## 🎓 Recommandation
-
-```mermaid
-graph TD
-    A{Objectif du projet ?} --> B[Apprentissage]
-    A --> C[Production]
-    
-    B --> D[✅ Déployer les DEUX]
-    D --> E[Comparer performances]
-    D --> F[Comparer coûts]
-    D --> G[Comparer dev experience]
-    
-    C --> H{Budget ?}
-    H -->|Limité| I[✅ Serverless]
-    H -->|Fixe OK| J{Trafic ?}
-    
-    J -->|Constant| K[✅ ECS]
-    J -->|Sporadique| L[✅ Serverless]
-    
-    style D fill:#e1f5ff
-    style I fill:#e8f5e9
-    style K fill:#fff3e0
-    style L fill:#e8f5e9
-```
-
-!!! success "Pour ce projet"
+!!! success "Approche Pédagogique"
     **Les deux architectures sont déployées** pour permettre la comparaison :
     
     - **ECS** : `infra/envs/dev/`

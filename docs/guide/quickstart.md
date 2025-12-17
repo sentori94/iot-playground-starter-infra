@@ -111,42 +111,15 @@ terraform output grafana_url
 # https://grafana-lambda-iot.sentori-studio.com
 ```
 
-Ouvrir dans le navigateur → Dashboard déjà configuré ! 🎉
+Ouvrir dans le navigateur → Dashboard déjà configuré avec CloudWatch datasource ! 🎉
 
-## 📊 Architecture Déployée
+## 📊 Ressources Déployées
 
-```mermaid
-graph TB
-    subgraph "✅ Déployé"
-        A[API Gateway]
-        B[Lambda Run API]
-        C[Lambda Sensor API]
-        D[DynamoDB Runs]
-        E[DynamoDB SensorData]
-        F[CloudWatch Logs]
-    end
-    
-    subgraph "⚠️ Optionnel"
-        G[Grafana ECS]
-        H[VPC]
-        I[ALB]
-    end
-    
-    A --> B
-    A --> C
-    B --> D
-    C --> E
-    B -.log.-> F
-    C -.log.-> F
-    
-    F --> G
-    G --> I
-    I --> H
-    
-    style A fill:#e8f5e9
-    style B fill:#e8f5e9
-    style C fill:#e8f5e9
-```
+**Obligatoires (Lambdas)** : API Gateway, Lambda Run API, Lambda Sensor API, DynamoDB (2 tables), CloudWatch Logs
+
+**Optionnelles (Grafana)** : VPC, ECS Cluster, ALB, Grafana Container
+
+Le déploiement des Lambdas suffit pour avoir une API fonctionnelle. Grafana n'est nécessaire que pour la visualisation.
 
 ## 🧹 Nettoyage
 
