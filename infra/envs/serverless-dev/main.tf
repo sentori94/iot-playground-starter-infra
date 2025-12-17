@@ -24,19 +24,7 @@ module "dynamodb_tables" {
 }
 
 # ===========================
-# Certificat ACM - Wildcard pour couvrir lambdas ET grafana
-# ===========================
-module "acm_lambda_api" {
-  count  = var.lambda_api_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
-  source = "../../modules/acm_certificate"
-
-  domain_name     = "*.${var.route53_zone_name}"  # Wildcard: *.sentori-studio.com
-  route53_zone_id = data.aws_route53_zone.main[0].zone_id
-  tags            = local.common_tags
-}
-
-# ===========================
-# Module API Gateway Lambda IoT (sans lambdas d'abord)
+# Module API Gateway Lambda IoT
 # ===========================
 module "api_gateway_lambda_iot" {
   source = "../../modules/serverless/api_gateway_lambda_iot"
@@ -45,9 +33,9 @@ module "api_gateway_lambda_iot" {
   environment                   = var.env
   lambda_run_api_invoke_arn     = module.lambda_run_api.invoke_arn
   lambda_sensor_api_invoke_arn  = module.lambda_sensor_api.invoke_arn
-  custom_domain_name            = var.lambda_api_domain_name
-  certificate_arn               = length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : ""
-  route53_zone_id               = var.route53_zone_name != "" ? data.aws_route53_zone.main[0].zone_id : ""
+  custom_domain_name            = ""  # Pas de domaine personnalisé pour le moment
+  certificate_arn               = ""
+  route53_zone_id               = ""
   tags                          = local.common_tags
 }
 
