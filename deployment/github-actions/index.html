@@ -7,11 +7,11 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="Infrastructure as Code pour IoT Playground - Architecture ECS vs Serverless" name="description"/>
 <meta content="Sentori Studio" name="author"/>
-<link href="../serverless/" rel="prev"/>
-<link href="../../deployment/prerequisites/" rel="next"/>
+<link href="../../guide/quickstart/" rel="prev"/>
+<link href="../../guide/quickstart/" rel="next"/>
 <link href="../../assets/images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.6.1, mkdocs-material-9.7.0" name="generator"/>
-<title>Comparaison - IoT Playground Infrastructure</title>
+<title>GitHub Actions - IoT Playground Infrastructure</title>
 <link href="../../assets/stylesheets/main.618322db.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -24,7 +24,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#comparaison-ecs-vs-serverless">
+<a class="md-skip" href="#github-actions-workflows">
           Aller au contenu
         </a>
 </div>
@@ -48,7 +48,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Comparaison
+              GitHub Actions
             
           </span>
 </div>
@@ -123,8 +123,8 @@
 
       </a>
 </li>
-<li class="md-tabs__item md-tabs__item--active">
-<a class="md-tabs__link" href="../overview/">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../architecture/overview/">
           
   
   
@@ -132,8 +132,8 @@
 
         </a>
 </li>
-<li class="md-tabs__item">
-<a class="md-tabs__link" href="../../deployment/prerequisites/">
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../prerequisites/">
           
   
   
@@ -206,9 +206,9 @@
   </span>
 </a>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
 <span class="md-ellipsis">
     
   
@@ -219,7 +219,7 @@
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_2">
 <span class="md-nav__icon md-icon"></span>
             
@@ -230,7 +230,7 @@
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../overview/">
+<a class="md-nav__link" href="../../architecture/overview/">
 <span class="md-ellipsis">
     
   
@@ -242,7 +242,7 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../ecs/">
+<a class="md-nav__link" href="../../architecture/ecs/">
 <span class="md-ellipsis">
     
   
@@ -254,7 +254,7 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../serverless/">
+<a class="md-nav__link" href="../../architecture/serverless/">
 <span class="md-ellipsis">
     
   
@@ -265,20 +265,8 @@
   </span>
 </a>
 </li>
-<li class="md-nav__item md-nav__item--active">
-<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
-<label class="md-nav__link md-nav__link--active" for="__toc">
-<span class="md-ellipsis">
-    
-  
-    Comparaison
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<a class="md-nav__link md-nav__link--active" href="./">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../architecture/comparison/">
 <span class="md-ellipsis">
     
   
@@ -288,150 +276,13 @@
     
   </span>
 </a>
-<nav aria-label="Table des matières" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table des matières
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#objectif-de-la-comparaison">
-<span class="md-ellipsis">
-      
-        🎯 Objectif de la Comparaison
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#tableau-comparatif">
-<span class="md-ellipsis">
-      
-        📊 Tableau Comparatif
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#cas-dusage-recommandes">
-<span class="md-ellipsis">
-      
-        🎯 Cas d'Usage Recommandés
-      
-    </span>
-</a>
-<nav aria-label="🎯 Cas d'Usage Recommandés" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#ecs-classic">
-<span class="md-ellipsis">
-      
-        ECS Classic
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#serverless-lambda">
-<span class="md-ellipsis">
-      
-        Serverless Lambda
-      
-    </span>
-</a>
 </li>
 </ul>
 </nav>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#analyse-couts-detaillee">
-<span class="md-ellipsis">
-      
-        💰 Analyse Coûts Détaillée
-      
-    </span>
-</a>
-<nav aria-label="💰 Analyse Coûts Détaillée" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-1000-reqjour">
-<span class="md-ellipsis">
-      
-        Scénario : 1000 req/jour
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-100k-reqjour">
-<span class="md-ellipsis">
-      
-        Scénario : 100k req/jour
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#conclusion-couts">
-<span class="md-ellipsis">
-      
-        Conclusion Coûts
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#performance">
-<span class="md-ellipsis">
-      
-        ⚡ Performance
-      
-    </span>
-</a>
-<nav aria-label="⚡ Performance" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#latence-observee">
-<span class="md-ellipsis">
-      
-        Latence Observée
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#throughput">
-<span class="md-ellipsis">
-      
-        Throughput
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#recommandation-pour-ce-projet">
-<span class="md-ellipsis">
-      
-        🎓 Recommandation pour ce Projet
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
 <span class="md-ellipsis">
     
   
@@ -442,7 +293,7 @@
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<nav aria-expanded="true" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_3">
 <span class="md-nav__icon md-icon"></span>
             
@@ -453,7 +304,7 @@
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../deployment/prerequisites/">
+<a class="md-nav__link" href="../prerequisites/">
 <span class="md-ellipsis">
     
   
@@ -465,7 +316,7 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../deployment/ecs/">
+<a class="md-nav__link" href="../ecs/">
 <span class="md-ellipsis">
     
   
@@ -488,8 +339,20 @@
   </span>
 </a>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../deployment/github-actions/">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    
+  
+    GitHub Actions
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
 <span class="md-ellipsis">
     
   
@@ -499,6 +362,99 @@
     
   </span>
 </a>
+<nav aria-label="Table des matières" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#workflows-disponibles">
+<span class="md-ellipsis">
+      
+        📋 Workflows Disponibles
+      
+    </span>
+</a>
+<nav aria-label="📋 Workflows Disponibles" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-deploy-serverless-unified">
+<span class="md-ellipsis">
+      
+        1. Deploy Serverless (Unified)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-destroy-serverless">
+<span class="md-ellipsis">
+      
+        2. Destroy Serverless
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-deploy-mkdocs-documentation">
+<span class="md-ellipsis">
+      
+        3. Deploy MkDocs Documentation
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#flux-de-deploiement-typique">
+<span class="md-ellipsis">
+      
+        🔄 Flux de Déploiement Typique
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#structure-dun-workflow">
+<span class="md-ellipsis">
+      
+        🛠️ Structure d'un Workflow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#secrets-requis">
+<span class="md-ellipsis">
+      
+        🔐 Secrets Requis
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#monitoring-des-workflows">
+<span class="md-ellipsis">
+      
+        📊 Monitoring des Workflows
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#liens">
+<span class="md-ellipsis">
+      
+        🔗 Liens
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 </ul>
 </nav>
@@ -728,47 +684,38 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#objectif-de-la-comparaison">
+<a class="md-nav__link" href="#workflows-disponibles">
 <span class="md-ellipsis">
       
-        🎯 Objectif de la Comparaison
+        📋 Workflows Disponibles
       
     </span>
 </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#tableau-comparatif">
-<span class="md-ellipsis">
-      
-        📊 Tableau Comparatif
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#cas-dusage-recommandes">
-<span class="md-ellipsis">
-      
-        🎯 Cas d'Usage Recommandés
-      
-    </span>
-</a>
-<nav aria-label="🎯 Cas d'Usage Recommandés" class="md-nav">
+<nav aria-label="📋 Workflows Disponibles" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#ecs-classic">
+<a class="md-nav__link" href="#1-deploy-serverless-unified">
 <span class="md-ellipsis">
       
-        ECS Classic
+        1. Deploy Serverless (Unified)
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#serverless-lambda">
+<a class="md-nav__link" href="#2-destroy-serverless">
 <span class="md-ellipsis">
       
-        Serverless Lambda
+        2. Destroy Serverless
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-deploy-mkdocs-documentation">
+<span class="md-ellipsis">
+      
+        3. Deploy MkDocs Documentation
       
     </span>
 </a>
@@ -777,81 +724,46 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#analyse-couts-detaillee">
+<a class="md-nav__link" href="#flux-de-deploiement-typique">
 <span class="md-ellipsis">
       
-        💰 Analyse Coûts Détaillée
-      
-    </span>
-</a>
-<nav aria-label="💰 Analyse Coûts Détaillée" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-1000-reqjour">
-<span class="md-ellipsis">
-      
-        Scénario : 1000 req/jour
+        🔄 Flux de Déploiement Typique
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-100k-reqjour">
+<a class="md-nav__link" href="#structure-dun-workflow">
 <span class="md-ellipsis">
       
-        Scénario : 100k req/jour
+        🛠️ Structure d'un Workflow
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#conclusion-couts">
+<a class="md-nav__link" href="#secrets-requis">
 <span class="md-ellipsis">
       
-        Conclusion Coûts
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#performance">
-<span class="md-ellipsis">
-      
-        ⚡ Performance
-      
-    </span>
-</a>
-<nav aria-label="⚡ Performance" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#latence-observee">
-<span class="md-ellipsis">
-      
-        Latence Observée
+        🔐 Secrets Requis
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#throughput">
+<a class="md-nav__link" href="#monitoring-des-workflows">
 <span class="md-ellipsis">
       
-        Throughput
+        📊 Monitoring des Workflows
       
     </span>
 </a>
 </li>
-</ul>
-</nav>
-</li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#recommandation-pour-ce-projet">
+<a class="md-nav__link" href="#liens">
 <span class="md-ellipsis">
       
-        🎓 Recommandation pour ce Projet
+        🔗 Liens
       
     </span>
 </a>
@@ -863,352 +775,118 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<h1 id="comparaison-ecs-vs-serverless">Comparaison ECS vs Serverless<a class="headerlink" href="#comparaison-ecs-vs-serverless" title="Permanent link">¶</a></h1>
-<h2 id="objectif-de-la-comparaison">🎯 Objectif de la Comparaison<a class="headerlink" href="#objectif-de-la-comparaison" title="Permanent link">¶</a></h2>
-<p>Ce projet permet de mesurer concrètement les différences entre une architecture conteneurisée (ECS) et une architecture serverless (Lambda) sur AWS. Les deux implémentent exactement la même fonctionnalité (simulation de capteurs IoT), permettant une comparaison objective.</p>
-<pre class="mermaid"><code>graph TB
-    subgraph "Architecture ECS"
-        A1[Always-On]
-        A2[Conteneurs Docker]
-        A3[PostgreSQL]
-        A4[Coût fixe: $90/mois]
-    end
+<h1 id="github-actions-workflows">GitHub Actions Workflows<a class="headerlink" href="#github-actions-workflows" title="Permanent link">¶</a></h1>
+<p>Le projet utilise GitHub Actions pour automatiser les déploiements et la documentation.</p>
+<h2 id="workflows-disponibles">📋 Workflows Disponibles<a class="headerlink" href="#workflows-disponibles" title="Permanent link">¶</a></h2>
+<h3 id="1-deploy-serverless-unified">1. Deploy Serverless (Unified)<a class="headerlink" href="#1-deploy-serverless-unified" title="Permanent link">¶</a></h3>
+<p><strong>Fichier</strong> : <code>.github/workflows/deploy-serverless-unified.yml</code></p>
+<p>Déploie l'infrastructure Serverless (Lambda + DynamoDB + Grafana).</p>
+<p><strong>Déclenchement</strong> : Manuel (workflow_dispatch)</p>
+<p><strong>Paramètres</strong> :
+- <code>component</code> : Composant à déployer
+  - <code>lambdas</code> : API Lambda + DynamoDB uniquement
+  - <code>grafana</code> : Grafana ECS uniquement
+  - <code>full</code> : Tout déployer
+- <code>action</code> : Action à effectuer
+  - <code>plan</code> : Afficher les changements
+  - <code>apply</code> : Appliquer les changements</p>
+<p><strong>Utilisation</strong> :
+1. <strong>Actions</strong> → <strong>Deploy Serverless (Unified)</strong>
+2. <strong>Run workflow</strong>
+3. Choisir les paramètres
+4. <strong>Run workflow</strong> (bouton vert)</p>
+<hr/>
+<h3 id="2-destroy-serverless">2. Destroy Serverless<a class="headerlink" href="#2-destroy-serverless" title="Permanent link">¶</a></h3>
+<p><strong>Fichier</strong> : <code>.github/workflows/destroy-serverless.yml</code></p>
+<p>Détruit l'infrastructure Serverless.</p>
+<p><strong>Déclenchement</strong> : Manuel (workflow_dispatch)</p>
+<p><strong>Paramètres</strong> :
+- <code>component</code> : Composant à détruire (<code>lambdas</code>, <code>grafana</code>, <code>full</code>)
+- <code>CONFIRM_DESTROY</code> : Taper <code>DESTROY</code> pour confirmer
+- <code>DESTROY_BACKEND</code> : Supprimer aussi le backend S3/DynamoDB (<code>yes</code>/<code>no</code>)</p>
+<p>⚠️ <strong>Attention</strong> : Action irréversible !</p>
+<hr/>
+<h3 id="3-deploy-mkdocs-documentation">3. Deploy MkDocs Documentation<a class="headerlink" href="#3-deploy-mkdocs-documentation" title="Permanent link">¶</a></h3>
+<p><strong>Fichier</strong> : <code>.github/workflows/deploy-docs.yml</code></p>
+<p>Déploie la documentation sur GitHub Pages.</p>
+<p><strong>Déclenchement</strong> : 
+- Push sur <code>master</code> avec modifications dans <code>docs/</code>
+- Manuel (workflow_dispatch)</p>
+<p><strong>Résultat</strong> : Documentation accessible sur <code>https://sentori94.github.io/iot-playground-starter-infra/</code></p>
+<hr/>
+<h2 id="flux-de-deploiement-typique">🔄 Flux de Déploiement Typique<a class="headerlink" href="#flux-de-deploiement-typique" title="Permanent link">¶</a></h2>
+<pre class="mermaid"><code>graph TD
+    A[Push sur master] --&gt; B{Type de changement ?}
 
-    subgraph "Architecture Serverless"
-        B1[On-Demand]
-        B2[Lambda Python]
-        B3[DynamoDB]
-        B4[Coût variable: $1-150/mois]
-    end
+    B --&gt;|Code Lambda| C[Deploy Serverless&lt;br/&gt;Component: lambdas]
+    B --&gt;|Config Grafana| D[Deploy Serverless&lt;br/&gt;Component: grafana]
+    B --&gt;|Documentation| E[Deploy Docs]
 
-    subgraph "Frontend Unique"
-        C[Angular App]
-    end
+    C --&gt; F[Terraform Plan]
+    D --&gt; F
 
-    C --&gt;|Même API| A2
-    C --&gt;|Même API| B2
+    F --&gt; G{Action = apply ?}
 
-    style A2 fill:#fff3e0
-    style B2 fill:#e8f5e9</code></pre>
-<h2 id="tableau-comparatif">📊 Tableau Comparatif<a class="headerlink" href="#tableau-comparatif" title="Permanent link">¶</a></h2>
-<table>
-<thead>
-<tr>
-<th>Aspect</th>
-<th>ECS Classic</th>
-<th>Serverless Lambda</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Runtime</strong></td>
-<td>Spring Boot (Java)</td>
-<td>Python 3.11</td>
-</tr>
-<tr>
-<td><strong>Base de données</strong></td>
-<td>PostgreSQL (RDS)</td>
-<td>DynamoDB</td>
-</tr>
-<tr>
-<td><strong>Compute</strong></td>
-<td>ECS Fargate (Always-on)</td>
-<td>Lambda (On-demand)</td>
-</tr>
-<tr>
-<td><strong>Scaling</strong></td>
-<td>Auto-scaling ECS</td>
-<td>Auto-scaling Lambda</td>
-</tr>
-<tr>
-<td><strong>Cold Start</strong></td>
-<td>❌ Aucun</td>
-<td>⚠️ ~1-2s (first request)</td>
-</tr>
-<tr>
-<td><strong>Coût idle</strong></td>
-<td>~$80/mois</td>
-<td>~$1/mois (sans Grafana)</td>
-</tr>
-<tr>
-<td><strong>Coût actif</strong></td>
-<td>~$80/mois (fixe)</td>
-<td>Variable selon usage</td>
-</tr>
-<tr>
-<td><strong>Monitoring</strong></td>
-<td>Prometheus</td>
-<td>CloudWatch Logs</td>
-</tr>
-<tr>
-<td><strong>Grafana</strong></td>
-<td>Datasource Prometheus</td>
-<td>Datasource CloudWatch</td>
-</tr>
-<tr>
-<td><strong>HTTPS</strong></td>
-<td>✅ ALB + ACM</td>
-<td>✅ API Gateway + ACM</td>
-</tr>
-<tr>
-<td><strong>Authentification</strong></td>
-<td>Header X-User</td>
-<td>Header X-User</td>
-</tr>
-<tr>
-<td><strong>Limite concurrent</strong></td>
-<td>Configurable ECS</td>
-<td>5 runs globaux</td>
-</tr>
-</tbody>
-</table>
-<h2 id="cas-dusage-recommandes">🎯 Cas d'Usage Recommandés<a class="headerlink" href="#cas-dusage-recommandes" title="Permanent link">¶</a></h2>
-<h3 id="ecs-classic">ECS Classic<a class="headerlink" href="#ecs-classic" title="Permanent link">¶</a></h3>
-<p><strong>Quand choisir ECS :</strong>
-- Trafic constant et prévisible (&gt; 100 req/min en continu)
-- Besoin de latence ultra-faible (&lt; 50ms)
-- Applications avec état ou connexions persistantes
-- Workloads de longue durée (&gt; 15 minutes)</p>
-<p><strong>Avantages ECS :</strong>
-- ✅ Pas de cold start
-- ✅ Connexions persistantes (BDD, cache)
-- ✅ Latence prévisible
-- ✅ Debugging plus simple (logs structurés)
-- ✅ Écosystème Java mature</p>
-<p><strong>Inconvénients ECS :</strong>
-- ❌ Coût fixe même sans trafic
-- ❌ Gestion de l'infrastructure
-- ❌ Scaling moins réactif</p>
-<h3 id="serverless-lambda">Serverless Lambda<a class="headerlink" href="#serverless-lambda" title="Permanent link">¶</a></h3>
-<p><strong>Quand choisir Serverless :</strong>
-- Trafic sporadique ou imprévisible
-- Budget limité (pay-per-use)
-- Pics de charge importants nécessitant un scaling rapide
-- Prototypes ou applications en phase de test</p>
-<p><strong>Avantages Serverless :</strong>
-- ✅ Pay-per-use (coût = usage réel)
-- ✅ Scaling automatique infini
-- ✅ Pas de gestion serveur
-- ✅ DynamoDB très performant</p>
-<p><strong>Inconvénients Serverless :</strong>
-- ❌ Cold start (~1-2s)
-- ❌ Timeout max 15 minutes
-- ❌ Debugging plus complexe
-- ❌ Vendor lock-in AWS</p>
-<h2 id="analyse-couts-detaillee">💰 Analyse Coûts Détaillée<a class="headerlink" href="#analyse-couts-detaillee" title="Permanent link">¶</a></h2>
-<h3 id="scenario-1000-reqjour">Scénario : 1000 req/jour<a class="headerlink" href="#scenario-1000-reqjour" title="Permanent link">¶</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">ECS</label><label for="__tabbed_1_2">Serverless</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fargate (1 task, 0.5 vCPU, 1 GB)</td>
-<td>~$30</td>
-</tr>
-<tr>
-<td>RDS PostgreSQL (db.t3.micro)</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td>ALB</td>
-<td>~$16</td>
-</tr>
-<tr>
-<td>Prometheus ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$90/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Lambda (30k invocations)</td>
-<td>~$0.01</td>
-</tr>
-<tr>
-<td>DynamoDB (on-demand, 30k writes)</td>
-<td>~$0.40</td>
-</tr>
-<tr>
-<td>API Gateway (30k requests)</td>
-<td>~$0.10</td>
-</tr>
-<tr>
-<td>CloudWatch Logs (5 GB)</td>
-<td>~$2.50</td>
-</tr>
-<tr>
-<td>Grafana ECS (si actif)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>VPC (NAT, IGW pour Grafana)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td><strong>TOTAL (avec Grafana)</strong></td>
-<td><strong>~$83/mois</strong></td>
-</tr>
-<tr>
-<td><strong>TOTAL (sans Grafana)</strong></td>
-<td><strong>~$3/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</input></input></div>
-<h3 id="scenario-100k-reqjour">Scénario : 100k req/jour<a class="headerlink" href="#scenario-100k-reqjour" title="Permanent link">¶</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio"><input id="__tabbed_2_2" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="__tabbed_2_1">ECS</label><label for="__tabbed_2_2">Serverless</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fargate (2 tasks, 1 vCPU, 2 GB)</td>
-<td>~$60</td>
-</tr>
-<tr>
-<td>RDS PostgreSQL (db.t3.small)</td>
-<td>~$30</td>
-</tr>
-<tr>
-<td>ALB</td>
-<td>~$20</td>
-</tr>
-<tr>
-<td>Prometheus ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$140/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Lambda (3M invocations)</td>
-<td>~$1.20</td>
-</tr>
-<tr>
-<td>DynamoDB (3M writes)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>API Gateway (3M requests)</td>
-<td>~$10</td>
-</tr>
-<tr>
-<td>CloudWatch Logs (50 GB)</td>
-<td>~$25</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>VPC</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$156/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</input></input></div>
-<h3 id="conclusion-couts">Conclusion Coûts<a class="headerlink" href="#conclusion-couts" title="Permanent link">¶</a></h3>
-<div class="admonition tip">
-<p class="admonition-title">Analyse</p>
+    G --&gt;|Oui| H[Terraform Apply]
+    G --&gt;|Non| I[Afficher Plan]
+
+    H --&gt; J[Infrastructure Déployée]
+    E --&gt; K[Docs Publiées]
+
+    style H fill:#e8f5e9
+    style K fill:#e3f2fd</code></pre>
+<h2 id="structure-dun-workflow">🛠️ Structure d'un Workflow<a class="headerlink" href="#structure-dun-workflow" title="Permanent link">¶</a></h2>
+<p>Exemple pour déployer les Lambdas :</p>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy Serverless Lambdas</span>
+<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>
+<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="nt">on</span><span class="p">:</span>
+<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">  </span><span class="nt">workflow_dispatch</span><span class="p">:</span>
+<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="w">      </span><span class="nt">action</span><span class="p">:</span>
+<a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">choice</span>
+<a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">        </span><span class="nt">options</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">plan</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">apply</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a>
+<a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="nt">jobs</span><span class="p">:</span>
+<a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">  </span><span class="nt">deploy</span><span class="p">:</span>
+<a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout</span>
+<a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a>
+<a href="#__codelineno-0-17" id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Configure AWS</span>
+<a href="#__codelineno-0-18" id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aws-actions/configure-aws-credentials@v4</span>
+<a href="#__codelineno-0-19" id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<a href="#__codelineno-0-20" id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">          </span><span class="nt">aws-access-key-id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.AWS_ACCESS_KEY_ID }}</span>
+<a href="#__codelineno-0-21" id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">          </span><span class="nt">aws-secret-access-key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.AWS_SECRET_ACCESS_KEY }}</span>
+<a href="#__codelineno-0-22" id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="w">          </span><span class="nt">aws-region</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eu-west-3</span>
+<a href="#__codelineno-0-23" id="__codelineno-0-23" name="__codelineno-0-23"></a>
+<a href="#__codelineno-0-24" id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Terraform Init</span>
+<a href="#__codelineno-0-25" id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">terraform init</span>
+<a href="#__codelineno-0-26" id="__codelineno-0-26" name="__codelineno-0-26"></a>
+<a href="#__codelineno-0-27" id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Terraform Apply</span>
+<a href="#__codelineno-0-28" id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">terraform apply -target=module.lambda_run_api</span>
+</code></pre></div>
+<h2 id="secrets-requis">🔐 Secrets Requis<a class="headerlink" href="#secrets-requis" title="Permanent link">¶</a></h2>
+<p>Les workflows nécessitent les secrets GitHub suivants :</p>
 <ul>
-<li><strong>&lt; 10k req/jour</strong> → Serverless <strong>beaucoup</strong> moins cher</li>
-<li><strong>10k - 50k req/jour</strong> → Équivalent</li>
-<li><strong>&gt; 100k req/jour</strong> → ECS plus économique</li>
+<li><code>AWS_ACCESS_KEY_ID</code> : Access Key AWS</li>
+<li><code>AWS_SECRET_ACCESS_KEY</code> : Secret Key AWS</li>
 </ul>
-</div>
-<h2 id="performance">⚡ Performance<a class="headerlink" href="#performance" title="Permanent link">¶</a></h2>
-<h3 id="latence-observee">Latence Observée<a class="headerlink" href="#latence-observee" title="Permanent link">¶</a></h3>
-<p><strong>ECS (toujours chaud)</strong> : P50 ~50ms, P95 ~100ms, P99 ~150ms<br/>
-<strong>Serverless (warm)</strong> : P50 ~80ms, P95 ~200ms, P99 ~500ms<br/>
-<strong>Serverless (cold start)</strong> : P50 ~1500ms, P95 ~2500ms, P99 ~3500ms</p>
-<p>Le cold start est le principal inconvénient du Serverless, mais il ne se produit que sur la première requête ou après une période d'inactivité.</p>
-<h3 id="throughput">Throughput<a class="headerlink" href="#throughput" title="Permanent link">¶</a></h3>
-<table>
-<thead>
-<tr>
-<th>Architecture</th>
-<th>Max Throughput</th>
-<th>Scaling Time</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>ECS</strong></td>
-<td>~1000 req/s (2 tasks)</td>
-<td>2-3 minutes</td>
-</tr>
-<tr>
-<td><strong>Serverless</strong></td>
-<td>~10000 req/s (1000 lambdas)</td>
-<td>&lt; 10 secondes</td>
-</tr>
-</tbody>
-</table>
-<h2 id="recommandation-pour-ce-projet">🎓 Recommandation pour ce Projet<a class="headerlink" href="#recommandation-pour-ce-projet" title="Permanent link">¶</a></h2>
-<div class="admonition success">
-<p class="admonition-title">Approche Pédagogique</p>
-<p><strong>Les deux architectures sont déployées</strong> pour permettre la comparaison :</p>
+<p>Configuration : <strong>Settings</strong> → <strong>Secrets and variables</strong> → <strong>Actions</strong></p>
+<h2 id="monitoring-des-workflows">📊 Monitoring des Workflows<a class="headerlink" href="#monitoring-des-workflows" title="Permanent link">¶</a></h2>
 <ul>
-<li><strong>ECS</strong> : <code>infra/envs/dev/</code></li>
-<li><strong>Serverless</strong> : <code>infra/envs/serverless-dev/</code></li>
+<li><strong>Actions</strong> : Voir l'historique et les logs détaillés</li>
+<li><strong>Durée moyenne</strong> : </li>
+<li>Lambdas : ~5 minutes</li>
+<li>Grafana : ~10 minutes</li>
+<li>Full : ~15 minutes</li>
+<li>Documentation : ~2 minutes</li>
 </ul>
-<p>→ Choix dans le frontend : "Mode ECS" vs "Mode Serverless"</p>
-</div>
+<h2 id="liens">🔗 Liens<a class="headerlink" href="#liens" title="Permanent link">¶</a></h2>
+<ul>
+<li><a href="../../guide/quickstart/">Guide Quickstart</a></li>
+<li><a href="../ecs/">Déploiement ECS</a></li>
+</ul>
 </article>
 </div>
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>

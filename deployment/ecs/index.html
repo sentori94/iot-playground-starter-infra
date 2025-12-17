@@ -7,11 +7,11 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="Infrastructure as Code pour IoT Playground - Architecture ECS vs Serverless" name="description"/>
 <meta content="Sentori Studio" name="author"/>
-<link href="../serverless/" rel="prev"/>
-<link href="../../deployment/prerequisites/" rel="next"/>
+<link href="../prerequisites/" rel="prev"/>
+<link href="../../guide/quickstart/" rel="next"/>
 <link href="../../assets/images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.6.1, mkdocs-material-9.7.0" name="generator"/>
-<title>Comparaison - IoT Playground Infrastructure</title>
+<title>Infrastructure ECS - IoT Playground Infrastructure</title>
 <link href="../../assets/stylesheets/main.618322db.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -24,7 +24,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#comparaison-ecs-vs-serverless">
+<a class="md-skip" href="#deploiement-infrastructure-ecs">
           Aller au contenu
         </a>
 </div>
@@ -48,7 +48,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Comparaison
+              Infrastructure ECS
             
           </span>
 </div>
@@ -123,8 +123,8 @@
 
       </a>
 </li>
-<li class="md-tabs__item md-tabs__item--active">
-<a class="md-tabs__link" href="../overview/">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../architecture/overview/">
           
   
   
@@ -132,8 +132,8 @@
 
         </a>
 </li>
-<li class="md-tabs__item">
-<a class="md-tabs__link" href="../../deployment/prerequisites/">
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../prerequisites/">
           
   
   
@@ -206,9 +206,9 @@
   </span>
 </a>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
 <span class="md-ellipsis">
     
   
@@ -219,7 +219,7 @@
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_2">
 <span class="md-nav__icon md-icon"></span>
             
@@ -230,7 +230,7 @@
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../overview/">
+<a class="md-nav__link" href="../../architecture/overview/">
 <span class="md-ellipsis">
     
   
@@ -242,7 +242,7 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../ecs/">
+<a class="md-nav__link" href="../../architecture/ecs/">
 <span class="md-ellipsis">
     
   
@@ -254,11 +254,61 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../serverless/">
+<a class="md-nav__link" href="../../architecture/serverless/">
 <span class="md-ellipsis">
     
   
     Serverless (Lambda)
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../architecture/comparison/">
+<span class="md-ellipsis">
+    
+  
+    Comparaison
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+<span class="md-ellipsis">
+    
+  
+    Déploiement
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Déploiement
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../prerequisites/">
+<span class="md-ellipsis">
+    
+  
+    Prérequis
   
 
     
@@ -271,7 +321,7 @@
 <span class="md-ellipsis">
     
   
-    Comparaison
+    Infrastructure ECS
   
 
     
@@ -282,7 +332,7 @@
 <span class="md-ellipsis">
     
   
-    Comparaison
+    Infrastructure ECS
   
 
     
@@ -295,47 +345,20 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#objectif-de-la-comparaison">
+<a class="md-nav__link" href="#infrastructure-manager">
 <span class="md-ellipsis">
       
-        🎯 Objectif de la Comparaison
+        🎯 Infrastructure Manager
       
     </span>
 </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#tableau-comparatif">
-<span class="md-ellipsis">
-      
-        📊 Tableau Comparatif
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#cas-dusage-recommandes">
-<span class="md-ellipsis">
-      
-        🎯 Cas d'Usage Recommandés
-      
-    </span>
-</a>
-<nav aria-label="🎯 Cas d'Usage Recommandés" class="md-nav">
+<nav aria-label="🎯 Infrastructure Manager" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#ecs-classic">
+<a class="md-nav__link" href="#principe-de-fonctionnement">
 <span class="md-ellipsis">
       
-        ECS Classic
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#serverless-lambda">
-<span class="md-ellipsis">
-      
-        Serverless Lambda
+        Principe de Fonctionnement
       
     </span>
 </a>
@@ -344,38 +367,29 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#analyse-couts-detaillee">
+<a class="md-nav__link" href="#cycle-de-vie">
 <span class="md-ellipsis">
       
-        💰 Analyse Coûts Détaillée
+        🔄 Cycle de Vie
       
     </span>
 </a>
-<nav aria-label="💰 Analyse Coûts Détaillée" class="md-nav">
+<nav aria-label="🔄 Cycle de Vie" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-1000-reqjour">
+<a class="md-nav__link" href="#demarrage-de-linfrastructure">
 <span class="md-ellipsis">
       
-        Scénario : 1000 req/jour
+        Démarrage de l'Infrastructure
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-100k-reqjour">
+<a class="md-nav__link" href="#arret-de-linfrastructure">
 <span class="md-ellipsis">
       
-        Scénario : 100k req/jour
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#conclusion-couts">
-<span class="md-ellipsis">
-      
-        Conclusion Coûts
+        Arrêt de l'Infrastructure
       
     </span>
 </a>
@@ -384,29 +398,47 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#performance">
+<a class="md-nav__link" href="#etats-de-linfrastructure">
 <span class="md-ellipsis">
       
-        ⚡ Performance
+        📊 États de l'Infrastructure
       
     </span>
 </a>
-<nav aria-label="⚡ Performance" class="md-nav">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#api-infrastructure-manager">
+<span class="md-ellipsis">
+      
+        🎛️ API Infrastructure Manager
+      
+    </span>
+</a>
+<nav aria-label="🎛️ API Infrastructure Manager" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#latence-observee">
+<a class="md-nav__link" href="#get-infrastatus">
 <span class="md-ellipsis">
       
-        Latence Observée
+        GET /infra/status
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#throughput">
+<a class="md-nav__link" href="#post-infrastart">
 <span class="md-ellipsis">
       
-        Throughput
+        POST /infra/start
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-infrastop">
+<span class="md-ellipsis">
+      
+        POST /infra/stop
       
     </span>
 </a>
@@ -415,66 +447,34 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#recommandation-pour-ce-projet">
+<a class="md-nav__link" href="#optimisation-des-couts">
 <span class="md-ellipsis">
       
-        🎓 Recommandation pour ce Projet
+        💰 Optimisation des Coûts
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deploiement-de-linfrastructure-manager">
+<span class="md-ellipsis">
+      
+        🚀 Déploiement de l'Infrastructure Manager
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#liens">
+<span class="md-ellipsis">
+      
+        🔗 Liens
       
     </span>
 </a>
 </li>
 </ul>
 </nav>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-<span class="md-ellipsis">
-    
-  
-    Déploiement
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_3">
-<span class="md-nav__icon md-icon"></span>
-            
-  
-    Déploiement
-  
-
-          </label>
-<ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../deployment/prerequisites/">
-<span class="md-ellipsis">
-    
-  
-    Prérequis
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../deployment/ecs/">
-<span class="md-ellipsis">
-    
-  
-    Infrastructure ECS
-  
-
-    
-  </span>
-</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../guide/quickstart/">
@@ -489,7 +489,7 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../deployment/github-actions/">
+<a class="md-nav__link" href="../github-actions/">
 <span class="md-ellipsis">
     
   
@@ -728,47 +728,20 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#objectif-de-la-comparaison">
+<a class="md-nav__link" href="#infrastructure-manager">
 <span class="md-ellipsis">
       
-        🎯 Objectif de la Comparaison
+        🎯 Infrastructure Manager
       
     </span>
 </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#tableau-comparatif">
-<span class="md-ellipsis">
-      
-        📊 Tableau Comparatif
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#cas-dusage-recommandes">
-<span class="md-ellipsis">
-      
-        🎯 Cas d'Usage Recommandés
-      
-    </span>
-</a>
-<nav aria-label="🎯 Cas d'Usage Recommandés" class="md-nav">
+<nav aria-label="🎯 Infrastructure Manager" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#ecs-classic">
+<a class="md-nav__link" href="#principe-de-fonctionnement">
 <span class="md-ellipsis">
       
-        ECS Classic
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#serverless-lambda">
-<span class="md-ellipsis">
-      
-        Serverless Lambda
+        Principe de Fonctionnement
       
     </span>
 </a>
@@ -777,38 +750,29 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#analyse-couts-detaillee">
+<a class="md-nav__link" href="#cycle-de-vie">
 <span class="md-ellipsis">
       
-        💰 Analyse Coûts Détaillée
+        🔄 Cycle de Vie
       
     </span>
 </a>
-<nav aria-label="💰 Analyse Coûts Détaillée" class="md-nav">
+<nav aria-label="🔄 Cycle de Vie" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-1000-reqjour">
+<a class="md-nav__link" href="#demarrage-de-linfrastructure">
 <span class="md-ellipsis">
       
-        Scénario : 1000 req/jour
+        Démarrage de l'Infrastructure
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#scenario-100k-reqjour">
+<a class="md-nav__link" href="#arret-de-linfrastructure">
 <span class="md-ellipsis">
       
-        Scénario : 100k req/jour
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#conclusion-couts">
-<span class="md-ellipsis">
-      
-        Conclusion Coûts
+        Arrêt de l'Infrastructure
       
     </span>
 </a>
@@ -817,29 +781,47 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#performance">
+<a class="md-nav__link" href="#etats-de-linfrastructure">
 <span class="md-ellipsis">
       
-        ⚡ Performance
-      
-    </span>
-</a>
-<nav aria-label="⚡ Performance" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#latence-observee">
-<span class="md-ellipsis">
-      
-        Latence Observée
+        📊 États de l'Infrastructure
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#throughput">
+<a class="md-nav__link" href="#api-infrastructure-manager">
 <span class="md-ellipsis">
       
-        Throughput
+        🎛️ API Infrastructure Manager
+      
+    </span>
+</a>
+<nav aria-label="🎛️ API Infrastructure Manager" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#get-infrastatus">
+<span class="md-ellipsis">
+      
+        GET /infra/status
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-infrastart">
+<span class="md-ellipsis">
+      
+        POST /infra/start
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-infrastop">
+<span class="md-ellipsis">
+      
+        POST /infra/stop
       
     </span>
 </a>
@@ -848,10 +830,28 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#recommandation-pour-ce-projet">
+<a class="md-nav__link" href="#optimisation-des-couts">
 <span class="md-ellipsis">
       
-        🎓 Recommandation pour ce Projet
+        💰 Optimisation des Coûts
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deploiement-de-linfrastructure-manager">
+<span class="md-ellipsis">
+      
+        🚀 Déploiement de l'Infrastructure Manager
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#liens">
+<span class="md-ellipsis">
+      
+        🔗 Liens
       
     </span>
 </a>
@@ -863,352 +863,145 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<h1 id="comparaison-ecs-vs-serverless">Comparaison ECS vs Serverless<a class="headerlink" href="#comparaison-ecs-vs-serverless" title="Permanent link">¶</a></h1>
-<h2 id="objectif-de-la-comparaison">🎯 Objectif de la Comparaison<a class="headerlink" href="#objectif-de-la-comparaison" title="Permanent link">¶</a></h2>
-<p>Ce projet permet de mesurer concrètement les différences entre une architecture conteneurisée (ECS) et une architecture serverless (Lambda) sur AWS. Les deux implémentent exactement la même fonctionnalité (simulation de capteurs IoT), permettant une comparaison objective.</p>
+<h1 id="deploiement-infrastructure-ecs">Déploiement Infrastructure ECS<a class="headerlink" href="#deploiement-infrastructure-ecs" title="Permanent link">¶</a></h1>
+<h2 id="infrastructure-manager">🎯 Infrastructure Manager<a class="headerlink" href="#infrastructure-manager" title="Permanent link">¶</a></h2>
+<p>L'infrastructure ECS utilise un système <strong>Infrastructure Manager</strong> qui permet de créer et détruire l'infrastructure complète à la demande via une API.</p>
+<h3 id="principe-de-fonctionnement">Principe de Fonctionnement<a class="headerlink" href="#principe-de-fonctionnement" title="Permanent link">¶</a></h3>
+<p>L'infrastructure ECS n'est <strong>pas toujours active</strong> pour économiser les coûts. Elle peut être démarrée uniquement quand nécessaire via le frontend.</p>
 <pre class="mermaid"><code>graph TB
-    subgraph "Architecture ECS"
-        A1[Always-On]
-        A2[Conteneurs Docker]
-        A3[PostgreSQL]
-        A4[Coût fixe: $90/mois]
+    subgraph "Frontend Angular"
+        USER[Utilisateur]
+        BUTTON[Bouton Start/Stop Infrastructure]
     end
 
-    subgraph "Architecture Serverless"
-        B1[On-Demand]
-        B2[Lambda Python]
-        B3[DynamoDB]
-        B4[Coût variable: $1-150/mois]
+    subgraph "Infrastructure Manager"
+        API[Lambda Infra Manager]
+        SF[Step Functions]
     end
 
-    subgraph "Frontend Unique"
-        C[Angular App]
+    subgraph "Infrastructure ECS"
+        STATUS{État Infra}
+        TERRAFORM[Terraform Apply/Destroy]
+        INFRA[ECS + RDS + ALB]
     end
 
-    C --&gt;|Même API| A2
-    C --&gt;|Même API| B2
+    USER --&gt;|Clique| BUTTON
+    BUTTON --&gt;|API Call| API
 
-    style A2 fill:#fff3e0
-    style B2 fill:#e8f5e9</code></pre>
-<h2 id="tableau-comparatif">📊 Tableau Comparatif<a class="headerlink" href="#tableau-comparatif" title="Permanent link">¶</a></h2>
+    API --&gt; STATUS
+
+    STATUS --&gt;|Stopped| TERRAFORM
+    STATUS --&gt;|Running| TERRAFORM
+
+    TERRAFORM --&gt;|Create| INFRA
+    TERRAFORM --&gt;|Destroy| INFRA
+
+    INFRA -.Status.-&gt; API
+    API -.Response.-&gt; BUTTON
+
+    style API fill:#e8f5e9
+    style INFRA fill:#fff3e0</code></pre>
+<h2 id="cycle-de-vie">🔄 Cycle de Vie<a class="headerlink" href="#cycle-de-vie" title="Permanent link">¶</a></h2>
+<h3 id="demarrage-de-linfrastructure">Démarrage de l'Infrastructure<a class="headerlink" href="#demarrage-de-linfrastructure" title="Permanent link">¶</a></h3>
+<ol>
+<li><strong>Frontend</strong> : L'utilisateur clique sur "Démarrer Infrastructure ECS"</li>
+<li><strong>API Call</strong> : Le frontend appelle <code>POST /infra/start</code></li>
+<li><strong>Lambda Manager</strong> : Déclenche un Step Functions workflow</li>
+<li><strong>Terraform Apply</strong> : Crée toutes les ressources (VPC, ECS, RDS, ALB)</li>
+<li><strong>Attente</strong> : Le processus prend ~15 minutes</li>
+<li><strong>Ready</strong> : L'infrastructure est prête, l'API ECS est accessible</li>
+</ol>
+<h3 id="arret-de-linfrastructure">Arrêt de l'Infrastructure<a class="headerlink" href="#arret-de-linfrastructure" title="Permanent link">¶</a></h3>
+<ol>
+<li><strong>Frontend</strong> : L'utilisateur clique sur "Arrêter Infrastructure ECS"</li>
+<li><strong>API Call</strong> : Le frontend appelle <code>POST /infra/stop</code></li>
+<li><strong>Lambda Manager</strong> : Déclenche un Step Functions workflow</li>
+<li><strong>Terraform Destroy</strong> : Supprime toutes les ressources</li>
+<li><strong>Attente</strong> : Le processus prend ~10 minutes</li>
+<li><strong>Stopped</strong> : L'infrastructure est détruite, plus de coûts</li>
+</ol>
+<h2 id="etats-de-linfrastructure">📊 États de l'Infrastructure<a class="headerlink" href="#etats-de-linfrastructure" title="Permanent link">¶</a></h2>
 <table>
 <thead>
 <tr>
-<th>Aspect</th>
-<th>ECS Classic</th>
-<th>Serverless Lambda</th>
+<th>État</th>
+<th>Description</th>
+<th>Actions disponibles</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Runtime</strong></td>
-<td>Spring Boot (Java)</td>
-<td>Python 3.11</td>
+<td><strong>STOPPED</strong></td>
+<td>Infrastructure détruite</td>
+<td>Start</td>
 </tr>
 <tr>
-<td><strong>Base de données</strong></td>
-<td>PostgreSQL (RDS)</td>
-<td>DynamoDB</td>
+<td><strong>STARTING</strong></td>
+<td>Création en cours (~15 min)</td>
+<td>-</td>
 </tr>
 <tr>
-<td><strong>Compute</strong></td>
-<td>ECS Fargate (Always-on)</td>
-<td>Lambda (On-demand)</td>
+<td><strong>RUNNING</strong></td>
+<td>Infrastructure active</td>
+<td>Stop, Use API</td>
 </tr>
 <tr>
-<td><strong>Scaling</strong></td>
-<td>Auto-scaling ECS</td>
-<td>Auto-scaling Lambda</td>
+<td><strong>STOPPING</strong></td>
+<td>Destruction en cours (~10 min)</td>
+<td>-</td>
 </tr>
 <tr>
-<td><strong>Cold Start</strong></td>
-<td>❌ Aucun</td>
-<td>⚠️ ~1-2s (first request)</td>
-</tr>
-<tr>
-<td><strong>Coût idle</strong></td>
-<td>~$80/mois</td>
-<td>~$1/mois (sans Grafana)</td>
-</tr>
-<tr>
-<td><strong>Coût actif</strong></td>
-<td>~$80/mois (fixe)</td>
-<td>Variable selon usage</td>
-</tr>
-<tr>
-<td><strong>Monitoring</strong></td>
-<td>Prometheus</td>
-<td>CloudWatch Logs</td>
-</tr>
-<tr>
-<td><strong>Grafana</strong></td>
-<td>Datasource Prometheus</td>
-<td>Datasource CloudWatch</td>
-</tr>
-<tr>
-<td><strong>HTTPS</strong></td>
-<td>✅ ALB + ACM</td>
-<td>✅ API Gateway + ACM</td>
-</tr>
-<tr>
-<td><strong>Authentification</strong></td>
-<td>Header X-User</td>
-<td>Header X-User</td>
-</tr>
-<tr>
-<td><strong>Limite concurrent</strong></td>
-<td>Configurable ECS</td>
-<td>5 runs globaux</td>
+<td><strong>ERROR</strong></td>
+<td>Erreur lors de l'opération</td>
+<td>Retry</td>
 </tr>
 </tbody>
 </table>
-<h2 id="cas-dusage-recommandes">🎯 Cas d'Usage Recommandés<a class="headerlink" href="#cas-dusage-recommandes" title="Permanent link">¶</a></h2>
-<h3 id="ecs-classic">ECS Classic<a class="headerlink" href="#ecs-classic" title="Permanent link">¶</a></h3>
-<p><strong>Quand choisir ECS :</strong>
-- Trafic constant et prévisible (&gt; 100 req/min en continu)
-- Besoin de latence ultra-faible (&lt; 50ms)
-- Applications avec état ou connexions persistantes
-- Workloads de longue durée (&gt; 15 minutes)</p>
-<p><strong>Avantages ECS :</strong>
-- ✅ Pas de cold start
-- ✅ Connexions persistantes (BDD, cache)
-- ✅ Latence prévisible
-- ✅ Debugging plus simple (logs structurés)
-- ✅ Écosystème Java mature</p>
-<p><strong>Inconvénients ECS :</strong>
-- ❌ Coût fixe même sans trafic
-- ❌ Gestion de l'infrastructure
-- ❌ Scaling moins réactif</p>
-<h3 id="serverless-lambda">Serverless Lambda<a class="headerlink" href="#serverless-lambda" title="Permanent link">¶</a></h3>
-<p><strong>Quand choisir Serverless :</strong>
-- Trafic sporadique ou imprévisible
-- Budget limité (pay-per-use)
-- Pics de charge importants nécessitant un scaling rapide
-- Prototypes ou applications en phase de test</p>
-<p><strong>Avantages Serverless :</strong>
-- ✅ Pay-per-use (coût = usage réel)
-- ✅ Scaling automatique infini
-- ✅ Pas de gestion serveur
-- ✅ DynamoDB très performant</p>
-<p><strong>Inconvénients Serverless :</strong>
-- ❌ Cold start (~1-2s)
-- ❌ Timeout max 15 minutes
-- ❌ Debugging plus complexe
-- ❌ Vendor lock-in AWS</p>
-<h2 id="analyse-couts-detaillee">💰 Analyse Coûts Détaillée<a class="headerlink" href="#analyse-couts-detaillee" title="Permanent link">¶</a></h2>
-<h3 id="scenario-1000-reqjour">Scénario : 1000 req/jour<a class="headerlink" href="#scenario-1000-reqjour" title="Permanent link">¶</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">ECS</label><label for="__tabbed_1_2">Serverless</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fargate (1 task, 0.5 vCPU, 1 GB)</td>
-<td>~$30</td>
-</tr>
-<tr>
-<td>RDS PostgreSQL (db.t3.micro)</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td>ALB</td>
-<td>~$16</td>
-</tr>
-<tr>
-<td>Prometheus ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$90/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Lambda (30k invocations)</td>
-<td>~$0.01</td>
-</tr>
-<tr>
-<td>DynamoDB (on-demand, 30k writes)</td>
-<td>~$0.40</td>
-</tr>
-<tr>
-<td>API Gateway (30k requests)</td>
-<td>~$0.10</td>
-</tr>
-<tr>
-<td>CloudWatch Logs (5 GB)</td>
-<td>~$2.50</td>
-</tr>
-<tr>
-<td>Grafana ECS (si actif)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>VPC (NAT, IGW pour Grafana)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td><strong>TOTAL (avec Grafana)</strong></td>
-<td><strong>~$83/mois</strong></td>
-</tr>
-<tr>
-<td><strong>TOTAL (sans Grafana)</strong></td>
-<td><strong>~$3/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</input></input></div>
-<h3 id="scenario-100k-reqjour">Scénario : 100k req/jour<a class="headerlink" href="#scenario-100k-reqjour" title="Permanent link">¶</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio"><input id="__tabbed_2_2" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="__tabbed_2_1">ECS</label><label for="__tabbed_2_2">Serverless</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fargate (2 tasks, 1 vCPU, 2 GB)</td>
-<td>~$60</td>
-</tr>
-<tr>
-<td>RDS PostgreSQL (db.t3.small)</td>
-<td>~$30</td>
-</tr>
-<tr>
-<td>ALB</td>
-<td>~$20</td>
-</tr>
-<tr>
-<td>Prometheus ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$140/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Lambda (3M invocations)</td>
-<td>~$1.20</td>
-</tr>
-<tr>
-<td>DynamoDB (3M writes)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>API Gateway (3M requests)</td>
-<td>~$10</td>
-</tr>
-<tr>
-<td>CloudWatch Logs (50 GB)</td>
-<td>~$25</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>VPC</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$156/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</input></input></div>
-<h3 id="conclusion-couts">Conclusion Coûts<a class="headerlink" href="#conclusion-couts" title="Permanent link">¶</a></h3>
-<div class="admonition tip">
-<p class="admonition-title">Analyse</p>
+<h2 id="api-infrastructure-manager">🎛️ API Infrastructure Manager<a class="headerlink" href="#api-infrastructure-manager" title="Permanent link">¶</a></h2>
+<h3 id="get-infrastatus">GET <code>/infra/status</code><a class="headerlink" href="#get-infrastatus" title="Permanent link">¶</a></h3>
+<p>Récupère l'état actuel de l'infrastructure ECS.</p>
+<p><strong>Response 200</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="p">{</span>
+<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RUNNING"</span><span class="p">,</span>
+<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api-ecs-iot.sentori-studio.com"</span><span class="p">,</span>
+<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">  </span><span class="nt">"lastUpdate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2025-01-15T10:30:00Z"</span>
+<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="post-infrastart">POST <code>/infra/start</code><a class="headerlink" href="#post-infrastart" title="Permanent link">¶</a></h3>
+<p>Démarre l'infrastructure ECS.</p>
+<p><strong>Response 202</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="p">{</span>
+<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Infrastructure starting"</span><span class="p">,</span>
+<a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="nt">"estimatedTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15 minutes"</span>
+<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="post-infrastop">POST <code>/infra/stop</code><a class="headerlink" href="#post-infrastop" title="Permanent link">¶</a></h3>
+<p>Arrête l'infrastructure ECS.</p>
+<p><strong>Response 202</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="p">{</span>
+<a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Infrastructure stopping"</span><span class="p">,</span>
+<a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="w">  </span><span class="nt">"estimatedTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10 minutes"</span>
+<a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="p">}</span>
+</code></pre></div></p>
+<h2 id="optimisation-des-couts">💰 Optimisation des Coûts<a class="headerlink" href="#optimisation-des-couts" title="Permanent link">¶</a></h2>
+<p>Ce système permet d'économiser significativement sur les coûts AWS :</p>
 <ul>
-<li><strong>&lt; 10k req/jour</strong> → Serverless <strong>beaucoup</strong> moins cher</li>
-<li><strong>10k - 50k req/jour</strong> → Équivalent</li>
-<li><strong>&gt; 100k req/jour</strong> → ECS plus économique</li>
+<li><strong>Sans Infrastructure Manager</strong> : Infrastructure toujours active = <strong>~$90/mois</strong></li>
+<li><strong>Avec Infrastructure Manager</strong> : Infrastructure active 8h/jour = <strong>~$30/mois</strong></li>
+<li><strong>Usage occasionnel</strong> : Infrastructure active 2h/semaine = <strong>~$5/mois</strong></li>
 </ul>
-</div>
-<h2 id="performance">⚡ Performance<a class="headerlink" href="#performance" title="Permanent link">¶</a></h2>
-<h3 id="latence-observee">Latence Observée<a class="headerlink" href="#latence-observee" title="Permanent link">¶</a></h3>
-<p><strong>ECS (toujours chaud)</strong> : P50 ~50ms, P95 ~100ms, P99 ~150ms<br/>
-<strong>Serverless (warm)</strong> : P50 ~80ms, P95 ~200ms, P99 ~500ms<br/>
-<strong>Serverless (cold start)</strong> : P50 ~1500ms, P95 ~2500ms, P99 ~3500ms</p>
-<p>Le cold start est le principal inconvénient du Serverless, mais il ne se produit que sur la première requête ou après une période d'inactivité.</p>
-<h3 id="throughput">Throughput<a class="headerlink" href="#throughput" title="Permanent link">¶</a></h3>
-<table>
-<thead>
-<tr>
-<th>Architecture</th>
-<th>Max Throughput</th>
-<th>Scaling Time</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>ECS</strong></td>
-<td>~1000 req/s (2 tasks)</td>
-<td>2-3 minutes</td>
-</tr>
-<tr>
-<td><strong>Serverless</strong></td>
-<td>~10000 req/s (1000 lambdas)</td>
-<td>&lt; 10 secondes</td>
-</tr>
-</tbody>
-</table>
-<h2 id="recommandation-pour-ce-projet">🎓 Recommandation pour ce Projet<a class="headerlink" href="#recommandation-pour-ce-projet" title="Permanent link">¶</a></h2>
-<div class="admonition success">
-<p class="admonition-title">Approche Pédagogique</p>
-<p><strong>Les deux architectures sont déployées</strong> pour permettre la comparaison :</p>
+<p>Le coût de l'Infrastructure Manager lui-même (Lambda + Step Functions) est négligeable (~$1/mois).</p>
+<h2 id="deploiement-de-linfrastructure-manager">🚀 Déploiement de l'Infrastructure Manager<a class="headerlink" href="#deploiement-de-linfrastructure-manager" title="Permanent link">¶</a></h2>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>infra/envs/inframanager-dev
+<a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a>terraform<span class="w"> </span>init
+<a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a>terraform<span class="w"> </span>apply
+</code></pre></div>
+<p>Une fois déployé, l'Infrastructure Manager est accessible depuis le frontend et permet de contrôler l'infrastructure ECS à la demande.</p>
+<h2 id="liens">🔗 Liens<a class="headerlink" href="#liens" title="Permanent link">¶</a></h2>
 <ul>
-<li><strong>ECS</strong> : <code>infra/envs/dev/</code></li>
-<li><strong>Serverless</strong> : <code>infra/envs/serverless-dev/</code></li>
+<li><a href="../../architecture/ecs/">Architecture ECS</a></li>
+<li><a href="serverless.md">Guide Serverless</a></li>
 </ul>
-<p>→ Choix dans le frontend : "Mode ECS" vs "Mode Serverless"</p>
-</div>
 </article>
 </div>
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
