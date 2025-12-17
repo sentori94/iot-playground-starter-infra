@@ -40,4 +40,45 @@ variable "grafana_domain_name" {
   default     = ""
 }
 
+# ===========================
+# Variables Grafana ECS
+# ===========================
+
+variable "enable_grafana" {
+  description = "Activer le déploiement de Grafana sur ECS"
+  type        = bool
+  default     = false
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block pour le VPC Serverless (Grafana)"
+  type        = string
+  default     = "10.1.0.0/16"
+}
+
+variable "availability_zones" {
+  description = "Liste des Availability Zones pour le VPC"
+  type        = list(string)
+  default     = ["eu-west-3a", "eu-west-3b"]
+}
+
+variable "grafana_image_uri" {
+  description = "URI de l'image Docker Grafana dans ECR"
+  type        = string
+  default     = ""
+}
+
+variable "grafana_image_tag" {
+  description = "Tag de l'image Grafana"
+  type        = string
+  default     = "latest"
+}
+
+variable "grafana_admin_password" {
+  description = "Mot de passe admin Grafana"
+  type        = string
+  sensitive   = true
+  default     = "ChangeMe123!"
+}
+
 

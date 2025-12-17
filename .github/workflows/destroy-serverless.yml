@@ -1,0 +1,198 @@
+name: Destroy Serverless Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: "Composant à détruire"
+        type: choice
+        required: true
+        default: "lambdas"
+        options:
+          - "lambdas"      # DynamoDB + Lambdas + API Gateway + ACM
+          - "grafana"      # VPC + ECS + Grafana
+          - "full"         # Tout (Lambdas + Grafana)
+      CONFIRM_DESTROY:
+        description: "Tapez 'DESTROY' pour confirmer"
+        required: true
+      DESTROY_BACKEND:
+        description: "Détruire aussi le backend S3 + DynamoDB ?"
+        type: choice
+        required: true
+        default: "no"
+        options:
+          - "no"
+          - "yes"
+
+env:
+  AWS_REGION: eu-west-3
+  TF_WORKING_DIR: ./infra/envs/serverless-dev
+
+jobs:
+  destroy:
+    name: "Destroy Serverless - ${{ github.event.inputs.component }}"
+    runs-on: ubuntu-latest
+    if: github.event.inputs.CONFIRM_DESTROY == 'DESTROY'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Remove local Terraform state files
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "🧹 Cleaning local Terraform state..."
+          rm -f terraform.tfstate terraform.tfstate.backup
+          echo "✅ Local state cleaned"
+
+      - name: Clean DynamoDB checksums
+        run: |
+          TABLE="terraform-lock"
+          REGION="${{ env.AWS_REGION }}"
+          
+          echo "🧹 Cleaning DynamoDB lock table checksums..."
+          
+          if aws dynamodb describe-table --table-name $TABLE --region $REGION 2>/dev/null; then
+            aws dynamodb scan --table-name $TABLE --region $REGION --output json 2>/dev/null | \
+            jq -r '.Items[]? | .LockID.S' | \
+            while read -r lock_id; do
+              if [ -n "$lock_id" ]; then
+                aws dynamodb delete-item --table-name $TABLE --region $REGION --key "{\"LockID\":{\"S\":\"$lock_id\"}}" 2>/dev/null || true
+              fi
+            done
+            echo "✅ DynamoDB cleaned"
+          fi
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      - name: Set Terraform Targets (Lambdas only)
+        if: github.event.inputs.component == 'lambdas'
+        run: |
+          echo "TF_TARGET=-target=module.api_gateway_lambda_iot -target=module.lambda_sensor_api -target=module.lambda_run_api -target=module.dynamodb_tables -target=module.acm_lambda_api" >> $GITHUB_ENV
+
+      - name: Set Terraform Targets (Grafana only)
+        if: github.event.inputs.component == 'grafana'
+        run: |
+          echo "TF_TARGET=-target=module.grafana_serverless -target=aws_iam_role_policy.grafana_cloudwatch -target=aws_iam_role.grafana_cloudwatch -target=module.ecs_cluster_serverless -target=module.vpc_serverless" >> $GITHUB_ENV
+
+      - name: Set Terraform Targets (Full)
+        if: github.event.inputs.component == 'full'
+        run: |
+          echo "TF_TARGET=" >> $GITHUB_ENV
+
+      - name: Terraform Destroy
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "🗑️ Running Terraform Destroy for: ${{ github.event.inputs.component }}"
+          terraform destroy -auto-approve ${{ env.TF_TARGET }}
+
+      - name: Cleanup Backend (S3 + DynamoDB)
+        if: github.event.inputs.DESTROY_BACKEND == 'yes'
+        run: |
+          BUCKET="iot-playground-tfstate-serverless"
+          TABLE="terraform-lock"
+          REGION="${{ env.AWS_REGION }}"
+          
+          echo "🗑️ Cleaning up Terraform backend..."
+          
+          # Empty and delete S3 bucket
+          if aws s3api head-bucket --bucket "$BUCKET" --region "$REGION" 2>/dev/null; then
+            echo "📦 Emptying S3 bucket..."
+            aws s3 rm s3://$BUCKET --recursive --region $REGION || true
+            
+            # Delete versions
+            aws s3api list-object-versions --bucket $BUCKET --region $REGION --output json 2>/dev/null | \
+            jq -r '.Versions[]? | "--key \"" + .Key + "\" --version-id \"" + .VersionId + "\""' | \
+            while read -r args; do
+              if [ -n "$args" ]; then
+                eval aws s3api delete-object --bucket $BUCKET --region $REGION $args || true
+              fi
+            done
+            
+            # Delete delete markers
+            aws s3api list-object-versions --bucket $BUCKET --region $REGION --output json 2>/dev/null | \
+            jq -r '.DeleteMarkers[]? | "--key \"" + .Key + "\" --version-id \"" + .VersionId + "\""' | \
+            while read -r args; do
+              if [ -n "$args" ]; then
+                eval aws s3api delete-object --bucket $BUCKET --region $REGION $args || true
+              fi
+            done
+            
+            echo "🗑️ Deleting S3 bucket..."
+            aws s3api delete-bucket --bucket $BUCKET --region $REGION || true
+            echo "✅ S3 bucket deleted"
+          fi
+          
+          # Delete DynamoDB table
+          if aws dynamodb describe-table --table-name $TABLE --region $REGION 2>/dev/null; then
+            echo "🗑️ Emptying DynamoDB table..."
+            # Scan and delete all items first
+            aws dynamodb scan --table-name $TABLE --region $REGION --output json 2>/dev/null | \
+            jq -r '.Items[]? | .LockID.S' | \
+            while read -r lock_id; do
+              if [ -n "$lock_id" ]; then
+                aws dynamodb delete-item --table-name $TABLE --region $REGION --key "{\"LockID\":{\"S\":\"$lock_id\"}}" || true
+              fi
+            done
+            
+            echo "🗑️ Deleting DynamoDB table..."
+            aws dynamodb delete-table --table-name $TABLE --region $REGION || true
+            echo "✅ DynamoDB table deleted"
+          fi
+          
+          echo "✅ Backend cleanup complete"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "  🗑️ DESTROY COMPLETED"
+          echo "=========================================="
+          echo ""
+          echo "📦 Component: ${{ github.event.inputs.component }}"
+          echo "🧹 Backend cleanup: ${{ github.event.inputs.DESTROY_BACKEND }}"
+          echo ""
+          
+          if [ "${{ github.event.inputs.component }}" == "lambdas" ]; then
+            echo "📋 Resources destroyed:"
+            echo "  • ACM Certificate"
+            echo "  • API Gateway + Domain"
+            echo "  • Lambda Run API"
+            echo "  • Lambda Sensor API"
+            echo "  • DynamoDB Tables (Runs, SensorData)"
+          elif [ "${{ github.event.inputs.component }}" == "grafana" ]; then
+            echo "📋 Resources destroyed:"
+            echo "  • Grafana ECS Service"
+            echo "  • ECS Cluster"
+            echo "  • VPC Serverless (subnets, IGW, NAT)"
+            echo "  • ALB Grafana"
+            echo "  • IAM Role CloudWatch"
+          else
+            echo "📋 Resources destroyed:"
+            echo "  • ALL (Lambdas + Grafana)"
+          fi
+          
+          if [ "${{ github.event.inputs.DESTROY_BACKEND }}" == "yes" ]; then
+            echo ""
+            echo "🧹 Backend destroyed:"
+            echo "  • S3 bucket: iot-playground-tfstate-serverless"
+            echo "  • DynamoDB table: terraform-lock"
+          fi
+          
+          echo ""
+          echo "=========================================="
+

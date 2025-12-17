@@ -57,7 +57,10 @@ resource "aws_api_gateway_integration_response" "runs_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_options,
+    aws_api_gateway_method_response.runs_options
+  ]
 }
 
 # ===========================
@@ -107,7 +110,10 @@ resource "aws_api_gateway_integration_response" "runs_start_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_start_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_start_options,
+    aws_api_gateway_method_response.runs_start_options
+  ]
 }
 
 # ===========================
@@ -157,7 +163,10 @@ resource "aws_api_gateway_integration_response" "runs_can_start_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_can_start_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_can_start_options,
+    aws_api_gateway_method_response.runs_can_start_options
+  ]
 }
 
 # ===========================
@@ -207,7 +216,10 @@ resource "aws_api_gateway_integration_response" "runs_running_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_running_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_running_options,
+    aws_api_gateway_method_response.runs_running_options
+  ]
 }
 
 # ===========================
@@ -257,7 +269,10 @@ resource "aws_api_gateway_integration_response" "runs_id_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_id_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_id_options,
+    aws_api_gateway_method_response.runs_id_options
+  ]
 }
 
 # ===========================
@@ -307,7 +322,10 @@ resource "aws_api_gateway_integration_response" "runs_id_finish_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_id_finish_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_id_finish_options,
+    aws_api_gateway_method_response.runs_id_finish_options
+  ]
 }
 
 # ===========================
@@ -357,7 +375,10 @@ resource "aws_api_gateway_integration_response" "runs_all_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_all_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_all_options,
+    aws_api_gateway_method_response.runs_all_options
+  ]
 }
 
 # ===========================
@@ -407,7 +428,10 @@ resource "aws_api_gateway_integration_response" "runs_interrupt_all_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.runs_interrupt_all_options]
+  depends_on = [
+    aws_api_gateway_integration.runs_interrupt_all_options,
+    aws_api_gateway_method_response.runs_interrupt_all_options
+  ]
 }
 
 # ===========================
@@ -457,6 +481,9 @@ resource "aws_api_gateway_integration_response" "sensors_data_options" {
 
   response_parameters = local.cors_headers
 
-  depends_on = [aws_api_gateway_integration.sensors_data_options]
+  depends_on = [
+    aws_api_gateway_integration.sensors_data_options,
+    aws_api_gateway_method_response.sensors_data_options
+  ]
 }
 

@@ -24,6 +24,28 @@ module "dynamodb_tables" {
 }
 
 # ===========================
+# Data: Certificat ACM existant (si disponible)
+# ===========================
+data "aws_acm_certificate" "existing" {
+  count       = var.lambda_api_domain_name != "" ? 1 : 0
+  domain      = var.lambda_api_domain_name
+  statuses    = ["ISSUED"]
+  most_recent = true
+}
+
+# ===========================
+# Certificat ACM pour les Lambdas
+# ===========================
+module "acm_lambda_api" {
+  count  = var.lambda_api_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
+  source = "../../modules/acm_certificate"
+
+  domain_name     = var.lambda_api_domain_name
+  route53_zone_id = data.aws_route53_zone.main[0].zone_id
+  tags            = local.common_tags
+}
+
+# ===========================
 # Module API Gateway Lambda IoT
 # ===========================
 module "api_gateway_lambda_iot" {
@@ -33,9 +55,9 @@ module "api_gateway_lambda_iot" {
   environment                   = var.env
   lambda_run_api_invoke_arn     = module.lambda_run_api.invoke_arn
   lambda_sensor_api_invoke_arn  = module.lambda_sensor_api.invoke_arn
-  custom_domain_name            = ""  # Pas de domaine personnalisé pour le moment
-  certificate_arn               = ""
-  route53_zone_id               = ""
+  custom_domain_name            = var.lambda_api_domain_name
+  certificate_arn               = length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : ""
+  route53_zone_id               = var.route53_zone_name != "" && length(data.aws_route53_zone.main) > 0 ? data.aws_route53_zone.main[0].zone_id : ""
   tags                          = local.common_tags
 }
 
@@ -68,7 +90,111 @@ module "lambda_sensor_api" {
   tags                      = local.common_tags
 }
 
+# ===========================
+# Module VPC Serverless (pour Grafana)
+# ===========================
+module "vpc_serverless" {
+  count  = var.enable_grafana ? 1 : 0
+  source = "../../modules/serverless/vpc"
 
+  project            = var.project
+  environment        = var.env
+  vpc_cidr           = var.vpc_cidr
+  availability_zones = var.availability_zones
+  tags               = local.common_tags
+}
+
+# ===========================
+# Module ECS Cluster (pour Grafana)
+# ===========================
+module "ecs_cluster_serverless" {
+  count  = var.enable_grafana ? 1 : 0
+  source = "../../modules/serverless/ecs_cluster"
+
+  project     = var.project
+  environment = var.env
+  tags        = local.common_tags
+}
+
+# ===========================
+# IAM Role pour Grafana accéder à CloudWatch
+# ===========================
+resource "aws_iam_role" "grafana_cloudwatch" {
+  count = var.enable_grafana ? 1 : 0
+  name  = "${var.project}-grafana-cw-${var.env}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy" "grafana_cloudwatch" {
+  count = var.enable_grafana ? 1 : 0
+  name  = "${var.project}-grafana-cw-access-${var.env}"
+  role  = aws_iam_role.grafana_cloudwatch[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:GetMetricData",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics",
+          "cloudwatch:DescribeAlarms"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:FilterLogEvents",
+          "logs:GetLogEvents",
+          "logs:GetLogGroupFields",
+          "logs:GetQueryResults",
+          "logs:StartQuery",
+          "logs:StopQuery"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# ===========================
+# Module Grafana ECS
+# ===========================
+module "grafana_serverless" {
+  count  = var.enable_grafana ? 1 : 0
+  source = "../../modules/serverless/grafana_ecs"
+
+  project                = var.project
+  environment            = var.env
+  vpc_id                 = module.vpc_serverless[0].vpc_id
+  public_subnet_ids      = module.vpc_serverless[0].public_subnet_ids
+  private_subnet_ids     = module.vpc_serverless[0].private_subnet_ids
+  ecs_cluster_id         = module.ecs_cluster_serverless[0].cluster_id
+  grafana_image_uri      = var.grafana_image_uri
+  grafana_image_tag      = var.grafana_image_tag
+  grafana_admin_password = var.grafana_admin_password
+  custom_domain_name     = ""
+  certificate_arn        = ""
+  route53_zone_id        = ""
+  grafana_task_role_arn  = aws_iam_role.grafana_cloudwatch[0].arn
+  tags                   = local.common_tags
+}
 
 # ===========================
 # Data Sources
