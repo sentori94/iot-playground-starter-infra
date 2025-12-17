@@ -179,10 +179,10 @@ resource "aws_lb_target_group" "grafana" {
 }
 
 # ===========================
-# HTTPS Listener (désactivé si pas de certificat)
+# HTTPS Listener (si domaine personnalisé configuré)
 # ===========================
 resource "aws_lb_listener" "https" {
-  count = var.certificate_arn != "" ? 1 : 0
+  count = var.custom_domain_name != "" ? 1 : 0
 
   load_balancer_arn = aws_lb.grafana.arn
   port              = "443"
@@ -194,10 +194,12 @@ resource "aws_lb_listener" "https" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.grafana.arn
   }
+
+  depends_on = [aws_lb_target_group.grafana]
 }
 
 # ===========================
-# HTTP Listener (forward si pas de certificat, sinon redirect to HTTPS)
+# HTTP Listener (forward si pas de domaine personnalisé, sinon redirect to HTTPS)
 # ===========================
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.grafana.arn
@@ -205,12 +207,12 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = var.certificate_arn != "" ? "redirect" : "forward"
+    type = var.custom_domain_name != "" ? "redirect" : "forward"
 
-    target_group_arn = var.certificate_arn != "" ? null : aws_lb_target_group.grafana.arn
+    target_group_arn = var.custom_domain_name != "" ? null : aws_lb_target_group.grafana.arn
 
     dynamic "redirect" {
-      for_each = var.certificate_arn != "" ? [1] : []
+      for_each = var.custom_domain_name != "" ? [1] : []
       content {
         port        = "443"
         protocol    = "HTTPS"
@@ -224,7 +226,7 @@ resource "aws_lb_listener" "http" {
 # Route53 Record
 # ===========================
 resource "aws_route53_record" "grafana" {
-  count = var.custom_domain_name != "" && var.route53_zone_id != "" ? 1 : 0
+  count = var.custom_domain_name != "" ? 1 : 0
 
   zone_id = var.route53_zone_id
   name    = var.custom_domain_name
