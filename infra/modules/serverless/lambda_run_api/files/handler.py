@@ -236,7 +236,15 @@ def start_run(event):
     run_id = str(uuid.uuid4())
     started_at = datetime.utcnow().isoformat() + 'Z'
 
-    params = body.get('params', {})
+    # Extraire les paramètres du body
+    # Le body peut contenir soit { "duration": 60, "interval": 5 }
+    # soit { "params": { "duration": 60, "interval": 5 } }
+    params = body.get('params', body)  # Si params n'existe pas, utiliser body directement
+    duration = params.get('duration', 60)  # Défaut: 60 secondes
+    interval = params.get('interval', 5)   # Défaut: 5 secondes
+
+    print(f"[RUN-API] Body received: {json.dumps(body)}")
+    print(f"[RUN-API] Extracted params: duration={duration}, interval={interval}")
 
     # Créer le run dans DynamoDB
     item = {
@@ -244,13 +252,15 @@ def start_run(event):
         'username': user,
         'status': 'RUNNING',
         'startedAt': started_at,
-        'params': json.dumps(params) if isinstance(params, dict) else str(params),
-        'grafanaUrl': f'http://grafana-grafana-serverless-dev-20113386.eu-west-3.elb.amazonaws.com/grafana/d/iot-serverless-cloudwatch?var-RunId={run_id}'
+        'duration': duration,
+        'interval': interval,
+        'params': params,  # Stocker l'objet params complet
+        'grafanaUrl': f'http://grafana-grafana-serverless-dev-20113386.eu-west-3.elb.amazonaws.com/d/iot-serverless-cloudwatch/iot-serverless-sensor-monitoring-cloudwatch?orgId=1&from=now-3h&to=now&refresh=5s&var-SensorId=All&var-User=All&var-RunId={run_id}'
     }
 
     table.put_item(Item=item)
 
-    print(f"[RUN-API] Run started: {run_id} by user '{user}'")
+    print(f"[RUN-API] Run started: {run_id} by user '{user}' (duration={duration}s, interval={interval}s)")
 
     return response(201, convert_decimals(item))
 
