@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../serverless/">
+        <link rel="prev" href="../overview/">
       
       
-        <link rel="next" href="../../guide/quickstart/">
+        <link rel="next" href="../serverless/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Comparaison - IoT Playground Infrastructure</title>
+        <title>ECS (Classic) - IoT Playground Infrastructure</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#comparaison-ecs-vs-serverless" class="md-skip">
+        <a href="#architecture-ecs-classic" class="md-skip">
           Aller au contenu
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Comparaison
+              ECS (Classic)
             
           </span>
         </div>
@@ -520,10 +520,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../ecs/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECS (Classic)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -539,6 +566,175 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#composants-principaux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🏗️ Composants Principaux
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🏗️ Composants Principaux">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ecs-fargate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS Fargate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rds-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RDS PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#application-load-balancer-alb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Load Balancer (ALB)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-avec-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring avec Prometheus
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grafana
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flux-de-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Flux de Données
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#couts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💰 Coûts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploiement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 Déploiement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#securite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Sécurité
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#avantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ Avantages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inconvenients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Inconvénients
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -576,37 +772,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Comparaison
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../comparison/" class="md-nav__link">
         
   
   
@@ -622,187 +791,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table des matières
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#objectif-de-la-comparaison" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎯 Objectif de la Comparaison
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tableau-comparatif" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        📊 Tableau Comparatif
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cas-dusage-recommandes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎯 Cas d'Usage Recommandés
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🎯 Cas d&#39;Usage Recommandés">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ecs-classic" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ECS Classic
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#serverless-lambda" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Serverless Lambda
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#analyse-couts-detaillee" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        💰 Analyse Coûts Détaillée
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="💰 Analyse Coûts Détaillée">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#scenario-1000-reqjour" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Scénario : 1000 req/jour
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#scenario-100k-reqjour" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Scénario : 100k req/jour
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conclusion-couts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conclusion Coûts
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ⚡ Performance
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="⚡ Performance">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#latence-observee" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Latence Observée
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#throughput" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Throughput
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recommandation-pour-ce-projet" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎓 Recommandation pour ce Projet
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1561,10 +1549,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#objectif-de-la-comparaison" class="md-nav__link">
+  <a href="#vue-densemble" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Objectif de la Comparaison
+        🎯 Vue d'ensemble
       
     </span>
   </a>
@@ -1572,33 +1560,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tableau-comparatif" class="md-nav__link">
+  <a href="#composants-principaux" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📊 Tableau Comparatif
+        🏗️ Composants Principaux
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cas-dusage-recommandes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎯 Cas d'Usage Recommandés
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🎯 Cas d&#39;Usage Recommandés">
+    <nav class="md-nav" aria-label="🏗️ Composants Principaux">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ecs-classic" class="md-nav__link">
+  <a href="#ecs-fargate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ECS Classic
+        ECS Fargate
       
     </span>
   </a>
@@ -1606,10 +1583,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#serverless-lambda" class="md-nav__link">
+  <a href="#rds-postgresql" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Serverless Lambda
+        RDS PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#application-load-balancer-alb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Load Balancer (ALB)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-avec-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring avec Prometheus
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grafana
       
     </span>
   </a>
@@ -1622,99 +1632,65 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#analyse-couts-detaillee" class="md-nav__link">
+  <a href="#flux-de-donnees" class="md-nav__link">
     <span class="md-ellipsis">
       
-        💰 Analyse Coûts Détaillée
+        🔄 Flux de Données
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="💰 Analyse Coûts Détaillée">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#scenario-1000-reqjour" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Scénario : 1000 req/jour
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#scenario-100k-reqjour" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Scénario : 100k req/jour
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conclusion-couts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conclusion Coûts
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance" class="md-nav__link">
+  <a href="#couts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ⚡ Performance
+        💰 Coûts
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="⚡ Performance">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#latence-observee" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Latence Observée
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#throughput" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Throughput
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#recommandation-pour-ce-projet" class="md-nav__link">
+  <a href="#deploiement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎓 Recommandation pour ce Projet
+        🚀 Déploiement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#securite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Sécurité
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#avantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ Avantages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inconvenients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Inconvénients
       
     </span>
   </a>
@@ -1741,328 +1717,112 @@
   
 
 
-<h1 id="comparaison-ecs-vs-serverless">Comparaison ECS vs Serverless<a class="headerlink" href="#comparaison-ecs-vs-serverless" title="Permanent link">&para;</a></h1>
-<h2 id="objectif-de-la-comparaison">🎯 Objectif de la Comparaison<a class="headerlink" href="#objectif-de-la-comparaison" title="Permanent link">&para;</a></h2>
-<p>Ce projet permet de mesurer concrètement les différences entre une architecture conteneurisée (ECS) et une architecture serverless (Lambda) sur AWS. Les deux implémentent exactement la même fonctionnalité (simulation de capteurs IoT), permettant une comparaison objective.</p>
-<h2 id="tableau-comparatif">📊 Tableau Comparatif<a class="headerlink" href="#tableau-comparatif" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Aspect</th>
-<th>ECS Classic</th>
-<th>Serverless Lambda</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Runtime</strong></td>
-<td>Spring Boot (Java)</td>
-<td>Python 3.11</td>
-</tr>
-<tr>
-<td><strong>Base de données</strong></td>
-<td>PostgreSQL (RDS)</td>
-<td>DynamoDB</td>
-</tr>
-<tr>
-<td><strong>Compute</strong></td>
-<td>ECS Fargate (Always-on)</td>
-<td>Lambda (On-demand)</td>
-</tr>
-<tr>
-<td><strong>Scaling</strong></td>
-<td>Auto-scaling ECS</td>
-<td>Auto-scaling Lambda</td>
-</tr>
-<tr>
-<td><strong>Cold Start</strong></td>
-<td>❌ Aucun</td>
-<td>⚠️ ~1-2s (first request)</td>
-</tr>
-<tr>
-<td><strong>Coût idle</strong></td>
-<td>~$80/mois</td>
-<td>~$1/mois (sans Grafana)</td>
-</tr>
-<tr>
-<td><strong>Coût actif</strong></td>
-<td>~$80/mois (fixe)</td>
-<td>Variable selon usage</td>
-</tr>
-<tr>
-<td><strong>Monitoring</strong></td>
-<td>Prometheus</td>
-<td>CloudWatch Logs</td>
-</tr>
-<tr>
-<td><strong>Grafana</strong></td>
-<td>Datasource Prometheus</td>
-<td>Datasource CloudWatch</td>
-</tr>
-<tr>
-<td><strong>HTTPS</strong></td>
-<td>✅ ALB + ACM</td>
-<td>✅ API Gateway + ACM</td>
-</tr>
-<tr>
-<td><strong>Authentification</strong></td>
-<td>Header X-User</td>
-<td>Header X-User</td>
-</tr>
-<tr>
-<td><strong>Limite concurrent</strong></td>
-<td>Configurable ECS</td>
-<td>5 runs globaux</td>
-</tr>
-</tbody>
-</table>
-<h2 id="cas-dusage-recommandes">🎯 Cas d'Usage Recommandés<a class="headerlink" href="#cas-dusage-recommandes" title="Permanent link">&para;</a></h2>
-<h3 id="ecs-classic">ECS Classic<a class="headerlink" href="#ecs-classic" title="Permanent link">&para;</a></h3>
-<p><strong>Quand choisir ECS :</strong>
-- Trafic constant et prévisible (&gt; 100 req/min en continu)
-- Besoin de latence ultra-faible (&lt; 50ms)
-- Applications avec état ou connexions persistantes
-- Workloads de longue durée (&gt; 15 minutes)</p>
-<p><strong>Avantages ECS :</strong>
-- ✅ Pas de cold start
-- ✅ Connexions persistantes (BDD, cache)
-- ✅ Latence prévisible
-- ✅ Debugging plus simple (logs structurés)
-- ✅ Écosystème Java mature</p>
-<p><strong>Inconvénients ECS :</strong>
-- ❌ Coût fixe même sans trafic
-- ❌ Gestion de l'infrastructure
-- ❌ Scaling moins réactif</p>
-<h3 id="serverless-lambda">Serverless Lambda<a class="headerlink" href="#serverless-lambda" title="Permanent link">&para;</a></h3>
-<p><strong>Quand choisir Serverless :</strong>
-- Trafic sporadique ou imprévisible
-- Budget limité (pay-per-use)
-- Pics de charge importants nécessitant un scaling rapide
-- Prototypes ou applications en phase de test</p>
-<p><strong>Avantages Serverless :</strong>
-- ✅ Pay-per-use (coût = usage réel)
-- ✅ Scaling automatique infini
-- ✅ Pas de gestion serveur
-- ✅ DynamoDB très performant</p>
-<p><strong>Inconvénients Serverless :</strong>
-- ❌ Cold start (~1-2s)
-- ❌ Timeout max 15 minutes
-- ❌ Debugging plus complexe
-- ❌ Vendor lock-in AWS</p>
-<h2 id="analyse-couts-detaillee">💰 Analyse Coûts Détaillée<a class="headerlink" href="#analyse-couts-detaillee" title="Permanent link">&para;</a></h2>
-<h3 id="scenario-1000-reqjour">Scénario : 1000 req/jour<a class="headerlink" href="#scenario-1000-reqjour" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">ECS</label><label for="__tabbed_1_2">Serverless</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
+<h1 id="architecture-ecs-classic">Architecture ECS (Classic)<a class="headerlink" href="#architecture-ecs-classic" title="Permanent link">&para;</a></h1>
+<h2 id="vue-densemble">🎯 Vue d'ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">&para;</a></h2>
+<p>L'architecture ECS représente l'approche traditionnelle avec des <strong>conteneurs Docker</strong> qui tournent en permanence sur AWS Fargate. Cette architecture est adaptée aux applications nécessitant une latence constante et prévisible, avec des connexions persistantes vers la base de données.</p>
+<h2 id="composants-principaux">🏗️ Composants Principaux<a class="headerlink" href="#composants-principaux" title="Permanent link">&para;</a></h2>
+<h3 id="ecs-fargate">ECS Fargate<a class="headerlink" href="#ecs-fargate" title="Permanent link">&para;</a></h3>
+<p>Les conteneurs Spring Boot tournent sur <strong>Fargate</strong> (serverless containers) sans avoir à gérer les instances EC2. Chaque tâche ECS a 0.5 vCPU et 1 GB de mémoire, suffisant pour l'application IoT Playground.</p>
+<h3 id="rds-postgresql">RDS PostgreSQL<a class="headerlink" href="#rds-postgresql" title="Permanent link">&para;</a></h3>
+<p>Base de données relationnelle <strong>PostgreSQL</strong> hébergée sur RDS dans un subnet privé. Elle stocke :
+- <strong>Table <code>runs</code></strong> : Métadonnées des simulations
+- <strong>Table <code>sensor_data</code></strong> : Données des capteurs avec relations (foreign keys vers runs)</p>
+<h3 id="application-load-balancer-alb">Application Load Balancer (ALB)<a class="headerlink" href="#application-load-balancer-alb" title="Permanent link">&para;</a></h3>
+<p>L'ALB distribue le trafic HTTPS vers les conteneurs ECS. Il gère :
+- Terminaison SSL/TLS avec certificat ACM
+- Health checks vers <code>/actuator/health</code>
+- Sticky sessions (optionnel)</p>
+<h3 id="monitoring-avec-prometheus">Monitoring avec Prometheus<a class="headerlink" href="#monitoring-avec-prometheus" title="Permanent link">&para;</a></h3>
+<p>Un conteneur Prometheus tourne sur ECS et scrape les métriques Spring Boot exposées sur <code>/actuator/prometheus</code>. Ces métriques incluent :
+- Métriques JVM (heap, threads, GC)
+- Métriques HTTP (requêtes, latence, erreurs)
+- Métriques custom (runs actifs, données capteurs)</p>
+<h3 id="grafana">Grafana<a class="headerlink" href="#grafana" title="Permanent link">&para;</a></h3>
+<p>Un conteneur Grafana interroge Prometheus et affiche des dashboards temps réel. Grafana est accessible via un domaine personnalisé avec certificat HTTPS.</p>
+<h2 id="flux-de-donnees">🔄 Flux de Données<a class="headerlink" href="#flux-de-donnees" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Requête entrante</strong> : Le frontend envoie une requête HTTPS vers l'ALB</li>
+<li><strong>Routage</strong> : L'ALB route vers un conteneur ECS disponible</li>
+<li><strong>Traitement</strong> : Spring Boot traite la requête et interroge PostgreSQL</li>
+<li><strong>Réponse</strong> : Les données sont retournées au frontend via l'ALB</li>
+<li><strong>Monitoring</strong> : Prometheus scrape les métriques toutes les 15 secondes</li>
+</ol>
+<h2 id="couts">💰 Coûts<a class="headerlink" href="#couts" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Ressource</th>
+<th>Configuration</th>
 <th>Coût mensuel</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Fargate (1 task, 0.5 vCPU, 1 GB)</td>
+<td>Fargate (Spring Boot)</td>
+<td>1 task, 0.5 vCPU, 1 GB</td>
 <td>~$30</td>
 </tr>
 <tr>
-<td>RDS PostgreSQL (db.t3.micro)</td>
+<td>RDS PostgreSQL</td>
+<td>db.t3.micro</td>
 <td>~$15</td>
 </tr>
 <tr>
-<td>ALB</td>
+<td>Application Load Balancer</td>
+<td>Standard</td>
 <td>~$16</td>
 </tr>
 <tr>
-<td>Prometheus ECS</td>
+<td>Fargate (Prometheus)</td>
+<td>1 task, 0.25 vCPU, 0.5 GB</td>
 <td>~$15</td>
 </tr>
 <tr>
-<td>Grafana ECS</td>
+<td>Fargate (Grafana)</td>
+<td>1 task, 0.25 vCPU, 0.5 GB</td>
 <td>~$15</td>
 </tr>
 <tr>
-<td><strong>TOTAL</strong></td>
+<td><strong>Total</strong></td>
+<td></td>
 <td><strong>~$90/mois</strong></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Lambda (30k invocations)</td>
-<td>~$0.01</td>
-</tr>
-<tr>
-<td>DynamoDB (on-demand, 30k writes)</td>
-<td>~$0.40</td>
-</tr>
-<tr>
-<td>API Gateway (30k requests)</td>
-<td>~$0.10</td>
-</tr>
-<tr>
-<td>CloudWatch Logs (5 GB)</td>
-<td>~$2.50</td>
-</tr>
-<tr>
-<td>Grafana ECS (si actif)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>VPC (NAT, IGW pour Grafana)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td><strong>TOTAL (avec Grafana)</strong></td>
-<td><strong>~$83/mois</strong></td>
-</tr>
-<tr>
-<td><strong>TOTAL (sans Grafana)</strong></td>
-<td><strong>~$3/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<h3 id="scenario-100k-reqjour">Scénario : 100k req/jour<a class="headerlink" href="#scenario-100k-reqjour" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">ECS</label><label for="__tabbed_2_2">Serverless</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fargate (2 tasks, 1 vCPU, 2 GB)</td>
-<td>~$60</td>
-</tr>
-<tr>
-<td>RDS PostgreSQL (db.t3.small)</td>
-<td>~$30</td>
-</tr>
-<tr>
-<td>ALB</td>
-<td>~$20</td>
-</tr>
-<tr>
-<td>Prometheus ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$15</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$140/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="tabbed-block">
-<table>
-<thead>
-<tr>
-<th>Ressource</th>
-<th>Coût mensuel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Lambda (3M invocations)</td>
-<td>~$1.20</td>
-</tr>
-<tr>
-<td>DynamoDB (3M writes)</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>API Gateway (3M requests)</td>
-<td>~$10</td>
-</tr>
-<tr>
-<td>CloudWatch Logs (50 GB)</td>
-<td>~$25</td>
-</tr>
-<tr>
-<td>Grafana ECS</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td>VPC</td>
-<td>~$40</td>
-</tr>
-<tr>
-<td><strong>TOTAL</strong></td>
-<td><strong>~$156/mois</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<h3 id="conclusion-couts">Conclusion Coûts<a class="headerlink" href="#conclusion-couts" title="Permanent link">&para;</a></h3>
-<div class="admonition tip">
-<p class="admonition-title">Analyse</p>
+<h2 id="deploiement">🚀 Déploiement<a class="headerlink" href="#deploiement" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>infra/envs/dev
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>terraform<span class="w"> </span>init
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>terraform<span class="w"> </span>apply
+</code></pre></div>
+<p>Les ressources sont créées dans l'ordre suivant :
+1. VPC et subnets (publics/privés)
+2. Security Groups
+3. RDS PostgreSQL
+4. ECS Cluster
+5. ALB
+6. ECS Services (Spring Boot, Prometheus, Grafana)</p>
+<p>Temps total : ~15 minutes</p>
+<h2 id="securite">🔐 Sécurité<a class="headerlink" href="#securite" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>&lt; 10k req/jour</strong> → Serverless <strong>beaucoup</strong> moins cher</li>
-<li><strong>10k - 50k req/jour</strong> → Équivalent</li>
-<li><strong>&gt; 100k req/jour</strong> → ECS plus économique</li>
+<li><strong>VPC</strong> : Réseau isolé avec subnets publics (ALB) et privés (ECS, RDS)</li>
+<li><strong>Security Groups</strong> : Règles strictes entre composants</li>
+<li><strong>RDS</strong> : Pas d'accès public, uniquement depuis ECS</li>
+<li><strong>Secrets</strong> : Mot de passe BDD stocké dans AWS Secrets Manager</li>
+<li><strong>HTTPS</strong> : Certificat ACM sur l'ALB</li>
 </ul>
-</div>
-<h2 id="performance">⚡ Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h2>
-<h3 id="latence-observee">Latence Observée<a class="headerlink" href="#latence-observee" title="Permanent link">&para;</a></h3>
-<p><strong>ECS (toujours chaud)</strong> : P50 ~50ms, P95 ~100ms, P99 ~150ms<br />
-<strong>Serverless (warm)</strong> : P50 ~80ms, P95 ~200ms, P99 ~500ms<br />
-<strong>Serverless (cold start)</strong> : P50 ~1500ms, P95 ~2500ms, P99 ~3500ms</p>
-<p>Le cold start est le principal inconvénient du Serverless, mais il ne se produit que sur la première requête ou après une période d'inactivité.</p>
-<h3 id="throughput">Throughput<a class="headerlink" href="#throughput" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Architecture</th>
-<th>Max Throughput</th>
-<th>Scaling Time</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>ECS</strong></td>
-<td>~1000 req/s (2 tasks)</td>
-<td>2-3 minutes</td>
-</tr>
-<tr>
-<td><strong>Serverless</strong></td>
-<td>~10000 req/s (1000 lambdas)</td>
-<td>&lt; 10 secondes</td>
-</tr>
-</tbody>
-</table>
-<h2 id="recommandation-pour-ce-projet">🎓 Recommandation pour ce Projet<a class="headerlink" href="#recommandation-pour-ce-projet" title="Permanent link">&para;</a></h2>
-<div class="admonition success">
-<p class="admonition-title">Approche Pédagogique</p>
-<p><strong>Les deux architectures sont déployées</strong> pour permettre la comparaison :</p>
+<h2 id="avantages">⚡ Avantages<a class="headerlink" href="#avantages" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>ECS</strong> : <code>infra/envs/dev/</code></li>
-<li><strong>Serverless</strong> : <code>infra/envs/serverless-dev/</code></li>
+<li><strong>Latence constante</strong> : Pas de cold start</li>
+<li><strong>Connexions persistantes</strong> : Pool de connexions vers PostgreSQL</li>
+<li><strong>Debugging facile</strong> : Logs structurés dans CloudWatch</li>
+<li><strong>Écosystème Java</strong> : Librairies Spring Boot éprouvées</li>
 </ul>
-<p>→ Choix dans le frontend : "Mode ECS" vs "Mode Serverless"</p>
-</div>
+<h2 id="inconvenients">⚠️ Inconvénients<a class="headerlink" href="#inconvenients" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Coût fixe</strong> : ~$90/mois même sans trafic</li>
+<li><strong>Scaling manuel</strong> : Nécessite configuration auto-scaling</li>
+<li><strong>Gestion infrastructure</strong> : Plus complexe que Serverless</li>
+</ul>
 
 
 

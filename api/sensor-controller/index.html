@@ -13,10 +13,8 @@
       
       
       
-        <link rel="prev" href="../../guide/quickstart/">
+        <link rel="prev" href="../run-controller/">
       
-      
-        <link rel="next" href="../sensor-controller/">
       
       
         
@@ -27,7 +25,7 @@
     
     
       
-        <title>Run Controller - IoT Playground Infrastructure</title>
+        <title>Sensor Controller - IoT Playground Infrastructure</title>
       
     
     
@@ -78,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-run-controller" class="md-skip">
+        <a href="#api-sensor-controller" class="md-skip">
           Aller au contenu
         </a>
       
@@ -112,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Run Controller
+              Sensor Controller
             
           </span>
         </div>
@@ -328,7 +326,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../run-controller/" class="md-tabs__link">
           
   
   
@@ -1240,6 +1238,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../run-controller/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1259,7 +1285,7 @@
   <span class="md-ellipsis">
     
   
-    Run Controller
+    Sensor Controller
   
 
     
@@ -1277,7 +1303,7 @@
   <span class="md-ellipsis">
     
   
-    Run Controller
+    Sensor Controller
   
 
     
@@ -1326,10 +1352,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#get-apirunscan-start" class="md-nav__link">
+  <a href="#post-apisensorsdata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GET /api/runs/can-start
+        POST /api/sensors/data
       
     </span>
   </a>
@@ -1337,76 +1363,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#post-apirunsstart" class="md-nav__link">
+  <a href="#get-apisensorsdata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        POST /api/runs/start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apirunsrunning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs/running
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#post-apirunsidfinish" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        POST /api/runs/{id}/finish
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#post-apirunsinterrupt-all" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        POST /api/runs/interrupt-all
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apirunsid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs/{id}
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apiruns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apirunsall" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs/all
+        GET /api/sensors/data
       
     </span>
   </a>
@@ -1419,10 +1379,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#etats-du-run" class="md-nav__link">
+  <a href="#format-des-donnees" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📊 États du Run
+        📊 Format des Données
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📊 Format des Données">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#capteur-simple-temperature-uniquement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capteur Simple (Température uniquement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#capteur-complet-temperature-humidite-pression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capteur Complet (Température, Humidité, Pression)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flux-dingestion-typique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Flux d'Ingestion Typique
       
     </span>
   </a>
@@ -1452,6 +1451,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#exemples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 Exemples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="💡 Exemples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemple-complet-avec-curl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple complet avec cURL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#liens" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1466,34 +1493,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../sensor-controller/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sensor Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1583,10 +1582,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#get-apirunscan-start" class="md-nav__link">
+  <a href="#post-apisensorsdata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GET /api/runs/can-start
+        POST /api/sensors/data
       
     </span>
   </a>
@@ -1594,76 +1593,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#post-apirunsstart" class="md-nav__link">
+  <a href="#get-apisensorsdata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        POST /api/runs/start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apirunsrunning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs/running
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#post-apirunsidfinish" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        POST /api/runs/{id}/finish
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#post-apirunsinterrupt-all" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        POST /api/runs/interrupt-all
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apirunsid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs/{id}
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apiruns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-apirunsall" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GET /api/runs/all
+        GET /api/sensors/data
       
     </span>
   </a>
@@ -1676,10 +1609,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#etats-du-run" class="md-nav__link">
+  <a href="#format-des-donnees" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📊 États du Run
+        📊 Format des Données
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📊 Format des Données">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#capteur-simple-temperature-uniquement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capteur Simple (Température uniquement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#capteur-complet-temperature-humidite-pression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capteur Complet (Température, Humidité, Pression)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flux-dingestion-typique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Flux d'Ingestion Typique
       
     </span>
   </a>
@@ -1705,6 +1677,34 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exemples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 Exemples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="💡 Exemples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemple-complet-avec-curl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple complet avec cURL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1739,203 +1739,125 @@
   
 
 
-<h1 id="api-run-controller">API Run Controller<a class="headerlink" href="#api-run-controller" title="Permanent link">&para;</a></h1>
-<p>Gestion du cycle de vie des simulations (runs).</p>
+<h1 id="api-sensor-controller">API Sensor Controller<a class="headerlink" href="#api-sensor-controller" title="Permanent link">&para;</a></h1>
+<p>Gestion de l'ingestion et récupération des données de capteurs IoT.</p>
 <h2 id="base-url">🎯 Base URL<a class="headerlink" href="#base-url" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Serverless</strong> : <code>https://api-lambda-iot.sentori-studio.com</code></li>
 <li><strong>ECS</strong> : <code>https://api-ecs-iot.sentori-studio.com</code> (futur)</li>
 </ul>
 <h2 id="endpoints">📋 Endpoints<a class="headerlink" href="#endpoints" title="Permanent link">&para;</a></h2>
-<h3 id="get-apirunscan-start">GET <code>/api/runs/can-start</code><a class="headerlink" href="#get-apirunscan-start" title="Permanent link">&para;</a></h3>
-<p>Vérifie si on peut démarrer une nouvelle simulation.</p>
+<h3 id="post-apisensorsdata">POST <code>/api/sensors/data</code><a class="headerlink" href="#post-apisensorsdata" title="Permanent link">&para;</a></h3>
+<p>Ingère une mesure de capteur dans le système.</p>
 <p><strong>Headers</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>(aucun header requis)
-</code></pre></div></p>
-<p><strong>Response 200</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;canStart&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;currentRunning&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;maxAllowed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;available&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">}</span>
-</code></pre></div></p>
-<hr />
-<h3 id="post-apirunsstart">POST <code>/api/runs/start</code><a class="headerlink" href="#post-apirunsstart" title="Permanent link">&para;</a></h3>
-<p>Démarre une nouvelle simulation.</p>
-<p><strong>Headers</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Content-Type: application/json
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>X-User: username
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Content-Type: application/json
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>X-User: username
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>X-Run-Id: run-uuid
 </code></pre></div></p>
 <p><strong>Body</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;runId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;sensorId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sensor-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">23.5</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;humidity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">65.2</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">&quot;pressure&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1013.25</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Response 201</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-user&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RUNNING&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;startedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="nt">&quot;grafanaUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://grafana-lambda-iot.sentori-studio.com/d/...&quot;</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;660e8400-e29b-41d4-a716-446655440001&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;runId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;sensorId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sensor-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:05Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">23.5</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">&quot;humidity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">65.2</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="nt">&quot;pressure&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1013.25</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
 </code></pre></div></p>
-<p><strong>Response 400</strong> (limite atteinte)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Maximum concurrent runs reached&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;currentRunning&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;maxAllowed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+<p><strong>Response 400</strong> (validation error)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Invalid sensor data&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;temperature must be a number&quot;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Response 404</strong> (run not found)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Run not found&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <hr />
-<h3 id="get-apirunsrunning">GET <code>/api/runs/running</code><a class="headerlink" href="#get-apirunsrunning" title="Permanent link">&para;</a></h3>
-<p>Liste tous les runs en cours (tous utilisateurs).</p>
+<h3 id="get-apisensorsdata">GET <code>/api/sensors/data</code><a class="headerlink" href="#get-apisensorsdata" title="Permanent link">&para;</a></h3>
+<p>Récupère les données de capteurs filtrées.</p>
+<p><strong>Query Parameters</strong>
+- <code>runId</code> (optional) : UUID du run
+- <code>sensorId</code> (optional) : ID du capteur
+- <code>startDate</code> (optional) : Date de début (ISO 8601)
+- <code>endDate</code> (optional) : Date de fin (ISO 8601)
+- <code>limit</code> (optional) : Nombre max de résultats (défaut: 100)</p>
+<p><strong>Examples</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Toutes les données d&#39;un run</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>GET<span class="w"> </span>/api/sensors/data?runId<span class="o">=</span>550e8400-e29b-41d4-a716-446655440000
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Données d&#39;un capteur spécifique</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>GET<span class="w"> </span>/api/sensors/data?sensorId<span class="o">=</span>sensor-001
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Données dans une période</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>GET<span class="w"> </span>/api/sensors/data?startDate<span class="o">=</span><span class="m">2025</span>-01-15T10:00:00Z<span class="p">&amp;</span><span class="nv">endDate</span><span class="o">=</span><span class="m">2025</span>-01-15T11:00:00Z
+</code></pre></div></p>
 <p><strong>Response 200</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">[</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="p">{</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user1&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RUNNING&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">&quot;startedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="p">{</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;660e8400-e29b-41d4-a716-446655440001&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user2&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RUNNING&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="nt">&quot;startedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:32:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span><span class="p">,</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="p">]</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;660e8400-e29b-41d4-a716-446655440001&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">&quot;runId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">&quot;sensorId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sensor-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:05Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">23.5</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="nt">&quot;humidity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">65.2</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="nt">&quot;pressure&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1013.25</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;660e8400-e29b-41d4-a716-446655440002&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="nt">&quot;runId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="nt">&quot;sensorId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sensor-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:10Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">23.7</span><span class="p">,</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="nt">&quot;humidity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">65.0</span><span class="p">,</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="nt">&quot;pressure&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1013.20</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="p">]</span>
 </code></pre></div></p>
 <hr />
-<h3 id="post-apirunsidfinish">POST <code>/api/runs/{id}/finish</code><a class="headerlink" href="#post-apirunsidfinish" title="Permanent link">&para;</a></h3>
-<p>Termine un run en cours.</p>
-<p><strong>Path Parameters</strong>
-- <code>id</code> : UUID du run</p>
-<p><strong>Headers</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Content-Type: application/json
-</code></pre></div></p>
-<p><strong>Body</strong> (optionnel)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;errorMessage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Simulation interrupted by user&quot;</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Response 200</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-user&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">&quot;startedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nt">&quot;finishedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:31:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Response 404</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Run not found&quot;</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Response 400</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Run is not running&quot;</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">}</span>
-</code></pre></div></p>
-<hr />
-<h3 id="post-apirunsinterrupt-all">POST <code>/api/runs/interrupt-all</code><a class="headerlink" href="#post-apirunsinterrupt-all" title="Permanent link">&para;</a></h3>
-<p>Interrompt toutes les simulations en cours (tous utilisateurs).</p>
-<p><strong>Response 200</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;interrupted&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3 simulation(s) interrupted&quot;</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">}</span>
-</code></pre></div></p>
-<hr />
-<h3 id="get-apirunsid">GET <code>/api/runs/{id}</code><a class="headerlink" href="#get-apirunsid" title="Permanent link">&para;</a></h3>
-<p>Détails d'un run spécifique.</p>
-<p><strong>Path Parameters</strong>
-- <code>id</code> : UUID du run</p>
-<p><strong>Response 200</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-user&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="nt">&quot;startedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span><span class="nt">&quot;finishedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:31:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">    </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w">  </span><span class="nt">&quot;grafanaUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://grafana-lambda-iot.sentori-studio.com/d/...&quot;</span>
-<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Response 404</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Run not found&quot;</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">}</span>
-</code></pre></div></p>
-<hr />
-<h3 id="get-apiruns">GET <code>/api/runs</code><a class="headerlink" href="#get-apiruns" title="Permanent link">&para;</a></h3>
-<p>Liste paginée de tous les runs.</p>
-<p><strong>Query Parameters</strong>
-- <code>limit</code> (optional) : Nombre d'items par page (défaut: 20)
-- <code>lastKey</code> (optional) : Clé de pagination (base64)</p>
-<p><strong>Response 200</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">      </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-user&quot;</span><span class="p">,</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">      </span><span class="nt">&quot;startedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">      </span><span class="nt">&quot;finishedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:31:00Z&quot;</span>
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">  </span><span class="nt">&quot;count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
-<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span><span class="nt">&quot;nextKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eyJpZCI6ICIuLi4ifQ==&quot;</span>
-<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="p">}</span>
-</code></pre></div></p>
-<hr />
-<h3 id="get-apirunsall">GET <code>/api/runs/all</code><a class="headerlink" href="#get-apirunsall" title="Permanent link">&para;</a></h3>
-<p>Tous les runs sans pagination.</p>
-<p><strong>Response 200</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">[</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="p">{</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-user&quot;</span><span class="p">,</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="nt">&quot;startedAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:00Z&quot;</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">  </span><span class="err">...</span>
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="p">]</span>
-</code></pre></div></p>
-<h2 id="etats-du-run">📊 États du Run<a class="headerlink" href="#etats-du-run" title="Permanent link">&para;</a></h2>
-<p>Un run peut avoir 4 états :</p>
-<ul>
-<li><strong>RUNNING</strong> : Simulation en cours</li>
-<li><strong>COMPLETED</strong> : Simulation terminée avec succès</li>
-<li><strong>FAILED</strong> : Simulation terminée avec erreur</li>
-<li><strong>INTERRUPTED</strong> : Simulation interrompue manuellement</li>
-</ul>
-<p>Transitions : <code>RUNNING</code> → <code>COMPLETED</code> / <code>FAILED</code> / <code>INTERRUPTED</code> (états finaux)</p>
-<h2 id="authentification">🔐 Authentification<a class="headerlink" href="#authentification" title="Permanent link">&para;</a></h2>
-<p>Actuellement : <strong>Header <code>X-User</code></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-User: mon-username&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span>https://api-lambda-iot.sentori-studio.com/api/runs/running
+<h2 id="format-des-donnees">📊 Format des Données<a class="headerlink" href="#format-des-donnees" title="Permanent link">&para;</a></h2>
+<h3 id="capteur-simple-temperature-uniquement">Capteur Simple (Température uniquement)<a class="headerlink" href="#capteur-simple-temperature-uniquement" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;runId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;sensorId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;temp-sensor-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">23.5</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
 </code></pre></div>
+<h3 id="capteur-complet-temperature-humidite-pression">Capteur Complet (Température, Humidité, Pression)<a class="headerlink" href="#capteur-complet-temperature-humidite-pression" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;runId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;sensorId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;multi-sensor-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">23.5</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;humidity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">65.2</span><span class="p">,</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">&quot;pressure&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1013.25</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="flux-dingestion-typique">🔄 Flux d'Ingestion Typique<a class="headerlink" href="#flux-dingestion-typique" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Frontend démarre une simulation via <code>POST /api/runs/start</code></li>
+<li>Récupère le <code>runId</code> dans la réponse</li>
+<li>Toutes les N secondes (interval configuré) :</li>
+<li>Génère des données de capteur (température aléatoire)</li>
+<li>Envoie via <code>POST /api/sensors/data</code> avec le <code>runId</code></li>
+<li>Continue jusqu'à la fin de la durée configurée</li>
+<li>Termine la simulation via <code>POST /api/runs/{id}/finish</code></li>
+</ol>
+<h2 id="authentification">🔐 Authentification<a class="headerlink" href="#authentification" title="Permanent link">&para;</a></h2>
+<p>Les headers suivants sont requis :
+- <code>X-User</code> : Identifiant de l'utilisateur (string)
+- <code>X-Run-Id</code> : UUID du run associé (optionnel sur GET)</p>
 <h2 id="codes-derreur">🚨 Codes d'Erreur<a class="headerlink" href="#codes-derreur" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1946,16 +1868,16 @@
 </thead>
 <tbody>
 <tr>
-<td>200</td>
-<td>Success</td>
-</tr>
-<tr>
 <td>201</td>
 <td>Created</td>
 </tr>
 <tr>
+<td>200</td>
+<td>Success (GET)</td>
+</tr>
+<tr>
 <td>400</td>
-<td>Bad Request (limite, validation)</td>
+<td>Bad Request (validation)</td>
 </tr>
 <tr>
 <td>404</td>
@@ -1971,9 +1893,31 @@
 </tr>
 </tbody>
 </table>
+<h2 id="exemples">💡 Exemples<a class="headerlink" href="#exemples" title="Permanent link">&para;</a></h2>
+<h3 id="exemple-complet-avec-curl">Exemple complet avec cURL<a class="headerlink" href="#exemple-complet-avec-curl" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># 1. Démarrer un run</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nv">RUN_ID</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://api-lambda-iot.sentori-studio.com/api/runs/start<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-User: demo-user&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;duration&quot;: 60, &quot;interval&quot;: 5}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.id&#39;</span><span class="k">)</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># 2. Ingérer des données</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://api-lambda-iot.sentori-studio.com/api/sensors/data<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-User: demo-user&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-Run-Id: </span><span class="nv">$RUN_ID</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;{</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="s2">    \&quot;runId\&quot;: \&quot;</span><span class="nv">$RUN_ID</span><span class="s2">\&quot;,</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="s2">    \&quot;sensorId\&quot;: \&quot;temp-sensor-01\&quot;,</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="s2">    \&quot;temperature\&quot;: 23.5</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="s2">  }&quot;</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="c1"># 3. Récupérer les données</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>curl<span class="w"> </span><span class="s2">&quot;https://api-lambda-iot.sentori-studio.com/api/sensors/data?runId=</span><span class="nv">$RUN_ID</span><span class="s2">&quot;</span>
+</code></pre></div>
 <h2 id="liens">🔗 Liens<a class="headerlink" href="#liens" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../sensor-controller/">Sensor Controller API</a></li>
+<li><a href="../run-controller/">Run Controller API</a></li>
 <li><a href="../guide/simulations.md">Guide Simulations</a></li>
 </ul>
 
