@@ -13,24 +13,28 @@
       
       
       
+        <link rel="prev" href="../simulations/">
+      
+      
+        <link rel="next" href="../../api/run-controller/">
       
       
         
       
       
-      <link rel="icon" href="/assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
     
     
       
-        <title>IoT Playground Infrastructure</title>
+        <title>Monitoring avec Grafana - IoT Playground Infrastructure</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
       
         
-        <link rel="stylesheet" href="/assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +53,7 @@
       
     
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -73,6 +77,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#monitoring-avec-grafana" class="md-skip">
+          Aller au contenu
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -83,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="En-tête">
-    <a href="/." title="IoT Playground Infrastructure" class="md-header__button md-logo" aria-label="IoT Playground Infrastructure" data-md-component="logo">
+    <a href="../.." title="IoT Playground Infrastructure" class="md-header__button md-logo" aria-label="IoT Playground Infrastructure" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -103,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Monitoring avec Grafana
             
           </span>
         </div>
@@ -216,7 +225,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -237,7 +246,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/architecture/overview/" class="md-tabs__link">
+        <a href="../../architecture/overview/" class="md-tabs__link">
           
   
   
@@ -257,7 +266,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/deployment/ecs/" class="md-tabs__link">
+        <a href="../../deployment/ecs/" class="md-tabs__link">
           
   
   
@@ -277,7 +286,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/modules/structure/" class="md-tabs__link">
+        <a href="../../modules/structure/" class="md-tabs__link">
           
   
   
@@ -293,11 +302,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="/guide/quickstart/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../quickstart/" class="md-tabs__link">
           
   
   
@@ -317,7 +328,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/api/run-controller/" class="md-tabs__link">
+        <a href="../../api/run-controller/" class="md-tabs__link">
           
   
   
@@ -351,7 +362,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/." title="IoT Playground Infrastructure" class="md-nav__button md-logo" aria-label="IoT Playground Infrastructure" data-md-component="logo">
+    <a href="../.." title="IoT Playground Infrastructure" class="md-nav__button md-logo" aria-label="IoT Playground Infrastructure" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -381,7 +392,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -462,7 +473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/architecture/overview/" class="md-nav__link">
+      <a href="../../architecture/overview/" class="md-nav__link">
         
   
   
@@ -490,7 +501,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/architecture/ecs/" class="md-nav__link">
+      <a href="../../architecture/ecs/" class="md-nav__link">
         
   
   
@@ -518,7 +529,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/architecture/serverless/" class="md-nav__link">
+      <a href="../../architecture/serverless/" class="md-nav__link">
         
   
   
@@ -546,7 +557,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/architecture/comparison/" class="md-nav__link">
+      <a href="../../architecture/comparison/" class="md-nav__link">
         
   
   
@@ -635,7 +646,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/deployment/ecs/" class="md-nav__link">
+      <a href="../../deployment/ecs/" class="md-nav__link">
         
   
   
@@ -663,7 +674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/guide/quickstart/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -691,7 +702,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/deployment/github-actions/" class="md-nav__link">
+      <a href="../../deployment/github-actions/" class="md-nav__link">
         
   
   
@@ -780,7 +791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/modules/structure/" class="md-nav__link">
+      <a href="../../modules/structure/" class="md-nav__link">
         
   
   
@@ -808,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/modules/network.md" class="md-nav__link">
+      <a href="../../modules/network.md" class="md-nav__link">
         
   
   
@@ -836,7 +847,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/modules/database.md" class="md-nav__link">
+      <a href="../../modules/database.md" class="md-nav__link">
         
   
   
@@ -864,7 +875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/modules/compute.md" class="md-nav__link">
+      <a href="../../modules/compute.md" class="md-nav__link">
         
   
   
@@ -892,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/modules/monitoring.md" class="md-nav__link">
+      <a href="../../modules/monitoring.md" class="md-nav__link">
         
   
   
@@ -924,28 +935,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -963,7 +977,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -981,7 +995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/guide/quickstart/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -1009,7 +1023,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/guide/simulations/" class="md-nav__link">
+      <a href="../simulations/" class="md-nav__link">
         
   
   
@@ -1034,10 +1048,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/guide/grafana/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring avec Grafana
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1053,6 +1094,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#role-de-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Rôle de Grafana
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Dashboards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🌐 Accès
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-interessants-a-presenter-en-entretien" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Points intéressants à présenter en entretien
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1065,7 +1170,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/guide/troubleshooting.md" class="md-nav__link">
+      <a href="../troubleshooting.md" class="md-nav__link">
         
   
   
@@ -1154,7 +1259,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/api/run-controller/" class="md-nav__link">
+      <a href="../../api/run-controller/" class="md-nav__link">
         
   
   
@@ -1182,7 +1287,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/api/sensor-controller/" class="md-nav__link">
+      <a href="../../api/sensor-controller/" class="md-nav__link">
         
   
   
@@ -1227,6 +1332,60 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#role-de-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Rôle de Grafana
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Dashboards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🌐 Accès
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-interessants-a-presenter-en-entretien" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Points intéressants à présenter en entretien
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1239,8 +1398,69 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+  
+  
+
+
+<h1 id="monitoring-avec-grafana">Monitoring avec Grafana<a class="headerlink" href="#monitoring-avec-grafana" title="Permanent link">&para;</a></h1>
+<p>Cette page explique comment Grafana est utilisé pour observer les simulations, sans entrer dans les détails de configuration.</p>
+<h2 id="role-de-grafana">🎯 Rôle de Grafana<a class="headerlink" href="#role-de-grafana" title="Permanent link">&para;</a></h2>
+<p>Grafana sert d'interface unique pour :
+- Visualiser l'évolution des températures dans le temps
+- Filtrer par <strong>Run</strong>, <strong>User</strong> et <strong>Sensor</strong>
+- Comparer des simulations côté ECS et côté Serverless</p>
+<h2 id="dashboards">📊 Dashboards<a class="headerlink" href="#dashboards" title="Permanent link">&para;</a></h2>
+<p>Deux grandes familles de dashboards :</p>
+<ol>
+<li><strong>Dashboard ECS (Prometheus)</strong>  </li>
+<li>Datasource : Prometheus</li>
+<li>Focus sur : métriques techniques JVM, requêtes HTTP, status codes, etc.</li>
+<li>
+<p>Sert surtout à analyser le comportement de l'application Spring Boot.</p>
+</li>
+<li>
+<p><strong>Dashboard Serverless (CloudWatch)</strong>  </p>
+</li>
+<li>Datasource : CloudWatch Logs / Metrics</li>
+<li>Focus sur :<ul>
+<li>Nombre de runs démarrés / terminés</li>
+<li>Volume de données capteur ingérées</li>
+<li>Latence et erreurs des Lambdas</li>
+<li>Température moyenne par run / sensor / user</li>
+</ul>
+</li>
+</ol>
+<h2 id="acces">🌐 Accès<a class="headerlink" href="#acces" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Frontend</strong> : <code>https://app-iot.sentori-studio.com</code> propose des liens directs vers les dashboards</li>
+<li><strong>Grafana Serverless</strong> : exposé via un ALB avec HTTPS, accessible sur un sous-domaine dédié</li>
+</ul>
+<p>L'utilisateur n'a pas besoin de connaître l'URL exacte : le frontend injecte déjà l'URL Grafana liée au run dans les réponses de l'API.</p>
+<h2 id="points-interessants-a-presenter-en-entretien">🔍 Points intéressants à présenter en entretien<a class="headerlink" href="#points-interessants-a-presenter-en-entretien" title="Permanent link">&para;</a></h2>
+<ul>
+<li>La <strong>différence de datasource</strong> illustre bien la séparation ECS vs Serverless :</li>
+<li>Prometheus côté ECS</li>
+<li>CloudWatch côté Serverless</li>
+<li>Les dashboards sont construits autour des mêmes dimensions métier : user, run, sensor.</li>
+<li>L'URL Grafana est renvoyée par l'API <code>/api/runs/start</code>, ce qui montre l'intégration forte entre backend et observabilité.</li>
+</ul>
+<p>En résumé, Grafana est la "vitre" qui permet de voir ce qui se passe derrière les deux architectures, avec un focus métier plutôt que purement technique.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -1283,10 +1503,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "/assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
     
     
-      <script src="/assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
       
     
   </body>

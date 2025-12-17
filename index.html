@@ -141,7 +141,7 @@
         </a>
 </li>
 <li class="md-tabs__item">
-<a class="md-tabs__link" href="modules/structure.md">
+<a class="md-tabs__link" href="modules/structure/">
           
   
   
@@ -325,15 +325,6 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#demarrage-rapide">
-<span class="md-ellipsis">
-      
-        🚀 Démarrage Rapide
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
 <a class="md-nav__link" href="#organisation-du-projet">
 <span class="md-ellipsis">
       
@@ -514,7 +505,7 @@
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="modules/structure.md">
+<a class="md-nav__link" href="modules/structure/">
 <span class="md-ellipsis">
     
   
@@ -612,7 +603,7 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="guide/simulations.md">
+<a class="md-nav__link" href="guide/simulations/">
 <span class="md-ellipsis">
     
   
@@ -624,7 +615,7 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="guide/grafana.md">
+<a class="md-nav__link" href="guide/grafana/">
 <span class="md-ellipsis">
     
   
@@ -815,15 +806,6 @@
 </li>
 </ul>
 </nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#demarrage-rapide">
-<span class="md-ellipsis">
-      
-        🚀 Démarrage Rapide
-      
-    </span>
-</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#organisation-du-projet">
@@ -1038,15 +1020,6 @@
 <h3 id="cas-dusage-recommandes">Cas d'Usage Recommandés<a class="headerlink" href="#cas-dusage-recommandes" title="Permanent link">¶</a></h3>
 <p><strong>ECS</strong> : Trafic constant et prévisible, latence critique, connexions persistantes<br/>
 <strong>Serverless</strong> : Trafic sporadique, pics de charge, budget limité, pay-per-use</p>
-<h2 id="demarrage-rapide">🚀 Démarrage Rapide<a class="headerlink" href="#demarrage-rapide" title="Permanent link">¶</a></h2>
-<p>Pour déployer l'architecture Serverless (recommandé pour commencer) :</p>
-<ol>
-<li>Configurer AWS CLI avec les credentials</li>
-<li>Via GitHub Actions : <strong>Deploy Serverless (Unified)</strong> → Component: <code>lambdas</code> → Action: <code>apply</code></li>
-<li>Attendre ~5 minutes</li>
-<li>Tester l'API : <code>curl https://api-lambda-iot.sentori-studio.com/api/runs/can-start</code></li>
-</ol>
-<p>Voir le <a href="guide/quickstart/">guide complet</a> pour plus de détails.</p>
 <h2 id="organisation-du-projet">📁 Organisation du Projet<a class="headerlink" href="#organisation-du-projet" title="Permanent link">¶</a></h2>
 <p>Le projet est structuré en <strong>environnements Terraform séparés</strong> :</p>
 <ul>
@@ -1059,7 +1032,8 @@
 <h2 id="navigation">🔗 Navigation<a class="headerlink" href="#navigation" title="Permanent link">¶</a></h2>
 <ul>
 <li><strong>Architecture</strong> : <a href="architecture/ecs/">ECS</a> | <a href="architecture/serverless/">Serverless</a> | <a href="architecture/comparison/">Comparaison</a></li>
-<li><strong>Déploiement</strong> : <a href="guide/quickstart/">Guide Rapide</a></li>
+<li><strong>Déploiement</strong> : Infrastructure ECS &amp; Serverless</li>
+<li><strong>Guide utilisateur</strong> : Démarrage rapide &amp; parcours métier</li>
 <li><strong>API</strong> : <a href="api/run-controller/">Run Controller</a> | <a href="api/sensor-controller/">Sensor Controller</a></li>
 </ul>
 </article>
