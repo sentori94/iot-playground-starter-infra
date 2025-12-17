@@ -9,6 +9,11 @@ locals {
     ManagedBy    = "Terraform"
     Architecture = "Serverless"
   }
+
+  # Calculer l'URL Grafana de manière conditionnelle pour éviter les dépendances circulaires
+  # Si grafana_domain_name est défini, on l'utilise (domaine custom HTTPS)
+  # Sinon on utilise localhost par défaut (Grafana n'est pas déployé ou sera déployé séparément)
+  grafana_url = var.grafana_domain_name != "" ? "https://${var.grafana_domain_name}" : "http://localhost:3000"
 }
 
 
@@ -63,7 +68,7 @@ module "lambda_run_api" {
   runs_table_name           = module.dynamodb_tables.runs_table_name
   runs_table_arn            = module.dynamodb_tables.runs_table_arn
   api_gateway_execution_arn = module.api_gateway_lambda_iot.api_execution_arn
-  grafana_url               = var.grafana_domain_name != "" ? "https://${var.grafana_domain_name}" : "http://${module.grafana_serverless.alb_dns_name}"
+  grafana_url               = local.grafana_url
   tags                      = local.common_tags
 }
 
