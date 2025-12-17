@@ -161,6 +161,18 @@ resource "aws_iam_role_policy" "grafana_cloudwatch" {
 }
 
 # ===========================
+# Certificat ACM pour Grafana
+# ===========================
+module "acm_grafana" {
+  count  = var.grafana_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
+  source = "../../modules/acm_certificate"
+
+  domain_name     = var.grafana_domain_name
+  route53_zone_id = data.aws_route53_zone.main[0].zone_id
+  tags            = local.common_tags
+}
+
+# ===========================
 # Module Grafana ECS
 # ===========================
 module "grafana_serverless" {
@@ -175,9 +187,9 @@ module "grafana_serverless" {
   grafana_image_uri      = var.grafana_image_uri
   grafana_image_tag      = var.grafana_image_tag
   grafana_admin_password = var.grafana_admin_password
-  custom_domain_name     = ""
-  certificate_arn        = ""
-  route53_zone_id        = ""
+  custom_domain_name     = var.grafana_domain_name
+  certificate_arn        = var.grafana_domain_name != "" && length(module.acm_grafana) > 0 ? module.acm_grafana[0].certificate_validated_arn : ""
+  route53_zone_id        = var.grafana_domain_name != "" && length(data.aws_route53_zone.main) > 0 ? data.aws_route53_zone.main[0].zone_id : ""
   grafana_task_role_arn  = aws_iam_role.grafana_cloudwatch.arn
   tags                   = local.common_tags
 }

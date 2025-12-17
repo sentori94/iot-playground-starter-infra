@@ -87,7 +87,7 @@ jobs:
       - name: Set Terraform Targets (Grafana only)
         if: github.event.inputs.component == 'grafana'
         run: |
-          echo "TF_TARGET=-target=module.grafana_serverless -target=aws_iam_role_policy.grafana_cloudwatch -target=aws_iam_role.grafana_cloudwatch -target=module.ecs_cluster_serverless -target=module.vpc_serverless" >> $GITHUB_ENV
+          echo "TF_TARGET=-target=module.grafana_serverless -target=aws_iam_role_policy.grafana_cloudwatch -target=aws_iam_role.grafana_cloudwatch -target=module.ecs_cluster_serverless -target=module.vpc_serverless -target=module.acm_grafana" >> $GITHUB_ENV
 
       - name: Set Terraform Targets (Full)
         if: github.event.inputs.component == 'full'

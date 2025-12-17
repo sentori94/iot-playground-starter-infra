@@ -13,8 +13,13 @@ output "lambda_api_custom_domain" {
 }
 
 output "lambda_api_certificate_arn" {
-  description = "ARN du certificat ACM pour les Lambda APIs"
+  description = "ARN du certificat ACM pour Lambda API"
   value       = length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : "Pas de certificat"
+}
+
+output "grafana_certificate_arn" {
+  description = "ARN du certificat ACM pour Grafana"
+  value       = length(module.acm_grafana) > 0 ? module.acm_grafana[0].certificate_validated_arn : "Pas de certificat"
 }
 
 output "lambda_api_custom_domain_configured" {
