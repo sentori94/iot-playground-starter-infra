@@ -63,7 +63,7 @@ module "lambda_run_api" {
   runs_table_name           = module.dynamodb_tables.runs_table_name
   runs_table_arn            = module.dynamodb_tables.runs_table_arn
   api_gateway_execution_arn = module.api_gateway_lambda_iot.api_execution_arn
-  grafana_url               = var.grafana_url
+  grafana_url               = var.grafana_domain_name != "" ? "https://${var.grafana_domain_name}" : "http://${module.grafana_serverless.alb_dns_name}"
   tags                      = local.common_tags
 }
 

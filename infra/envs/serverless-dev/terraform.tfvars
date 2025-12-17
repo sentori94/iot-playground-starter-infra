@@ -6,9 +6,8 @@ aws_region  = "eu-west-3"
 route53_zone_name      = "sentori-studio.com"
 lambda_api_domain_name = "api-lambda-iot.sentori-studio.com"
 
-# Grafana - URL de base pour les dashboards
+# Grafana - Domaine personnalisé (pour futur usage avec certificat HTTPS)
 grafana_domain_name = "grafana-lambda-iot.sentori-studio.com"
-grafana_url         = "http://localhost:3000"  # Sera mis à jour avec l'URL ALB Grafana après déploiement
 
 # Grafana ECS - Configuration
 vpc_cidr               = "10.1.0.0/16"
