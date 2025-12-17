@@ -30,7 +30,19 @@ resource "aws_ecs_task_definition" "grafana_serverless" {
       },
       {
         name  = "GF_AUTH_ANONYMOUS_ENABLED"
-        value = "false"
+        value = "true"
+      },
+      {
+        name  = "GF_AUTH_ANONYMOUS_ORG_ROLE"
+        value = "Admin"
+      },
+      {
+        name  = "GF_AUTH_DISABLE_LOGIN_FORM"
+        value = "true"
+      },
+      {
+        name  = "GF_AUTH_DISABLE_SIGNOUT_MENU"
+        value = "true"
       },
       {
         name  = "AWS_REGION"
