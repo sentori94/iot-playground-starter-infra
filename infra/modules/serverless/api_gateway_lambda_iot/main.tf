@@ -278,7 +278,6 @@ resource "aws_api_gateway_integration" "sensors_data_get" {
   uri                     = var.lambda_sensor_api_invoke_arn
 }
 
-
 # ===========================
 # Deployment
 # ===========================
@@ -295,6 +294,16 @@ resource "aws_api_gateway_deployment" "lambda_iot" {
     aws_api_gateway_integration.runs_id_finish_post,
     aws_api_gateway_integration.sensors_data_post,
     aws_api_gateway_integration.sensors_data_get,
+    # CORS OPTIONS integrations
+    aws_api_gateway_integration_response.runs_options,
+    aws_api_gateway_integration_response.runs_start_options,
+    aws_api_gateway_integration_response.runs_can_start_options,
+    aws_api_gateway_integration_response.runs_running_options,
+    aws_api_gateway_integration_response.runs_id_options,
+    aws_api_gateway_integration_response.runs_id_finish_options,
+    aws_api_gateway_integration_response.runs_all_options,
+    aws_api_gateway_integration_response.runs_interrupt_all_options,
+    aws_api_gateway_integration_response.sensors_data_options,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.lambda_iot.id

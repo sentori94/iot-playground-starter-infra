@@ -12,6 +12,21 @@ output "lambda_api_custom_domain" {
   value       = module.api_gateway_lambda_iot.custom_domain_url != "" ? module.api_gateway_lambda_iot.custom_domain_url : "Custom domain non configuré - utilisez api_gateway_url"
 }
 
+output "lambda_api_certificate_arn" {
+  description = "ARN du certificat ACM pour les Lambda APIs"
+  value       = length(module.acm_lambda_api) > 0 ? module.acm_lambda_api[0].certificate_validated_arn : "Pas de certificat"
+}
+
+output "lambda_api_custom_domain_configured" {
+  description = "Le domaine personnalisé est-il configuré ?"
+  value       = module.api_gateway_lambda_iot.custom_domain_configured
+}
+
+output "lambda_api_regional_domain" {
+  description = "Nom de domaine régional pour le domaine personnalisé"
+  value       = module.api_gateway_lambda_iot.custom_domain_regional_name
+}
+
 output "dynamodb_runs_table" {
   description = "Nom de la table DynamoDB Runs"
   value       = module.dynamodb_tables.runs_table_name
@@ -44,6 +59,11 @@ output "grafana_alb_url" {
 output "grafana_url" {
   description = "URL complète de Grafana"
   value       = var.enable_grafana && length(module.grafana_serverless) > 0 ? "http://${module.grafana_serverless[0].alb_dns_name}" : "Grafana non déployé"
+}
+
+output "grafana_custom_domain" {
+  description = "Domaine personnalisé Grafana (si configuré)"
+  value       = var.grafana_domain_name != "" ? var.grafana_domain_name : "Pas de domaine personnalisé configuré"
 }
 
 

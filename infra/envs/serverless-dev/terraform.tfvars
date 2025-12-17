@@ -8,7 +8,7 @@ lambda_api_domain_name = "api-lambda-iot.sentori-studio.com"
 
 # Grafana - URL de base pour les dashboards
 grafana_domain_name = "grafana-lambda-iot.sentori-studio.com"
-grafana_url         = "http://localhost:3000"  # Sera mis à jour après déploiement avec l'URL ALB
+grafana_url         = "http://localhost:3000"  # Sera mis à jour avec l'URL ALB Grafana après déploiement
 
 # Grafana ECS - Configuration
 enable_grafana         = false  # true pour déployer Grafana

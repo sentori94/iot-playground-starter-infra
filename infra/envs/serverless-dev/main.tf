@@ -23,15 +23,6 @@ module "dynamodb_tables" {
   tags        = local.common_tags
 }
 
-# ===========================
-# Data: Certificat ACM existant (si disponible)
-# ===========================
-data "aws_acm_certificate" "existing" {
-  count       = var.lambda_api_domain_name != "" ? 1 : 0
-  domain      = var.lambda_api_domain_name
-  statuses    = ["ISSUED"]
-  most_recent = true
-}
 
 # ===========================
 # Certificat ACM pour les Lambdas
