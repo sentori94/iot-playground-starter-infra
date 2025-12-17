@@ -109,17 +109,6 @@ Les workflows CI/CD sont configurés pour déployer automatiquement :
 **ECS** : Trafic constant et prévisible, latence critique, connexions persistantes  
 **Serverless** : Trafic sporadique, pics de charge, budget limité, pay-per-use
 
-## 🚀 Démarrage Rapide
-
-Pour déployer l'architecture Serverless (recommandé pour commencer) :
-
-1. Configurer AWS CLI avec les credentials
-2. Via GitHub Actions : **Deploy Serverless (Unified)** → Component: `lambdas` → Action: `apply`
-3. Attendre ~5 minutes
-4. Tester l'API : `curl https://api-lambda-iot.sentori-studio.com/api/runs/can-start`
-
-Voir le [guide complet](guide/quickstart.md) pour plus de détails.
-
 ## 📁 Organisation du Projet
 
 Le projet est structuré en **environnements Terraform séparés** :
@@ -134,6 +123,6 @@ Les workflows GitHub Actions permettent de déployer chaque composant indépenda
 ## 🔗 Navigation
 
 - **Architecture** : [ECS](architecture/ecs.md) | [Serverless](architecture/serverless.md) | [Comparaison](architecture/comparison.md)
-- **Déploiement** : [Guide Rapide](guide/quickstart.md)
+- **Déploiement** : Infrastructure ECS & Serverless
+- **Guide utilisateur** : Démarrage rapide & parcours métier
 - **API** : [Run Controller](api/run-controller.md) | [Sensor Controller](api/sensor-controller.md)
-

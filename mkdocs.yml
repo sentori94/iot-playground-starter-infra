@@ -69,23 +69,21 @@ nav:
       - ECS (Classic): architecture/ecs.md
       - Serverless (Lambda): architecture/serverless.md
       - Comparaison: architecture/comparison.md
+      - Services AWS utilisés: architecture/aws-services.md
   - Déploiement:
-      - Prérequis: deployment/prerequisites.md
       - Infrastructure ECS: deployment/ecs.md
-      - Infrastructure Serverless: guide/quickstart.md
+      - Infrastructure Serverless: deployment/serverless.md
       - GitHub Actions: deployment/github-actions.md
-  - Modules Terraform:
-      - Structure: modules/structure.md
-      - Réseau: modules/network.md
-      - Base de données: modules/database.md
-      - Compute: modules/compute.md
-      - Monitoring: modules/monitoring.md
+  - Détails techniques (Terraform):
+      - Vue d'ensemble des modules: modules/structure.md
+      - Réseau (VPC & Subnets): modules/network.md
+      - Base de données (RDS & DynamoDB): modules/database.md
+      - Compute (ECS & Lambda): modules/compute.md
+      - Monitoring & Observabilité: modules/monitoring.md
   - Guide utilisateur:
       - Démarrage rapide: guide/quickstart.md
       - Gestion des simulations: guide/simulations.md
       - Monitoring avec Grafana: guide/grafana.md
-      - Troubleshooting: guide/troubleshooting.md
   - Référence API:
       - Run Controller: api/run-controller.md
       - Sensor Controller: api/sensor-controller.md
-

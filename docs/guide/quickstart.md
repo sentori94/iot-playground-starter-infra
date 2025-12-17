@@ -1,170 +1,72 @@
 # Démarrage Rapide
 
-## 🚀 Installation
+Cette section explique **comment l’utilisateur final utilise la plateforme**, sans entrer dans les détails techniques (pas de commandes, pas de prérequis).
 
-### Prérequis
+## 🎯 Parcours Utilisateur (Mode Serverless)
 
-- AWS CLI configuré
-- Terraform >= 1.6.0
-- Accès GitHub Actions (pour CI/CD)
-- Compte AWS avec permissions IAM suffisantes
+1. **Accès au frontend**  
+   L’utilisateur ouvre l’interface sur `https://app-iot.sentori-studio.com/`.
 
-### Configuration AWS CLI
+2. **Choix du mode**  
+   Sur l’écran d’accueil, il peut choisir entre :
+   - **Mode ECS** : backend Spring Boot sur ECS + PostgreSQL
+   - **Mode Serverless** : backend Lambda + DynamoDB
 
-```bash
-aws configure
-# AWS Access Key ID: VOTRE_ACCESS_KEY
-# AWS Secret Access Key: VOTRE_SECRET_KEY
-# Default region: eu-west-3
-# Default output format: json
-```
+3. **Création d’une simulation (Run)**  
+   En mode Serverless :
+   - L’utilisateur indique une **durée** (ex: 60 secondes)
+   - Un **intervalle** (ex: 5 secondes entre chaque mesure)
+   - Il lance la simulation via un bouton du type "Start Simulation".
 
-## 🎯 Déploiement Serverless (Recommandé)
+   En arrière-plan, le frontend appelle l’API `/api/runs/start` qui :
+   - Vérifie qu’on ne dépasse pas le **nombre max de simulations concurrentes** (5)
+   - Crée un run dans DynamoDB avec l’état `RUNNING`
+   - Retourne un identifiant de run et une URL Grafana associée.
 
-### Étape 1 : Déployer les Lambdas
+4. **Ingestion des données capteurs**  
+   Le frontend (ou un simulateur côté client) envoie régulièrement des mesures pour ce run :
+   - Température
+   - (éventuellement) Humidité, pression, etc.
 
-=== "GitHub Actions"
+   Ces mesures sont stockées dans la table `SensorData` en DynamoDB et loggées dans CloudWatch pour le monitoring.
 
-    1. Aller dans **Actions** → **Deploy Serverless (Unified)**
-    2. Cliquer sur **Run workflow**
-    3. Configurer :
-        - Component: `lambdas`
-        - Action: `apply`
-    4. Attendre ~5 minutes
+5. **Visualisation dans Grafana**  
+   L’interface propose un lien direct vers le dashboard Grafana correspondant :
+   - Vue globale de toutes les températures
+   - Filtres par **Run**, **User** et **Sensor**
+   - Possibilité de comparer plusieurs runs entre eux.
 
-=== "Local (Terraform)"
+6. **Fin ou interruption de la simulation**  
+   L’utilisateur peut :
+   - Laisser la simulation aller jusqu’au bout (durée configurée)
+   - La terminer explicitement ("Finish Run")
+   - Interrompre toutes les simulations en cours ("Interrupt All")
 
-    ```bash
-    cd infra/envs/serverless-dev
-    
-    # Initialiser
-    terraform init
-    
-    # Plan
-    terraform plan \
-      -target=module.acm_lambda_api \
-      -target=module.dynamodb_tables \
-      -target=module.lambda_run_api \
-      -target=module.lambda_sensor_api \
-      -target=module.api_gateway_lambda_iot
-    
-    # Apply
-    terraform apply \
-      -target=module.acm_lambda_api \
-      -target=module.dynamodb_tables \
-      -target=module.lambda_run_api \
-      -target=module.lambda_sensor_api \
-      -target=module.api_gateway_lambda_iot
-    ```
+   Côté backend, l’état du run passe à `COMPLETED`, `FAILED` ou `INTERRUPTED`.
 
-### Étape 2 : Récupérer l'URL API
+## 🧭 Parcours Utilisateur (Mode ECS)
 
-```bash
-cd infra/envs/serverless-dev
-terraform output api_gateway_url
-# https://api-lambda-iot.sentori-studio.com
-```
+Le parcours est volontairement **identique** côté frontend :
+- Même écrans
+- Même endpoints REST
+- Même concepts (Runs, Sensors, Users)
 
-### Étape 3 : Vérifier le Déploiement
+La différence est **strictement technique** :
+- Les requêtes partent vers l’API ECS (Spring Boot + PostgreSQL)
+- Le monitoring passe par Prometheus + Grafana
 
-```mermaid
-graph LR
-    A[GitHub Actions] -->|Deploy| B[Terraform]
-    B -->|Créé| C[Lambda + DynamoDB]
-    C -->|URL| D[API Gateway]
-    D -->|Accessible| E[https://api-lambda-iot...]
-    
-    style C fill:#e8f5e9
-```
+Cela permet, en entretien, de montrer :
+- Que le **contrat fonctionnel** est le même
+- Que seule l’implémentation backend change (ECS vs Serverless)
 
-### Étape 4 : Tester l'API
+## 🧠 Ce qu’il faut retenir pour l’entretien
 
-```bash
-# Can start ?
-curl /api/runs/can-start
-
-# Démarrer une simulation
-curl -X POST /api/runs/start \
-  -H "Content-Type: application/json" \
-  -H "X-User: test-user" \
-  -d '{"duration": 60, "interval": 5}'
-
-# Lister les runs
-curl /api/runs
-```
-
-### Étape 5 : Déployer Grafana (Optionnel)
-
-=== "GitHub Actions"
-
-    1. **Actions** → **Deploy Serverless (Unified)**
-    2. Configurer :
-        - Component: `grafana`
-        - Action: `apply`
-    3. Attendre ~10 minutes (VPC + ECS)
-
-=== "Local"
-
-    ```bash
-    terraform apply \
-      -target=module.acm_grafana \
-      -target=module.vpc_serverless \
-      -target=module.ecs_cluster_serverless \
-      -target=aws_iam_role.grafana_cloudwatch \
-      -target=aws_iam_role_policy.grafana_cloudwatch \
-      -target=module.grafana_serverless
-    ```
-
-### Étape 6 : Accéder à Grafana
-
-```bash
-# Récupérer l'URL
-terraform output grafana_url
-# https://grafana-lambda-iot.sentori-studio.com
-```
-
-Ouvrir dans le navigateur → Dashboard déjà configuré avec CloudWatch datasource ! 🎉
-
-## 📊 Ressources Déployées
-
-**Obligatoires (Lambdas)** : API Gateway, Lambda Run API, Lambda Sensor API, DynamoDB (2 tables), CloudWatch Logs
-
-**Optionnelles (Grafana)** : VPC, ECS Cluster, ALB, Grafana Container
-
-Le déploiement des Lambdas suffit pour avoir une API fonctionnelle. Grafana n'est nécessaire que pour la visualisation.
-
-## 🧹 Nettoyage
-
-### Détruire Grafana uniquement
-
-```bash
-# GitHub Actions
-Component: grafana
-Action: destroy
-CONFIRM_DESTROY: DESTROY
-```
-
-### Détruire tout
-
-```bash
-# GitHub Actions → Destroy Serverless
-Component: full
-Action: destroy
-CONFIRM_DESTROY: DESTROY
-DESTROY_BACKEND: yes  # Supprimer aussi S3 + DynamoDB backend
-```
-
-## ⏱️ Temps de Déploiement
-
-| Composant | Temps | Coût après déploiement |
-|-----------|-------|------------------------|
-| **Lambdas** | ~5 min | ~$1/mois |
-| **Grafana** | ~10 min | +$80/mois |
-| **Full** | ~15 min | ~$81/mois |
-
-## 🎯 Prochaines Étapes
-
-- [Configuration Grafana](../guide/grafana.md)
-- [Gestion des simulations](../guide/simulations.md)
-- [API Reference](../api/run-controller.md)
-
+- Le projet **ne force pas le lecteur** à exécuter des commandes : tout est pilotable par l’UI.
+- Le frontend masque la complexité (Terraform, CI/CD, AWS), l’utilisateur voit juste :
+  - Choix du mode (ECS / Serverless)
+  - Création et suivi de simulations
+  - Visualisation dans Grafana
+- C’est donc un **bac à sable IoT** pour comparer deux architectures cloud en conditions quasi réelles, avec :
+  - Les mêmes écrans
+  - Les mêmes APIs
+  - Des stacks techniques radicalement différentes sous le capot.

@@ -1,145 +1,52 @@
 # GitHub Actions Workflows
 
-Le projet utilise GitHub Actions pour automatiser les déploiements et la documentation.
+Le projet utilise GitHub Actions pour piloter les déploiements d’infrastructure, les images Docker et la documentation, sans avoir à lancer Terraform ou Docker manuellement.
 
-## 📋 Workflows Disponibles
+## 📋 Résumé des workflows principaux
 
-### 1. Deploy Serverless (Unified)
+| Workflow | Rôle | Scope |
+|----------|------|-------|
+| `deploy-serverless-unified.yml` | Déploie l’architecture serverless (Lambdas + DynamoDB + API Gateway, et éventuellement Grafana ECS) avec un paramètre `component` (`lambdas`, `grafana`, `full`). | Serverless |
+| `destroy-serverless.yml` | Détruit de façon contrôlée les ressources serverless (mêmes composants que ci-dessus, avec confirmation). | Serverless |
+| `deploy-docs.yml` | Construit la documentation MkDocs et la publie sur GitHub Pages. | Documentation |
+| `deploy-lambdas.yml` | Ancien workflow focalisé uniquement sur les Lambdas (remplacé par le workflow unifié, mais conservé pour historique). | Serverless (legacy) |
+| `deploy-infra-manager.yml` | Déploie l’Infrastructure Manager (Lambda + Terraform) qui pilote la création/destruction de l’infra ECS classique. | ECS / Infra Manager |
+| `deploy-cdn.yml` | Déploie la partie CDN/front (par exemple l’hébergement du frontend via CloudFront + S3). | Frontend |
+| `build-grafana-image.yml` | Construit et pousse l’image Docker Grafana custom vers ECR. | Observabilité |
+| `grafana.yml` | Déploiement ou gestion spécifique de Grafana dans l’architecture ECS classique. | Observabilité (ECS) |
+| `prometheus.yml` | Déploiement ou mise à jour du conteneur Prometheus pour l’architecture ECS. | Observabilité (ECS) |
+| `bootstrap.yml` | Prépare l’environnement Terraform (création des buckets S3, tables DynamoDB de lock, etc.). | Infra globale |
+| `bootstrap-manual.yml` | Variante manuelle du bootstrap pour initialiser l’infra de base. | Infra globale |
+| `terraform-destroy.yml` | Workflow générique pour lancer des `terraform destroy` contrôlés sur certains environnements. | Infra globale |
+| `start-resources.yml` | Démarre certains composants d’infrastructure (par exemple, remettre des tâches ECS en service). | Pilotage infra |
+| `stop-resources.yml` | Arrête certains composants (par exemple, mettre à zéro des services ECS pour réduire les coûts). | Pilotage infra |
+| `list-aws-resources.yml` | Utilise un script pour lister les ressources AWS du projet (inventaire, debug). | Outils |
 
-**Fichier** : `.github/workflows/deploy-serverless-unified.yml`
+Cette liste te permet de montrer rapidement que :
+- chaque grande brique du projet (ECS, Serverless, Grafana, CDN, Infra Manager, docs) a son workflow dédié,
+- l’ensemble de la plateforme est **pilotable depuis GitHub**.
 
-Déploie l'infrastructure Serverless (Lambda + DynamoDB + Grafana).
-
-**Déclenchement** : Manuel (workflow_dispatch)
-
-**Paramètres** :
-- `component` : Composant à déployer
-  - `lambdas` : API Lambda + DynamoDB uniquement
-  - `grafana` : Grafana ECS uniquement
-  - `full` : Tout déployer
-- `action` : Action à effectuer
-  - `plan` : Afficher les changements
-  - `apply` : Appliquer les changements
-
-**Utilisation** :
-1. **Actions** → **Deploy Serverless (Unified)**
-2. **Run workflow**
-3. Choisir les paramètres
-4. **Run workflow** (bouton vert)
-
----
-
-### 2. Destroy Serverless
-
-**Fichier** : `.github/workflows/destroy-serverless.yml`
-
-Détruit l'infrastructure Serverless.
-
-**Déclenchement** : Manuel (workflow_dispatch)
-
-**Paramètres** :
-- `component` : Composant à détruire (`lambdas`, `grafana`, `full`)
-- `CONFIRM_DESTROY` : Taper `DESTROY` pour confirmer
-- `DESTROY_BACKEND` : Supprimer aussi le backend S3/DynamoDB (`yes`/`no`)
-
-⚠️ **Attention** : Action irréversible !
-
----
-
-### 3. Deploy MkDocs Documentation
-
-**Fichier** : `.github/workflows/deploy-docs.yml`
-
-Déploie la documentation sur GitHub Pages.
-
-**Déclenchement** : 
-- Push sur `master` avec modifications dans `docs/`
-- Manuel (workflow_dispatch)
-
-**Résultat** : Documentation accessible sur `https://sentori94.github.io/iot-playground-starter-infra/`
-
----
-
-## 🔄 Flux de Déploiement Typique
+## 🔄 Vue d’ensemble
 
 ```mermaid
 graph TD
-    A[Push sur master] --> B{Type de changement ?}
+    A[Développeur] -->|Push / Run workflow| B[GitHub Actions]
     
-    B -->|Code Lambda| C[Deploy Serverless<br/>Component: lambdas]
-    B -->|Config Grafana| D[Deploy Serverless<br/>Component: grafana]
-    B -->|Documentation| E[Deploy Docs]
+    B --> C{Workflow}
     
-    C --> F[Terraform Plan]
-    D --> F
+    C -->|Serverless<br/>Deploy| D[Deploy Serverless]
+    C -->|Serverless<br/>Destroy| E[Destroy Serverless]
+    C -->|Documentation| F[Deploy Docs]
     
-    F --> G{Action = apply ?}
+    D --> G[Infra Serverless à jour]
+    E --> H[Infra Serverless détruite]
+    F --> I[Site MkDocs publié]
     
-    G -->|Oui| H[Terraform Apply]
-    G -->|Non| I[Afficher Plan]
-    
-    H --> J[Infrastructure Déployée]
-    E --> K[Docs Publiées]
-    
-    style H fill:#e8f5e9
-    style K fill:#e3f2fd
+    style D fill:#e8f5e9
+    style E fill:#ffe0b2
+    style F fill:#e3f2fd
 ```
 
-## 🛠️ Structure d'un Workflow
+## 🔐 Sécurité (vue haute niveau)
 
-Exemple pour déployer les Lambdas :
-
-```yaml
-name: Deploy Serverless Lambdas
-
-on:
-  workflow_dispatch:
-    inputs:
-      action:
-        type: choice
-        options: [plan, apply]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
-      
-      - name: Terraform Init
-        run: terraform init
-      
-      - name: Terraform Apply
-        run: terraform apply -target=module.lambda_run_api
-```
-
-## 🔐 Secrets Requis
-
-Les workflows nécessitent les secrets GitHub suivants :
-
-- `AWS_ACCESS_KEY_ID` : Access Key AWS
-- `AWS_SECRET_ACCESS_KEY` : Secret Key AWS
-
-Configuration : **Settings** → **Secrets and variables** → **Actions**
-
-## 📊 Monitoring des Workflows
-
-- **Actions** : Voir l'historique et les logs détaillés
-- **Durée moyenne** : 
-  - Lambdas : ~5 minutes
-  - Grafana : ~10 minutes
-  - Full : ~15 minutes
-  - Documentation : ~2 minutes
-
-## 🔗 Liens
-
-- [Guide Quickstart](../guide/quickstart.md)
-- [Déploiement ECS](ecs.md)
-
+Les workflows utilisent un rôle AWS technique via des **secrets GitHub** (Access Key / Secret Key) pour exécuter Terraform et les commandes AWS/Docker côté CI. L’historique complet des exécutions est visible dans l’onglet **Actions** du repository.
