@@ -33,8 +33,8 @@ module "acm_lambda_api" {
   domain_name     = "*.${var.route53_zone_name}"  # Wildcard: *.sentori-studio.com
   route53_zone_id = data.aws_route53_zone.main[0].zone_id
   tags            = merge(local.common_tags, {
-    Name = "Wildcard certificate for ${var.route53_zone_name}"
-    Usage = "Lambda API & Grafana"
+    Name  = "Wildcard-certificate-for-${var.route53_zone_name}"
+    Usage = "Lambda-API-Grafana"
   })
 }
 
