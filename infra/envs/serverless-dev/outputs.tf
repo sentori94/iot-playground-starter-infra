@@ -53,12 +53,12 @@ output "lambda_sensor_api_function_name" {
 
 output "grafana_alb_url" {
   description = "URL de l'ALB Grafana"
-  value       = var.enable_grafana && length(module.grafana_serverless) > 0 ? module.grafana_serverless[0].alb_dns_name : "Grafana non déployé"
+  value       = module.grafana_serverless.alb_dns_name
 }
 
 output "grafana_url" {
   description = "URL complète de Grafana"
-  value       = var.enable_grafana && length(module.grafana_serverless) > 0 ? "http://${module.grafana_serverless[0].alb_dns_name}" : "Grafana non déployé"
+  value       = "http://${module.grafana_serverless.alb_dns_name}"
 }
 
 output "grafana_custom_domain" {

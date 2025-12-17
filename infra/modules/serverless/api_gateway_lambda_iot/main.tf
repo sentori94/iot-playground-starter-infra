@@ -328,6 +328,16 @@ resource "aws_api_gateway_deployment" "lambda_iot" {
       aws_api_gateway_method.runs_id_finish_post.id,
       aws_api_gateway_method.sensors_data_post.id,
       aws_api_gateway_method.sensors_data_get.id,
+      # OPTIONS methods for CORS
+      aws_api_gateway_integration_response.runs_options.id,
+      aws_api_gateway_integration_response.runs_start_options.id,
+      aws_api_gateway_integration_response.runs_can_start_options.id,
+      aws_api_gateway_integration_response.runs_running_options.id,
+      aws_api_gateway_integration_response.runs_id_options.id,
+      aws_api_gateway_integration_response.runs_id_finish_options.id,
+      aws_api_gateway_integration_response.runs_all_options.id,
+      aws_api_gateway_integration_response.runs_interrupt_all_options.id,
+      aws_api_gateway_integration_response.sensors_data_options.id,
     ]))
   }
 

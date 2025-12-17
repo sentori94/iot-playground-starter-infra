@@ -126,13 +126,6 @@ jobs:
         run: |
           echo "TF_TARGET=" >> $GITHUB_ENV
 
-      - name: Enable Grafana Variable
-        if: github.event.inputs.component == 'grafana' || github.event.inputs.component == 'full'
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          echo "📝 Setting enable_grafana = true"
-          # Remplacer la valeur existante au lieu d'ajouter
-          sed -i 's/^enable_grafana\s*=\s*false/enable_grafana = true/' terraform.tfvars || echo 'enable_grafana = true' >> terraform.tfvars
 
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'

@@ -85,7 +85,6 @@ module "lambda_sensor_api" {
 # Module VPC Serverless (pour Grafana)
 # ===========================
 module "vpc_serverless" {
-  count  = var.enable_grafana ? 1 : 0
   source = "../../modules/serverless/vpc"
 
   project            = var.project
@@ -99,7 +98,6 @@ module "vpc_serverless" {
 # Module ECS Cluster (pour Grafana)
 # ===========================
 module "ecs_cluster_serverless" {
-  count  = var.enable_grafana ? 1 : 0
   source = "../../modules/serverless/ecs_cluster"
 
   project     = var.project
@@ -111,8 +109,7 @@ module "ecs_cluster_serverless" {
 # IAM Role pour Grafana accéder à CloudWatch
 # ===========================
 resource "aws_iam_role" "grafana_cloudwatch" {
-  count = var.enable_grafana ? 1 : 0
-  name  = "${var.project}-grafana-cw-${var.env}"
+  name = "${var.project}-grafana-cw-${var.env}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -129,9 +126,8 @@ resource "aws_iam_role" "grafana_cloudwatch" {
 }
 
 resource "aws_iam_role_policy" "grafana_cloudwatch" {
-  count = var.enable_grafana ? 1 : 0
-  name  = "${var.project}-grafana-cw-access-${var.env}"
-  role  = aws_iam_role.grafana_cloudwatch[0].id
+  name = "${var.project}-grafana-cw-access-${var.env}"
+  role = aws_iam_role.grafana_cloudwatch.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -168,22 +164,21 @@ resource "aws_iam_role_policy" "grafana_cloudwatch" {
 # Module Grafana ECS
 # ===========================
 module "grafana_serverless" {
-  count  = var.enable_grafana ? 1 : 0
   source = "../../modules/serverless/grafana_ecs"
 
   project                = var.project
   environment            = var.env
-  vpc_id                 = module.vpc_serverless[0].vpc_id
-  public_subnet_ids      = module.vpc_serverless[0].public_subnet_ids
-  private_subnet_ids     = module.vpc_serverless[0].private_subnet_ids
-  ecs_cluster_id         = module.ecs_cluster_serverless[0].cluster_id
+  vpc_id                 = module.vpc_serverless.vpc_id
+  public_subnet_ids      = module.vpc_serverless.public_subnet_ids
+  private_subnet_ids     = module.vpc_serverless.private_subnet_ids
+  ecs_cluster_id         = module.ecs_cluster_serverless.cluster_id
   grafana_image_uri      = var.grafana_image_uri
   grafana_image_tag      = var.grafana_image_tag
   grafana_admin_password = var.grafana_admin_password
   custom_domain_name     = ""
   certificate_arn        = ""
   route53_zone_id        = ""
-  grafana_task_role_arn  = aws_iam_role.grafana_cloudwatch[0].arn
+  grafana_task_role_arn  = aws_iam_role.grafana_cloudwatch.arn
   tags                   = local.common_tags
 }
 

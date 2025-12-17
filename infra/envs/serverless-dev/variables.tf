@@ -44,11 +44,6 @@ variable "grafana_domain_name" {
 # Variables Grafana ECS
 # ===========================
 
-variable "enable_grafana" {
-  description = "Activer le déploiement de Grafana sur ECS"
-  type        = bool
-  default     = false
-}
 
 variable "vpc_cidr" {
   description = "CIDR block pour le VPC Serverless (Grafana)"
