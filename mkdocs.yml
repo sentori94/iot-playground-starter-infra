@@ -1,0 +1,93 @@
+site_name: IoT Playground Infrastructure
+site_description: Infrastructure as Code pour IoT Playground - Architecture ECS vs Serverless
+site_author: Sentori Studio
+repo_url: https://github.com/sentori94/iot-playground-starter-infra
+repo_name: sentori94/iot-playground-starter-infra
+
+theme:
+  name: material
+  language: fr
+  palette:
+    # Mode clair
+    - scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Mode sombre
+    # Mode sombre
+    - scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Mode clair
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search:
+      lang: fr
+  - mermaid2
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Accueil: index.md
+  - Architecture:
+      - Vue d'ensemble: architecture/overview.md
+      - ECS (Classic): architecture/ecs.md
+      - Serverless (Lambda): architecture/serverless.md
+      - Comparaison: architecture/comparison.md
+  - Déploiement:
+      - Prérequis: deployment/prerequisites.md
+      - Infrastructure ECS: deployment/ecs.md
+      - Infrastructure Serverless: deployment/serverless.md
+      - Grafana: deployment/grafana.md
+      - GitHub Actions: deployment/github-actions.md
+  - Modules Terraform:
+      - Structure: modules/structure.md
+      - Réseau: modules/network.md
+      - Base de données: modules/database.md
+      - Compute: modules/compute.md
+      - Monitoring: modules/monitoring.md
+  - Guide utilisateur:
+      - Démarrage rapide: guide/quickstart.md
+      - Gestion des simulations: guide/simulations.md
+      - Monitoring avec Grafana: guide/grafana.md
+      - Troubleshooting: guide/troubleshooting.md
+  - Référence API:
+      - Run Controller: api/run-controller.md
+      - Sensor Controller: api/sensor-controller.md
+  - Coûts AWS: costs.md
+
