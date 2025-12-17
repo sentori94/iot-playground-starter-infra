@@ -136,7 +136,7 @@ def list_sensor_data(event):
 
 
 def publish_metrics(sensor_id, reading, user, run_id, sensor_type):
-    """Publie les métriques vers CloudWatch pour Grafana"""
+    """Publie les métriques vers CloudWatch pour Grafana avec haute résolution (1s)"""
     try:
         # Métrique principale avec dimensions
         cloudwatch.put_metric_data(
@@ -147,6 +147,7 @@ def publish_metrics(sensor_id, reading, user, run_id, sensor_type):
                     'Value': float(reading),
                     'Unit': 'None',
                     'Timestamp': datetime.utcnow(),
+                    'StorageResolution': 1,  # Haute résolution: 1 seconde (au lieu de 60s par défaut)
                     'Dimensions': [
                         {'Name': 'SensorId', 'Value': sensor_id},
                         {'Name': 'User', 'Value': user},
@@ -160,6 +161,7 @@ def publish_metrics(sensor_id, reading, user, run_id, sensor_type):
                     'Value': 1,
                     'Unit': 'Count',
                     'Timestamp': datetime.utcnow(),
+                    'StorageResolution': 1,  # Haute résolution: 1 seconde
                     'Dimensions': [
                         {'Name': 'SensorId', 'Value': sensor_id},
                         {'Name': 'User', 'Value': user},
