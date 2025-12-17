@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../quickstart/">
+        <link rel="prev" href="../comparison/">
       
       
-        <link rel="next" href="../grafana/">
+        <link rel="next" href="../../deployment/ecs/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Gestion des simulations - IoT Playground Infrastructure</title>
+        <title>Services AWS utilisés - IoT Playground Infrastructure</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gestion-des-simulations" class="md-skip">
+        <a href="#services-aws-utilises" class="md-skip">
           Aller au contenu
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Gestion des simulations
+              Services AWS utilisés
             
           </span>
         </div>
@@ -242,11 +242,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../architecture/overview/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
           
   
   
@@ -302,13 +304,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../quickstart/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../guide/quickstart/" class="md-tabs__link">
           
   
   
@@ -416,28 +416,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -455,7 +458,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -473,7 +476,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/overview/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -501,7 +504,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/ecs/" class="md-nav__link">
+      <a href="../ecs/" class="md-nav__link">
         
   
   
@@ -529,7 +532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/serverless/" class="md-nav__link">
+      <a href="../serverless/" class="md-nav__link">
         
   
   
@@ -557,7 +560,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/comparison/" class="md-nav__link">
+      <a href="../comparison/" class="md-nav__link">
         
   
   
@@ -582,10 +585,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../architecture/aws-services/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services AWS utilisés
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -601,6 +631,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compute-conteneurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧱 Compute &amp; Conteneurs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reseau-acces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🌐 Réseau &amp; Accès
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stockage-bases-de-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🗄️ Stockage &amp; Bases de données
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-certificats-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 DNS, Certificats &amp; IAM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observabilite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Observabilité
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#images-artefacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Images &amp; Artefacts
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -702,7 +818,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../guide/quickstart/" class="md-nav__link">
         
   
   
@@ -963,31 +1079,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1005,7 +1118,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1023,7 +1136,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../guide/quickstart/" class="md-nav__link">
         
   
   
@@ -1048,37 +1161,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Gestion des simulations
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../guide/simulations/" class="md-nav__link">
         
   
   
@@ -1094,70 +1180,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table des matières
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#concepts-cles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🧩 Concepts clés
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#actions-possibles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎮 Actions possibles
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cycle-de-vie-dun-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🔁 Cycle de vie d'un run
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#points-interessants-a-mentionner" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🧠 Points intéressants à mentionner
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1170,7 +1192,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../grafana/" class="md-nav__link">
+      <a href="../../guide/grafana/" class="md-nav__link">
         
   
   
@@ -1198,7 +1220,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../troubleshooting.md" class="md-nav__link">
+      <a href="../../guide/troubleshooting.md" class="md-nav__link">
         
   
   
@@ -1370,10 +1392,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#concepts-cles" class="md-nav__link">
+  <a href="#compute-conteneurs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧩 Concepts clés
+        🧱 Compute &amp; Conteneurs
       
     </span>
   </a>
@@ -1381,10 +1403,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#actions-possibles" class="md-nav__link">
+  <a href="#reseau-acces" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎮 Actions possibles
+        🌐 Réseau &amp; Accès
       
     </span>
   </a>
@@ -1392,10 +1414,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cycle-de-vie-dun-run" class="md-nav__link">
+  <a href="#stockage-bases-de-donnees" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔁 Cycle de vie d'un run
+        🗄️ Stockage &amp; Bases de données
       
     </span>
   </a>
@@ -1403,10 +1425,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#points-interessants-a-mentionner" class="md-nav__link">
+  <a href="#dns-certificats-iam" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧠 Points intéressants à mentionner
+        🔐 DNS, Certificats &amp; IAM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observabilite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Observabilité
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#images-artefacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Images &amp; Artefacts
       
     </span>
   </a>
@@ -1433,61 +1477,90 @@
   
 
 
-<h1 id="gestion-des-simulations">Gestion des simulations<a class="headerlink" href="#gestion-des-simulations" title="Permanent link">&para;</a></h1>
-<p>Cette page décrit la logique métier autour des <strong>simulations (runs)</strong>, vue côté utilisateur et côté architecture.</p>
-<h2 id="concepts-cles">🧩 Concepts clés<a class="headerlink" href="#concepts-cles" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Run</strong> : une simulation de capteurs sur une période donnée (ex: 60s avec une mesure toutes les 5s)</li>
-<li><strong>Sensor</strong> : un capteur logique (température, multi-mesures, etc.)</li>
-<li><strong>User</strong> : actuellement, tous les utilisateurs partagent la même "piscine" de runs (limite globale à 5), mais le header <code>X-User</code> permet de tracer qui a lancé quoi.</li>
-</ul>
-<h2 id="actions-possibles">🎮 Actions possibles<a class="headerlink" href="#actions-possibles" title="Permanent link">&para;</a></h2>
-<p>Depuis le frontend, l'utilisateur peut :</p>
-<ol>
-<li><strong>Vérifier s'il peut démarrer une simulation</strong><br />
-   → Endpoint <code>/api/runs/can-start</code> qui renvoie :</li>
-<li><code>canStart</code> (booléen)</li>
-<li><code>currentRunning</code> (nombre de runs actifs)</li>
-<li>
-<p><code>maxAllowed</code> (limite globale, 5)</p>
-</li>
-<li>
-<p><strong>Démarrer une simulation</strong><br />
-   → <code>/api/runs/start</code> avec la durée et l'intervalle. Le backend :</p>
-</li>
-<li>Vérifie la limite</li>
-<li>Crée un run <code>RUNNING</code> dans la base (PostgreSQL ou DynamoDB selon le mode)</li>
-<li>
-<p>Génère une URL Grafana pré-filtrée sur ce run</p>
-</li>
-<li>
-<p><strong>Lister les simulations en cours</strong><br />
-   → <code>/api/runs/running</code> pour voir les runs <code>RUNNING</code>.</p>
-</li>
-<li>
-<p><strong>Terminer une simulation</strong><br />
-   → <code>/api/runs/{id}/finish</code> pour passer le run à <code>COMPLETED</code>.</p>
-</li>
-<li>
-<p><strong>Interrompre toutes les simulations</strong><br />
-   → <code>/api/runs/interrupt-all</code> qui met à jour tous les runs <code>RUNNING</code> vers <code>INTERRUPTED</code>.</p>
-</li>
-</ol>
-<h2 id="cycle-de-vie-dun-run">🔁 Cycle de vie d'un run<a class="headerlink" href="#cycle-de-vie-dun-run" title="Permanent link">&para;</a></h2>
-<p>États principaux d'un run :</p>
-<ul>
-<li><code>RUNNING</code> : simulation active</li>
-<li><code>COMPLETED</code> : s'est terminée normalement</li>
-<li><code>FAILED</code> : erreur (ex: problème technique)</li>
-<li><code>INTERRUPTED</code> : arrêt manuel via l'API</li>
-</ul>
-<p>En entretien, tu peux insister sur le fait que <strong>cette logique métier est identique</strong> en ECS et en Serverless, ce qui renforce la comparaison technique entre les deux architectures.</p>
-<h2 id="points-interessants-a-mentionner">🧠 Points intéressants à mentionner<a class="headerlink" href="#points-interessants-a-mentionner" title="Permanent link">&para;</a></h2>
-<ul>
-<li>La <strong>limite globale à 5 runs</strong> illustre la gestion d'un quota simple côté backend.</li>
-<li><code>X-User</code> est déjà en place pour préparer une évolution vers des quotas par utilisateur.</li>
-<li>Chaque run est lié à une <strong>URL Grafana</strong> spécifique, ce qui crée un pont clair entre la couche métier et l'observabilité.</li>
-</ul>
+<h1 id="services-aws-utilises">Services AWS utilisés<a class="headerlink" href="#services-aws-utilises" title="Permanent link">&para;</a></h1>
+<p>Cette page résume les principaux services AWS du projet et leur rôle, pour pouvoir les citer rapidement en entretien.</p>
+<h2 id="compute-conteneurs">🧱 Compute &amp; Conteneurs<a class="headerlink" href="#compute-conteneurs" title="Permanent link">&para;</a></h2>
+<p><strong>ECS Fargate</strong><br />
+- Sert à exécuter les conteneurs :
+  - Application Spring Boot (mode ECS classique)
+  - Prometheus
+  - Grafana (mode ECS, y compris pour le monitoring serverless)
+- Permet de bénéficier de conteneurs managés <strong>sans gérer d’instances EC2</strong>.</p>
+<p><strong>AWS Lambda</strong><br />
+- Utilisé pour le backend Serverless :
+  - <code>lambda_run_api</code> : gestion des runs (can-start, start, finish, interrupt-all)
+  - <code>lambda_sensor_api</code> : ingestion des données capteurs
+- Facturation <strong>à l’appel et au temps d’exécution</strong>.</p>
+<h2 id="reseau-acces">🌐 Réseau &amp; Accès<a class="headerlink" href="#reseau-acces" title="Permanent link">&para;</a></h2>
+<p><strong>VPC (Virtual Private Cloud)</strong><br />
+- Fournit un réseau isolé pour :
+  - ECS + RDS (mode ECS)
+  - Grafana serverless (VPC dédié)
+- Sépare <strong>subnets publics</strong> (ALB, NAT) et <strong>subnets privés</strong> (ECS, RDS, Grafana).</p>
+<p><strong>Subnets publics / privés</strong><br />
+- <strong>Publics</strong> : ressources exposées (ALB, NAT Gateway).
+- <strong>Privés</strong> : ressources sensibles (ECS tasks, RDS, Grafana).</p>
+<p><strong>NAT Gateway</strong><br />
+- Permet aux ressources en subnets privés (ECS, Grafana) de sortir sur Internet (par exemple pour télécharger des images, plugins, etc.) <strong>sans être exposées directement</strong>.</p>
+<p><strong>Application Load Balancer (ALB)</strong><br />
+- Point d’entrée HTTP/HTTPS de l’architecture ECS et de Grafana serverless.
+- Fait la terminaison TLS (certificat ACM) et distribue le trafic vers les tâches ECS.</p>
+<p><strong>API Gateway</strong><br />
+- Point d’entrée HTTP/HTTPS pour le backend Serverless.
+- Route vers les Lambdas avec intégration REST.
+- Gère les aspects CORS, throttling, monitoring côté API.</p>
+<h2 id="stockage-bases-de-donnees">🗄️ Stockage &amp; Bases de données<a class="headerlink" href="#stockage-bases-de-donnees" title="Permanent link">&para;</a></h2>
+<p><strong>RDS PostgreSQL</strong><br />
+- Base de données relationnelle pour l’architecture ECS.
+- Stocke les entités classiques : <code>runs</code>, <code>sensor_data</code>, etc.</p>
+<p><strong>DynamoDB</strong><br />
+- Base NoSQL pour l’architecture Serverless.
+- Deux tables principales :
+  - <code>Runs</code> : métadonnées des simulations
+  - <code>SensorData</code> : mesures des capteurs
+- Mode on-demand (pay-per-request), parfaitement adapté à Lambda.</p>
+<p><strong>S3</strong><br />
+- Utilisé pour stocker l’<strong>état Terraform</strong> (remote backend).
+- Permet d’avoir un historique centralisé des déploiements infra.</p>
+<h2 id="dns-certificats-iam">🔐 DNS, Certificats &amp; IAM<a class="headerlink" href="#dns-certificats-iam" title="Permanent link">&para;</a></h2>
+<p><strong>Route53</strong><br />
+- Gère le domaine <code>sentori-studio.com</code> et les sous-domaines :
+  - <code>app-iot.sentori-studio.com</code> (frontend)
+  - <code>api-lambda-iot.sentori-studio.com</code> (API Serverless)
+  - <code>grafana-lambda-iot.sentori-studio.com</code> (Grafana serverless)</p>
+<p><strong>AWS Certificate Manager (ACM)</strong><br />
+- Fournit les certificats SSL/TLS pour les sous-domaines du projet.
+- Intégré à ALB et API Gateway pour du HTTPS de bout en bout.</p>
+<p><strong>IAM (Identity and Access Management)</strong><br />
+- Définit les rôles et policies pour :
+  - Lambdas (accès DynamoDB, CloudWatch)
+  - ECS tasks (accès CloudWatch, ECR)
+  - Terraform (droits de création/suppression des ressources)</p>
+<h2 id="observabilite">📊 Observabilité<a class="headerlink" href="#observabilite" title="Permanent link">&para;</a></h2>
+<p><strong>CloudWatch</strong><br />
+- Collecte les <strong>logs des Lambdas</strong> et des conteneurs ECS.
+- Expose des métriques (invocations, erreurs, latence, capacité DynamoDB…).
+- Sert de datasource pour Grafana en mode Serverless.</p>
+<p><strong>Prometheus</strong><br />
+- Déployé dans le VPC ECS.
+- Scrape les métriques Spring Boot (<code>/actuator/prometheus</code>).
+- Sert de datasource pour Grafana en mode ECS.</p>
+<p><strong>Grafana</strong><br />
+- Unifié pour les deux architectures :
+  - Datasource Prometheus (ECS)
+  - Datasource CloudWatch (Serverless)
+- Affiche des dashboards centrés sur le métier : Sensor, User, Run.</p>
+<h2 id="images-artefacts">📦 Images &amp; Artefacts<a class="headerlink" href="#images-artefacts" title="Permanent link">&para;</a></h2>
+<p><strong>ECR (Elastic Container Registry)</strong><br />
+- Stocke les images Docker :
+  - Application Spring Boot
+  - Grafana (image custom pour le mode serverless)
+- Intégré à ECS pour le déploiement des tâches.</p>
+<hr />
+<p>Cette page te donne un <strong>résumé rapide par service</strong>, que tu peux dérouler facilement en entretien pour montrer :
+- la couverture fonctionnelle du projet côté AWS,
+- la cohérence entre ECS et Serverless,
+- et le fait que chaque brique a un rôle clair dans l’architecture globale.</p>
 
 
 

@@ -16,7 +16,7 @@
         <link rel="prev" href="../../deployment/github-actions/">
       
       
-        <link rel="next" href="../../guide/quickstart/">
+        <link rel="next" href="../network/">
       
       
         
@@ -578,6 +578,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/aws-services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services AWS utilisés
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -854,10 +882,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#principes-de-design" class="md-nav__link">
+  <a href="#organisation-generale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Principes de design
+        🧱 Organisation générale
       
     </span>
   </a>
@@ -876,10 +904,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#organisation-generale" class="md-nav__link">
+  <a href="#principes-de-design" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧱 Organisation générale
+        🎯 Principes de design
       
     </span>
   </a>
@@ -902,7 +930,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../network.md" class="md-nav__link">
+      <a href="../network/" class="md-nav__link">
         
   
   
@@ -930,7 +958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../database.md" class="md-nav__link">
+      <a href="../database/" class="md-nav__link">
         
   
   
@@ -958,7 +986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../compute.md" class="md-nav__link">
+      <a href="../compute/" class="md-nav__link">
         
   
   
@@ -986,7 +1014,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../monitoring.md" class="md-nav__link">
+      <a href="../monitoring/" class="md-nav__link">
         
   
   
@@ -1331,10 +1359,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#principes-de-design" class="md-nav__link">
+  <a href="#organisation-generale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Principes de design
+        🧱 Organisation générale
       
     </span>
   </a>
@@ -1353,10 +1381,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#organisation-generale" class="md-nav__link">
+  <a href="#principes-de-design" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧱 Organisation générale
+        🎯 Principes de design
       
     </span>
   </a>
@@ -1384,47 +1412,60 @@
 
 
 <h1 id="vue-densemble-des-modules-terraform">Vue d'ensemble des modules Terraform<a class="headerlink" href="#vue-densemble-des-modules-terraform" title="Permanent link">&para;</a></h1>
-<p>Cette section présente la <strong>structure Terraform</strong> du projet sans entrer dans les détails de syntaxe. L'objectif est de montrer comment l'infrastructure est découpée en briques réutilisables.
-En entretien, tu peux t'appuyer sur cette page pour montrer que la partie Terraform est pensée de manière modulaire et maintenable, sans plonger dans le code brut.</p>
-<ul>
-<li><strong>Évolution</strong> : il est facile d'ajouter un nouvel environnement (ex: <code>serverless-staging</code>) en réutilisant les mêmes briques.</li>
-<li><strong>Réutilisation</strong> : les mêmes modules réseau / sécurité servent à ECS et Grafana serverless.</li>
-<li><strong>Séparation des responsabilités</strong> : réseau, compute, BDD, monitoring sont dans des modules dédiés.</li>
-</ul>
-<h2 id="principes-de-design">🎯 Principes de design<a class="headerlink" href="#principes-de-design" title="Permanent link">&para;</a></h2>
-<p><code>└── ...
-    │   └── vpc/            # VPC dédié Grafana serverless
-    │   ├── api_gateway_lambda_iot/
-    │   ├── lambda_sensor_api/
-    │   ├── lambda_run_api/
-    │   ├── dynamodb_tables/
-    ├── serverless/
-    ├── grafana_ecs/        # Grafana sur ECS (classique + serverless)
-    ├── alb/                # Application Load Balancer
-    ├── acm_certificate/    # Certificats ACM
-    ├── database/           # RDS PostgreSQL
-    ├── ecs/                # Cluster ECS de base
-    ├── network/            # VPC, subnets, route tables
-└── modules/
-│   └── inframanager-dev/   # Infra Manager pour ECS
-│   ├── serverless-dev/     # Environnement Lambda
-│   ├── dev/                # Environnement ECS
-├── envs/
-infra/</code>text</p>
-<h2 id="arborescence-simplifiee">📂 Arborescence (simplifiée)<a class="headerlink" href="#arborescence-simplifiee" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Garder une <strong>cohérence</strong> entre les environnements (<code>dev</code>, <code>serverless-dev</code>, <code>inframanager-dev</code>, ...)</li>
-<li>
-<p>Recomposer facilement une <strong>architecture ECS</strong> ou <strong>Serverless</strong>
-L'idée est de pouvoir :</p>
-</li>
-<li>
-<p>Modules "serverless" (Lambda, DynamoDB, API Gateway, Grafana serverless)</p>
-</li>
-<li>Modules "classiques" (ECS, RDS, réseau, etc.)</li>
-</ul>
-<p>Le répertoire <code>infra/modules/</code> contient des modules utilisés par plusieurs environnements :</p>
+<p>Cette section présente la <strong>structure Terraform</strong> du projet sans entrer dans les détails de syntaxe. L'objectif est de montrer comment l'infrastructure est découpée en briques réutilisables.</p>
+<p>En entretien, tu peux t'appuyer sur cette page pour montrer que la partie Terraform est pensée de manière modulaire et maintenable, sans plonger dans le code brut.</p>
 <h2 id="organisation-generale">🧱 Organisation générale<a class="headerlink" href="#organisation-generale" title="Permanent link">&para;</a></h2>
+<p>Le répertoire <code>infra/modules/</code> contient des modules utilisés par plusieurs environnements :</p>
+<ul>
+<li>Modules « classiques » : réseau, ECS, RDS, ALB, certificats, Grafana ECS…</li>
+<li>Modules « serverless » : DynamoDB, Lambdas, API Gateway, VPC dédié Grafana…</li>
+</ul>
+<p>L'idée est de pouvoir :
+- Recomposer facilement une <strong>architecture ECS</strong> ou <strong>Serverless</strong>
+- Garder une <strong>cohérence</strong> entre les environnements (<code>dev</code>, <code>serverless-dev</code>, <code>inframanager-dev</code>, ...)
+- Faire évoluer l’infra en ajoutant un nouvel environnement (ex: <code>serverless-staging</code>) en réutilisant les mêmes briques.</p>
+<h2 id="arborescence-simplifiee">📂 Arborescence (simplifiée)<a class="headerlink" href="#arborescence-simplifiee" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>infra/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── envs/
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── dev/                # Environnement ECS classique
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── serverless-dev/     # Environnement Serverless (Lambda)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   └── inframanager-dev/   # Environnement Infra Manager ECS
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>└── modules/
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    ├── network/            # VPC, subnets, route tables
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    ├── ecs/                # Cluster ECS de base
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    ├── database/           # RDS PostgreSQL
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ├── alb/                # Application Load Balancer
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    ├── acm_certificate/    # Certificats ACM
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    ├── grafana_ecs/        # Grafana sur ECS (mode classique + serverless)
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    └── serverless/
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        ├── dynamodb_tables/
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        ├── lambda_run_api/
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        ├── lambda_sensor_api/
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        ├── api_gateway_lambda_iot/
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        └── vpc/            # VPC dédié Grafana serverless
+</code></pre></div>
+<h2 id="principes-de-design">🎯 Principes de design<a class="headerlink" href="#principes-de-design" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Séparation des responsabilités</strong> :</li>
+<li><code>network</code> pour le réseau</li>
+<li><code>ecs</code> / <code>database</code> / <code>alb</code> pour le backend ECS</li>
+<li><code>serverless/*</code> pour la partie Lambda + DynamoDB + API Gateway</li>
+<li>
+<p><code>grafana_ecs</code> pour la brique d’observabilité commune</p>
+</li>
+<li>
+<p><strong>Réutilisation</strong> :</p>
+</li>
+<li>Les mêmes modules réseau / sécurité servent à ECS et Grafana serverless.</li>
+<li>
+<p>Les modules serverless peuvent être branchés sur d'autres environnements futurs.</p>
+</li>
+<li>
+<p><strong>Lisibilité</strong> :</p>
+</li>
+<li>Chaque environnement (<code>dev</code>, <code>serverless-dev</code>, <code>inframanager-dev</code>) assemble ces briques de manière déclarative dans son propre <code>main.tf</code>.</li>
+</ul>
+<p>En un coup d’œil, cette page doit te permettre d’expliquer <strong>comment est structurée l’infra</strong> sans ouvrir un seul fichier <code>.tf</code> pendant l’entretien.</p>
 
 
 
