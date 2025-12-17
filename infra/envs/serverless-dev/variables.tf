@@ -34,4 +34,10 @@ variable "grafana_url" {
   default     = "http://localhost:3000"
 }
 
+variable "grafana_domain_name" {
+  description = "Nom de domaine pour Grafana (ex: grafana-lambda-iot.sentori-studio.com)"
+  type        = string
+  default     = ""
+}
+
 

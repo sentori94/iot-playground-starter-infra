@@ -7,5 +7,6 @@ route53_zone_name      = "sentori-studio.com"
 lambda_api_domain_name = "api-lambda-iot.sentori-studio.com"
 
 # Grafana - URL de base pour les dashboards
-grafana_url = "http://grafana-grafana-serverless-dev-20113386.eu-west-3.elb.amazonaws.com"
+grafana_domain_name = "grafana-lambda-iot.sentori-studio.com"
+grafana_url         = "https://grafana-lambda-iot.sentori-studio.com"
 

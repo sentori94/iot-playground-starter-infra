@@ -89,13 +89,13 @@ resource "aws_iam_role_policy" "grafana_cloudwatch" {
 # ===========================
 # Data: Certificat ACM (depuis serverless-dev)
 # ===========================
-# DÉSACTIVÉ - Décommenter quand le certificat sera créé par serverless-dev
-# data "aws_acm_certificate" "lambda_api" {
-#   count       = 1
-#   domain      = "sentori-studio.com"
-#   statuses    = ["ISSUED"]
-#   most_recent = true
-# }
+# On récupère le certificat wildcard *.sentori-studio.com créé par serverless-dev
+data "aws_acm_certificate" "lambda_api" {
+  count       = var.grafana_domain_name != "" ? 1 : 0
+  domain      = "*.${var.route53_zone_name}"
+  statuses    = ["ISSUED"]
+  most_recent = true
+}
 
 # ===========================
 # Data: Route53 Zone
@@ -120,9 +120,9 @@ module "grafana_serverless" {
   grafana_image_uri      = var.grafana_image_uri
   grafana_image_tag      = var.grafana_image_tag
   grafana_admin_password = var.grafana_admin_password
-  custom_domain_name     = ""  # Désactivé - utilisera l'URL ALB
-  certificate_arn        = ""
-  route53_zone_id        = ""
+  custom_domain_name     = var.grafana_domain_name
+  certificate_arn        = var.grafana_domain_name != "" && length(data.aws_acm_certificate.lambda_api) > 0 ? data.aws_acm_certificate.lambda_api[0].arn : ""
+  route53_zone_id        = var.route53_zone_name != "" && length(data.aws_route53_zone.main) > 0 ? data.aws_route53_zone.main[0].zone_id : ""
   grafana_task_role_arn  = aws_iam_role.grafana_cloudwatch.arn
   tags                   = local.common_tags
 }

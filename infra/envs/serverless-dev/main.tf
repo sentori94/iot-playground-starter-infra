@@ -24,15 +24,18 @@ module "dynamodb_tables" {
 }
 
 # ===========================
-# Certificat ACM - Nouveau certificat pour lambdas
+# Certificat ACM - Wildcard pour couvrir lambdas ET grafana
 # ===========================
 module "acm_lambda_api" {
-  count  = var.lambda_api_domain_name != "" && var.route53_zone_name != "" ? 1 : 0
+  count  = var.route53_zone_name != "" ? 1 : 0
   source = "../../modules/acm_certificate"
 
-  domain_name     = var.lambda_api_domain_name
+  domain_name     = "*.${var.route53_zone_name}"  # Wildcard: *.sentori-studio.com
   route53_zone_id = data.aws_route53_zone.main[0].zone_id
-  tags            = local.common_tags
+  tags            = merge(local.common_tags, {
+    Name = "Wildcard certificate for ${var.route53_zone_name}"
+    Usage = "Lambda API & Grafana"
+  })
 }
 
 # ===========================
