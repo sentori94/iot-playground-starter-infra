@@ -741,25 +741,21 @@
 - l’ensemble de la plateforme est <strong>pilotable depuis GitHub</strong>.</p>
 <h2 id="vue-densemble">🔄 Vue d’ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">¶</a></h2>
 <pre class="mermaid"><code>graph TD
-    DEV[Développeur] --&gt;|Push / Run workflow| GA[GitHub Actions]
+    A[Développeur] --&gt;|Push / Run workflow| B[GitHub Actions]
 
-    GA --&gt; S[Serverless&lt;br/&gt;(deploy/destroy)]
-    GA --&gt; E[ECS &amp; Infra Manager]
-    GA --&gt; O[Observabilité&lt;br/&gt;(Grafana/Prometheus)]
-    GA --&gt; C[CDN / Frontend]
-    GA --&gt; D[Documentation]
+    B --&gt; C{Workflow}
 
-    S --&gt; INF_SLSS[Infra Serverless]
-    E --&gt; INF_ECS[Infra ECS]
-    O --&gt; OBS[Stack Monitoring]
-    C --&gt; FRONT[Frontend déployé]
-    D --&gt; DOC[Site de documentation]
+    C --&gt;|Serverless&lt;br/&gt;Deploy| D[Deploy Serverless]
+    C --&gt;|Serverless&lt;br/&gt;Destroy| E[Destroy Serverless]
+    C --&gt;|Documentation| F[Deploy Docs]
 
-    style S fill:#e8f5e9
-    style E fill:#fff3e0
-    style O fill:#e3f2fd
-    style C fill:#f3e5f5
-    style D fill:#e0f7fa</code></pre>
+    D --&gt; G[Infra Serverless à jour]
+    E --&gt; H[Infra Serverless détruite]
+    F --&gt; I[Site MkDocs publié]
+
+    style D fill:#e8f5e9
+    style E fill:#ffe0b2
+    style F fill:#e3f2fd</code></pre>
 <h2 id="securite-vue-haute-niveau">🔐 Sécurité (vue haute niveau)<a class="headerlink" href="#securite-vue-haute-niveau" title="Permanent link">¶</a></h2>
 <p>Les workflows utilisent un rôle AWS technique via des <strong>secrets GitHub</strong> (Access Key / Secret Key) pour exécuter Terraform et les commandes AWS/Docker côté CI. L’historique complet des exécutions est visible dans l’onglet <strong>Actions</strong> du repository.</p>
 </article>
