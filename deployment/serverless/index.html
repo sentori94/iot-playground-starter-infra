@@ -7,11 +7,11 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="Infrastructure as Code pour IoT Playground - Architecture ECS vs Serverless" name="description"/>
 <meta content="Sentori Studio" name="author"/>
-<link href="../../architecture/aws-services/" rel="prev"/>
-<link href="../serverless/" rel="next"/>
+<link href="../ecs/" rel="prev"/>
+<link href="../github-actions/" rel="next"/>
 <link href="../../assets/images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.6.1, mkdocs-material-9.7.0" name="generator"/>
-<title>Infrastructure ECS - IoT Playground Infrastructure</title>
+<title>Infrastructure Serverless - IoT Playground Infrastructure</title>
 <link href="../../assets/stylesheets/main.618322db.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -24,7 +24,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#deploiement-infrastructure-ecs">
+<a class="md-skip" href="#infrastructure-serverless">
           Aller au contenu
         </a>
 </div>
@@ -48,7 +48,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Infrastructure ECS
+              Infrastructure Serverless
             
           </span>
 </div>
@@ -133,7 +133,7 @@
         </a>
 </li>
 <li class="md-tabs__item md-tabs__item--active">
-<a class="md-tabs__link" href="./">
+<a class="md-tabs__link" href="../ecs/">
           
   
   
@@ -315,13 +315,25 @@
 
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ecs/">
+<span class="md-ellipsis">
+    
+  
+    Infrastructure ECS
+  
+
+    
+  </span>
+</a>
+</li>
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
 <label class="md-nav__link md-nav__link--active" for="__toc">
 <span class="md-ellipsis">
     
   
-    Infrastructure ECS
+    Infrastructure Serverless
   
 
     
@@ -332,7 +344,7 @@
 <span class="md-ellipsis">
     
   
-    Infrastructure ECS
+    Infrastructure Serverless
   
 
     
@@ -345,148 +357,61 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#infrastructure-manager">
+<a class="md-nav__link" href="#objectif">
 <span class="md-ellipsis">
       
-        🎯 Infrastructure Manager
-      
-    </span>
-</a>
-<nav aria-label="🎯 Infrastructure Manager" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#principe-de-fonctionnement">
-<span class="md-ellipsis">
-      
-        Principe de Fonctionnement
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#cycle-de-vie">
-<span class="md-ellipsis">
-      
-        🔄 Cycle de Vie
-      
-    </span>
-</a>
-<nav aria-label="🔄 Cycle de Vie" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#demarrage-de-linfrastructure">
-<span class="md-ellipsis">
-      
-        Démarrage de l'Infrastructure
+        🎯 Objectif
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#arret-de-linfrastructure">
+<a class="md-nav__link" href="#composants-principaux">
 <span class="md-ellipsis">
       
-        Arrêt de l'Infrastructure
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#etats-de-linfrastructure">
-<span class="md-ellipsis">
-      
-        📊 États de l'Infrastructure
+        🧱 Composants principaux
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#api-infrastructure-manager">
+<a class="md-nav__link" href="#schema-darchitecture">
 <span class="md-ellipsis">
       
-        🎛️ API Infrastructure Manager
-      
-    </span>
-</a>
-<nav aria-label="🎛️ API Infrastructure Manager" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#get-infrastatus">
-<span class="md-ellipsis">
-      
-        GET /infra/status
+        🗺️ Schéma d’architecture
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#post-infrastart">
+<a class="md-nav__link" href="#cycle-de-vie-dune-simulation">
 <span class="md-ellipsis">
       
-        POST /infra/start
+        🔄 Cycle de vie d’une simulation
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#post-infrastop">
+<a class="md-nav__link" href="#infrastructure-as-code">
 <span class="md-ellipsis">
       
-        POST /infra/stop
+        🧩 Infrastructure as Code
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deploiement-vue-conceptuelle">
+<span class="md-ellipsis">
+      
+        🚀 Déploiement (vue conceptuelle)
       
     </span>
 </a>
 </li>
 </ul>
 </nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#optimisation-des-couts">
-<span class="md-ellipsis">
-      
-        💰 Optimisation des Coûts
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#deploiement-de-linfrastructure-manager">
-<span class="md-ellipsis">
-      
-        🚀 Déploiement de l'Infrastructure Manager
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#liens">
-<span class="md-ellipsis">
-      
-        🔗 Liens
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../serverless/">
-<span class="md-ellipsis">
-    
-  
-    Infrastructure Serverless
-  
-
-    
-  </span>
-</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../github-actions/">
@@ -716,130 +641,55 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#infrastructure-manager">
+<a class="md-nav__link" href="#objectif">
 <span class="md-ellipsis">
       
-        🎯 Infrastructure Manager
-      
-    </span>
-</a>
-<nav aria-label="🎯 Infrastructure Manager" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#principe-de-fonctionnement">
-<span class="md-ellipsis">
-      
-        Principe de Fonctionnement
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#cycle-de-vie">
-<span class="md-ellipsis">
-      
-        🔄 Cycle de Vie
-      
-    </span>
-</a>
-<nav aria-label="🔄 Cycle de Vie" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#demarrage-de-linfrastructure">
-<span class="md-ellipsis">
-      
-        Démarrage de l'Infrastructure
+        🎯 Objectif
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#arret-de-linfrastructure">
+<a class="md-nav__link" href="#composants-principaux">
 <span class="md-ellipsis">
       
-        Arrêt de l'Infrastructure
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#etats-de-linfrastructure">
-<span class="md-ellipsis">
-      
-        📊 États de l'Infrastructure
+        🧱 Composants principaux
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#api-infrastructure-manager">
+<a class="md-nav__link" href="#schema-darchitecture">
 <span class="md-ellipsis">
       
-        🎛️ API Infrastructure Manager
-      
-    </span>
-</a>
-<nav aria-label="🎛️ API Infrastructure Manager" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#get-infrastatus">
-<span class="md-ellipsis">
-      
-        GET /infra/status
+        🗺️ Schéma d’architecture
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#post-infrastart">
+<a class="md-nav__link" href="#cycle-de-vie-dune-simulation">
 <span class="md-ellipsis">
       
-        POST /infra/start
+        🔄 Cycle de vie d’une simulation
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#post-infrastop">
+<a class="md-nav__link" href="#infrastructure-as-code">
 <span class="md-ellipsis">
       
-        POST /infra/stop
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#optimisation-des-couts">
-<span class="md-ellipsis">
-      
-        💰 Optimisation des Coûts
+        🧩 Infrastructure as Code
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#deploiement-de-linfrastructure-manager">
+<a class="md-nav__link" href="#deploiement-vue-conceptuelle">
 <span class="md-ellipsis">
       
-        🚀 Déploiement de l'Infrastructure Manager
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#liens">
-<span class="md-ellipsis">
-      
-        🔗 Liens
+        🚀 Déploiement (vue conceptuelle)
       
     </span>
 </a>
@@ -851,145 +701,75 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<h1 id="deploiement-infrastructure-ecs">Déploiement Infrastructure ECS<a class="headerlink" href="#deploiement-infrastructure-ecs" title="Permanent link">¶</a></h1>
-<h2 id="infrastructure-manager">🎯 Infrastructure Manager<a class="headerlink" href="#infrastructure-manager" title="Permanent link">¶</a></h2>
-<p>L'infrastructure ECS utilise un système <strong>Infrastructure Manager</strong> qui permet de créer et détruire l'infrastructure complète à la demande via une API.</p>
-<h3 id="principe-de-fonctionnement">Principe de Fonctionnement<a class="headerlink" href="#principe-de-fonctionnement" title="Permanent link">¶</a></h3>
-<p>L'infrastructure ECS n'est <strong>pas toujours active</strong> pour économiser les coûts. Elle peut être démarrée uniquement quand nécessaire via le frontend.</p>
-<pre class="mermaid"><code>graph TB
-    subgraph "Frontend Angular"
-        USER[Utilisateur]
-        BUTTON[Bouton Start/Stop Infrastructure]
-    end
-
-    subgraph "Infrastructure Manager"
-        API[Lambda Infra Manager]
-        SF[Step Functions]
-    end
-
-    subgraph "Infrastructure ECS"
-        STATUS{État Infra}
-        TERRAFORM[Terraform Apply/Destroy]
-        INFRA[ECS + RDS + ALB]
-    end
-
-    USER --&gt;|Clique| BUTTON
-    BUTTON --&gt;|API Call| API
-
-    API --&gt; STATUS
-
-    STATUS --&gt;|Stopped| TERRAFORM
-    STATUS --&gt;|Running| TERRAFORM
-
-    TERRAFORM --&gt;|Create| INFRA
-    TERRAFORM --&gt;|Destroy| INFRA
-
-    INFRA -.Status.-&gt; API
-    API -.Response.-&gt; BUTTON
-
-    style API fill:#e8f5e9
-    style INFRA fill:#fff3e0</code></pre>
-<h2 id="cycle-de-vie">🔄 Cycle de Vie<a class="headerlink" href="#cycle-de-vie" title="Permanent link">¶</a></h2>
-<h3 id="demarrage-de-linfrastructure">Démarrage de l'Infrastructure<a class="headerlink" href="#demarrage-de-linfrastructure" title="Permanent link">¶</a></h3>
-<ol>
-<li><strong>Frontend</strong> : L'utilisateur clique sur "Démarrer Infrastructure ECS"</li>
-<li><strong>API Call</strong> : Le frontend appelle <code>POST /infra/start</code></li>
-<li><strong>Lambda Manager</strong> : Déclenche un Step Functions workflow</li>
-<li><strong>Terraform Apply</strong> : Crée toutes les ressources (VPC, ECS, RDS, ALB)</li>
-<li><strong>Attente</strong> : Le processus prend ~15 minutes</li>
-<li><strong>Ready</strong> : L'infrastructure est prête, l'API ECS est accessible</li>
-</ol>
-<h3 id="arret-de-linfrastructure">Arrêt de l'Infrastructure<a class="headerlink" href="#arret-de-linfrastructure" title="Permanent link">¶</a></h3>
-<ol>
-<li><strong>Frontend</strong> : L'utilisateur clique sur "Arrêter Infrastructure ECS"</li>
-<li><strong>API Call</strong> : Le frontend appelle <code>POST /infra/stop</code></li>
-<li><strong>Lambda Manager</strong> : Déclenche un Step Functions workflow</li>
-<li><strong>Terraform Destroy</strong> : Supprime toutes les ressources</li>
-<li><strong>Attente</strong> : Le processus prend ~10 minutes</li>
-<li><strong>Stopped</strong> : L'infrastructure est détruite, plus de coûts</li>
-</ol>
-<h2 id="etats-de-linfrastructure">📊 États de l'Infrastructure<a class="headerlink" href="#etats-de-linfrastructure" title="Permanent link">¶</a></h2>
-<table>
-<thead>
-<tr>
-<th>État</th>
-<th>Description</th>
-<th>Actions disponibles</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>STOPPED</strong></td>
-<td>Infrastructure détruite</td>
-<td>Start</td>
-</tr>
-<tr>
-<td><strong>STARTING</strong></td>
-<td>Création en cours (~15 min)</td>
-<td>-</td>
-</tr>
-<tr>
-<td><strong>RUNNING</strong></td>
-<td>Infrastructure active</td>
-<td>Stop, Use API</td>
-</tr>
-<tr>
-<td><strong>STOPPING</strong></td>
-<td>Destruction en cours (~10 min)</td>
-<td>-</td>
-</tr>
-<tr>
-<td><strong>ERROR</strong></td>
-<td>Erreur lors de l'opération</td>
-<td>Retry</td>
-</tr>
-</tbody>
-</table>
-<h2 id="api-infrastructure-manager">🎛️ API Infrastructure Manager<a class="headerlink" href="#api-infrastructure-manager" title="Permanent link">¶</a></h2>
-<h3 id="get-infrastatus">GET <code>/infra/status</code><a class="headerlink" href="#get-infrastatus" title="Permanent link">¶</a></h3>
-<p>Récupère l'état actuel de l'infrastructure ECS.</p>
-<p><strong>Response 200</strong>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="p">{</span>
-<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RUNNING"</span><span class="p">,</span>
-<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api-ecs-iot.sentori-studio.com"</span><span class="p">,</span>
-<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">  </span><span class="nt">"lastUpdate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2025-01-15T10:30:00Z"</span>
-<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="p">}</span>
-</code></pre></div></p>
-<h3 id="post-infrastart">POST <code>/infra/start</code><a class="headerlink" href="#post-infrastart" title="Permanent link">¶</a></h3>
-<p>Démarre l'infrastructure ECS.</p>
-<p><strong>Response 202</strong>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="p">{</span>
-<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Infrastructure starting"</span><span class="p">,</span>
-<a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="nt">"estimatedTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15 minutes"</span>
-<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="p">}</span>
-</code></pre></div></p>
-<h3 id="post-infrastop">POST <code>/infra/stop</code><a class="headerlink" href="#post-infrastop" title="Permanent link">¶</a></h3>
-<p>Arrête l'infrastructure ECS.</p>
-<p><strong>Response 202</strong>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="p">{</span>
-<a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Infrastructure stopping"</span><span class="p">,</span>
-<a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="w">  </span><span class="nt">"estimatedTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10 minutes"</span>
-<a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="p">}</span>
-</code></pre></div></p>
-<h2 id="optimisation-des-couts">💰 Optimisation des Coûts<a class="headerlink" href="#optimisation-des-couts" title="Permanent link">¶</a></h2>
-<p>Ce système permet d'économiser significativement sur les coûts AWS :</p>
+<h1 id="infrastructure-serverless">Infrastructure Serverless<a class="headerlink" href="#infrastructure-serverless" title="Permanent link">¶</a></h1>
+<p>Cette page décrit l’infrastructure Serverless mise en place pour remplacer le backend Spring Boot par des Lambdas Python, tout en gardant la même expérience fonctionnelle côté frontend.</p>
+<h2 id="objectif">🎯 Objectif<a class="headerlink" href="#objectif" title="Permanent link">¶</a></h2>
 <ul>
-<li><strong>Sans Infrastructure Manager</strong> : Infrastructure toujours active = <strong>~$90/mois</strong></li>
-<li><strong>Avec Infrastructure Manager</strong> : Infrastructure active 8h/jour = <strong>~$30/mois</strong></li>
-<li><strong>Usage occasionnel</strong> : Infrastructure active 2h/semaine = <strong>~$5/mois</strong></li>
+<li>Offrir un backend <strong>full serverless</strong> pour l’application IoT Playground</li>
+<li>Conserver les mêmes endpoints REST que l’API Spring Boot</li>
+<li>S’appuyer sur des services managés uniquement (Lambda, DynamoDB, API Gateway, CloudWatch)</li>
 </ul>
-<p>Le coût de l'Infrastructure Manager lui-même (Lambda + Step Functions) est négligeable (~$1/mois).</p>
-<h2 id="deploiement-de-linfrastructure-manager">🚀 Déploiement de l'Infrastructure Manager<a class="headerlink" href="#deploiement-de-linfrastructure-manager" title="Permanent link">¶</a></h2>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>infra/envs/inframanager-dev
-<a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a>terraform<span class="w"> </span>init
-<a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a>terraform<span class="w"> </span>apply
-</code></pre></div>
-<p>Une fois déployé, l'Infrastructure Manager est accessible depuis le frontend et permet de contrôler l'infrastructure ECS à la demande.</p>
-<h2 id="liens">🔗 Liens<a class="headerlink" href="#liens" title="Permanent link">¶</a></h2>
+<h2 id="composants-principaux">🧱 Composants principaux<a class="headerlink" href="#composants-principaux" title="Permanent link">¶</a></h2>
 <ul>
-<li><a href="../../architecture/ecs/">Architecture ECS</a></li>
-<li><a href="../serverless/">Guide Serverless</a></li>
+<li><strong>API Gateway</strong> : point d’entrée HTTPS pour toutes les requêtes <code>/api/...</code></li>
+<li><strong>Lambda Run API</strong> : gère les runs (can-start, start, finish, interrupt-all)</li>
+<li><strong>Lambda Sensor API</strong> : gère l’ingestion des données capteurs</li>
+<li><strong>DynamoDB</strong> : stocke les runs et les mesures (NoSQL, on-demand)</li>
+<li><strong>CloudWatch Logs &amp; Metrics</strong> : centralise les logs et expose les métriques</li>
+<li><strong>Grafana (sur ECS)</strong> : dashboard dédié aux métriques CloudWatch serverless</li>
 </ul>
+<h2 id="schema-darchitecture">🗺️ Schéma d’architecture<a class="headerlink" href="#schema-darchitecture" title="Permanent link">¶</a></h2>
+<pre class="mermaid"><code>graph LR
+    FRONT[Frontend Angular] --&gt;|HTTPS /api/...| APIGW[API Gateway]
+
+    APIGW --&gt;|/api/runs/*| L_RUN[Lambda Run API]
+    APIGW --&gt;|/api/sensors/*| L_SENSOR[Lambda Sensor API]
+
+    L_RUN --&gt; DDB_RUNS[(DynamoDB&lt;br/&gt;Runs)]
+    L_SENSOR --&gt; DDB_DATA[(DynamoDB&lt;br/&gt;SensorData)]
+
+    L_RUN -.logs/metrics.-&gt; CW[CloudWatch]
+    L_SENSOR -.logs/metrics.-&gt; CW
+
+    CW --&gt; GRAF[Grafana ECS]
+
+    style L_RUN fill:#e8f5e9
+    style L_SENSOR fill:#e8f5e9
+    style APIGW fill:#e1f5ff
+    style GRAF fill:#e3f2fd</code></pre>
+<h2 id="cycle-de-vie-dune-simulation">🔄 Cycle de vie d’une simulation<a class="headerlink" href="#cycle-de-vie-dune-simulation" title="Permanent link">¶</a></h2>
+<ol>
+<li><strong>Démarrage</strong> : le frontend appelle <code>/api/runs/start</code> (via API Gateway) → Lambda Run API crée un run <code>RUNNING</code> dans DynamoDB.</li>
+<li><strong>Ingestion</strong> : à chaque intervalle, le frontend envoie <code>/api/sensors/data</code> → Lambda Sensor API enregistre les mesures dans <code>SensorData</code>.</li>
+<li><strong>Monitoring</strong> : les Lambdas émettent des logs et métriques dans CloudWatch → Grafana affiche l’évolution des capteurs (filtré par Run, User, Sensor).</li>
+<li><strong>Fin / interruption</strong> : <code>/api/runs/{id}/finish</code> ou <code>/api/runs/interrupt-all</code> mettent à jour l’état du run dans DynamoDB.</li>
+</ol>
+<h2 id="infrastructure-as-code">🧩 Infrastructure as Code<a class="headerlink" href="#infrastructure-as-code" title="Permanent link">¶</a></h2>
+<p>L’infrastructure Serverless est décrite dans <code>infra/envs/serverless-dev/</code> :</p>
+<ul>
+<li><strong>Modules utilisés</strong> :</li>
+<li><code>serverless/dynamodb_tables</code> pour les tables Runs et SensorData</li>
+<li><code>serverless/lambda_run_api</code> et <code>serverless/lambda_sensor_api</code> pour les fonctions Python</li>
+<li><code>serverless/api_gateway_lambda_iot</code> pour l’API Gateway + mappings</li>
+<li>
+<p><code>acm_certificate</code> et Route53 pour le domaine <code>api-lambda-iot.sentori-studio.com</code></p>
+</li>
+<li>
+<p><strong>Backend Terraform</strong> :</p>
+</li>
+<li>S3 pour l’état (<code>iot-playground-tfstate-serverless</code>)</li>
+<li>Table DynamoDB pour le lock des déploiements</li>
+</ul>
+<h2 id="deploiement-vue-conceptuelle">🚀 Déploiement (vue conceptuelle)<a class="headerlink" href="#deploiement-vue-conceptuelle" title="Permanent link">¶</a></h2>
+<p>Les déploiements sont déclenchés via <strong>GitHub Actions</strong> :</p>
+<ul>
+<li>Workflow <em>Deploy Serverless (Unified)</em> :</li>
+<li><code>component = lambdas</code> → Lambda + DynamoDB + API Gateway</li>
+<li><code>component = full</code> → + Grafana serverless</li>
+<li>Workflow <em>Destroy Serverless</em> :</li>
+<li>Permet de supprimer proprement les ressources quand elles ne sont plus nécessaires.</li>
+</ul>
+<p>L’idée est de pouvoir activer/désactiver rapidement l’environnement serverless pour des démos ou des comparaisons avec l’architecture ECS, sans dépendre de commandes manuelles.</p>
 </article>
 </div>
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
