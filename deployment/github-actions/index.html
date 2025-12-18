@@ -369,10 +369,10 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#resume-des-workflows">
+<a class="md-nav__link" href="#resume-des-workflows-principaux">
 <span class="md-ellipsis">
       
-        📋 Résumé des workflows
+        📋 Résumé des workflows principaux
       
     </span>
 </a>
@@ -614,10 +614,10 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#resume-des-workflows">
+<a class="md-nav__link" href="#resume-des-workflows-principaux">
 <span class="md-ellipsis">
       
-        📋 Résumé des workflows
+        📋 Résumé des workflows principaux
       
     </span>
 </a>
@@ -648,37 +648,120 @@
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
 <h1 id="github-actions-workflows">GitHub Actions Workflows<a class="headerlink" href="#github-actions-workflows" title="Permanent link">¶</a></h1>
-<p>Le projet utilise GitHub Actions pour piloter les déploiements d’infrastructure et la documentation, sans avoir à lancer Terraform manuellement.</p>
-<h2 id="resume-des-workflows">📋 Résumé des workflows<a class="headerlink" href="#resume-des-workflows" title="Permanent link">¶</a></h2>
-<p><strong>Deploy Serverless (Unified)</strong><br/>
-- Déploie l’architecture serverless (Lambdas + DynamoDB + API Gateway, et éventuellement Grafana sur ECS).<br/>
-- Permet de choisir quel composant déployer (<code>lambdas</code>, <code>grafana</code> ou <code>full</code>) et si l’on veut juste un plan ou un apply.</p>
-<p><strong>Destroy Serverless</strong><br/>
-- Détruit l’architecture serverless de façon contrôlée.<br/>
-- Même logique de sélection (<code>lambdas</code>, <code>grafana</code>, <code>full</code>) avec une confirmation explicite avant destruction.</p>
-<p><strong>Deploy MkDocs Documentation</strong><br/>
-- Construit et publie automatiquement la documentation sur GitHub Pages.<br/>
-- Se déclenche sur les changements de la doc ou à la demande.</p>
-<p>Ces trois workflows montrent que toute l’infrastructure (et la doc) est gérée de bout en bout via GitHub, ce qui facilite les démos et les déploiements reproductibles.</p>
+<p>Le projet utilise GitHub Actions pour piloter les déploiements d’infrastructure, les images Docker et la documentation, sans avoir à lancer Terraform ou Docker manuellement.</p>
+<h2 id="resume-des-workflows-principaux">📋 Résumé des workflows principaux<a class="headerlink" href="#resume-des-workflows-principaux" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>Rôle</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>deploy-serverless-unified.yml</code></td>
+<td>Déploie l’architecture serverless (Lambdas + DynamoDB + API Gateway, et éventuellement Grafana ECS) avec un paramètre <code>component</code> (<code>lambdas</code>, <code>grafana</code>, <code>full</code>).</td>
+<td>Serverless</td>
+</tr>
+<tr>
+<td><code>destroy-serverless.yml</code></td>
+<td>Détruit de façon contrôlée les ressources serverless (mêmes composants que ci-dessus, avec confirmation).</td>
+<td>Serverless</td>
+</tr>
+<tr>
+<td><code>deploy-docs.yml</code></td>
+<td>Construit la documentation MkDocs et la publie sur GitHub Pages.</td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td><code>deploy-lambdas.yml</code></td>
+<td>Ancien workflow focalisé uniquement sur les Lambdas (remplacé par le workflow unifié, mais conservé pour historique).</td>
+<td>Serverless (legacy)</td>
+</tr>
+<tr>
+<td><code>deploy-infra-manager.yml</code></td>
+<td>Déploie l’Infrastructure Manager (Lambda + Terraform) qui pilote la création/destruction de l’infra ECS classique.</td>
+<td>ECS / Infra Manager</td>
+</tr>
+<tr>
+<td><code>deploy-cdn.yml</code></td>
+<td>Déploie la partie CDN/front (par exemple l’hébergement du frontend via CloudFront + S3).</td>
+<td>Frontend</td>
+</tr>
+<tr>
+<td><code>build-grafana-image.yml</code></td>
+<td>Construit et pousse l’image Docker Grafana custom vers ECR.</td>
+<td>Observabilité</td>
+</tr>
+<tr>
+<td><code>grafana.yml</code></td>
+<td>Déploiement ou gestion spécifique de Grafana dans l’architecture ECS classique.</td>
+<td>Observabilité (ECS)</td>
+</tr>
+<tr>
+<td><code>prometheus.yml</code></td>
+<td>Déploiement ou mise à jour du conteneur Prometheus pour l’architecture ECS.</td>
+<td>Observabilité (ECS)</td>
+</tr>
+<tr>
+<td><code>bootstrap.yml</code></td>
+<td>Prépare l’environnement Terraform (création des buckets S3, tables DynamoDB de lock, etc.).</td>
+<td>Infra globale</td>
+</tr>
+<tr>
+<td><code>bootstrap-manual.yml</code></td>
+<td>Variante manuelle du bootstrap pour initialiser l’infra de base.</td>
+<td>Infra globale</td>
+</tr>
+<tr>
+<td><code>terraform-destroy.yml</code></td>
+<td>Workflow générique pour lancer des <code>terraform destroy</code> contrôlés sur certains environnements.</td>
+<td>Infra globale</td>
+</tr>
+<tr>
+<td><code>start-resources.yml</code></td>
+<td>Démarre certains composants d’infrastructure (par exemple, remettre des tâches ECS en service).</td>
+<td>Pilotage infra</td>
+</tr>
+<tr>
+<td><code>stop-resources.yml</code></td>
+<td>Arrête certains composants (par exemple, mettre à zéro des services ECS pour réduire les coûts).</td>
+<td>Pilotage infra</td>
+</tr>
+<tr>
+<td><code>list-aws-resources.yml</code></td>
+<td>Utilise un script pour lister les ressources AWS du projet (inventaire, debug).</td>
+<td>Outils</td>
+</tr>
+</tbody>
+</table>
+<p>Cette liste te permet de montrer rapidement que :
+- chaque grande brique du projet (ECS, Serverless, Grafana, CDN, Infra Manager, docs) a son workflow dédié,
+- l’ensemble de la plateforme est <strong>pilotable depuis GitHub</strong>.</p>
 <h2 id="vue-densemble">🔄 Vue d’ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">¶</a></h2>
 <pre class="mermaid"><code>graph TD
-    A[Développeur] --&gt;|Push / Run workflow| B[GitHub Actions]
+    DEV[Développeur] --&gt;|Push / Run workflow| GA[GitHub Actions]
 
-    B --&gt; C{Workflow}
+    GA --&gt; S[Serverless&lt;br/&gt;(deploy/destroy)]
+    GA --&gt; E[ECS &amp; Infra Manager]
+    GA --&gt; O[Observabilité&lt;br/&gt;(Grafana/Prometheus)]
+    GA --&gt; C[CDN / Frontend]
+    GA --&gt; D[Documentation]
 
-    C --&gt;|Serverless&lt;br/&gt;Deploy| D[Deploy Serverless]
-    C --&gt;|Serverless&lt;br/&gt;Destroy| E[Destroy Serverless]
-    C --&gt;|Documentation| F[Deploy Docs]
+    S --&gt; INF_SLSS[Infra Serverless]
+    E --&gt; INF_ECS[Infra ECS]
+    O --&gt; OBS[Stack Monitoring]
+    C --&gt; FRONT[Frontend déployé]
+    D --&gt; DOC[Site de documentation]
 
-    D --&gt; G[Infra Serverless à jour]
-    E --&gt; H[Infra Serverless détruite]
-    F --&gt; I[Site MkDocs publié]
-
-    style D fill:#e8f5e9
-    style E fill:#ffe0b2
-    style F fill:#e3f2fd</code></pre>
+    style S fill:#e8f5e9
+    style E fill:#fff3e0
+    style O fill:#e3f2fd
+    style C fill:#f3e5f5
+    style D fill:#e0f7fa</code></pre>
 <h2 id="securite-vue-haute-niveau">🔐 Sécurité (vue haute niveau)<a class="headerlink" href="#securite-vue-haute-niveau" title="Permanent link">¶</a></h2>
-<p>Les workflows utilisent un rôle AWS technique via des <strong>secrets GitHub</strong> (Access Key / Secret Key) pour exécuter Terraform côté CI. L’historique complet des exécutions est visible dans l’onglet <strong>Actions</strong> du repository.</p>
+<p>Les workflows utilisent un rôle AWS technique via des <strong>secrets GitHub</strong> (Access Key / Secret Key) pour exécuter Terraform et les commandes AWS/Docker côté CI. L’historique complet des exécutions est visible dans l’onglet <strong>Actions</strong> du repository.</p>
 </article>
 </div>
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
